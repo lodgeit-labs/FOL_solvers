@@ -1,21 +1,3 @@
-/*
-╺┳┓┏━╸╺┳╸
- ┃┃┣╸  ┃
-╺┻┛┗━╸ ╹
-have exactly one solution,
-deterministic (det).
-a fully checking implementation.
-*/
-
-/*
-
-% a more abstracted implementation:
-upsides:
-	less code repetition
-	when you step inside a '!', it takes one skip to get to the wrapped call
-downsides:
-	throws don't happen right in the '!' predicate, so you cannot just press 'r' in gtrace to try the call again
-*/
 '!'(X) :-
 	det_with(Call_id, X),
 	call(X),
