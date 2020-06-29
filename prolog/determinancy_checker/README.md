@@ -1,3 +1,6 @@
+### what is this
+a runtime determinancy checker for (SWI) prolog
+
 ### how to use
 (terminology adapted from: https://stackoverflow.com/questions/39804667/has-the-notion-of-semidet-in-prolog-settled )
 #### deterministic (det)
