@@ -1,13 +1,3 @@
-
-/*
-┏━┓┏━╸┏┳┓╻╺┳┓┏━╸╺┳╸
-┗━┓┣╸ ┃┃┃┃ ┃┃┣╸  ┃
-┗━┛┗━╸╹ ╹╹╺┻┛┗━╸ ╹
-either have no solutions or have one solution,
-semideterministic (semidet)
-a fully checking implementation
-*/
-
 '?'(X) :-
 	gensym(determinancy_checker__semideterministic_call__progress, Call_id),
 	determinancy_checker_semidet_with(Call_id),

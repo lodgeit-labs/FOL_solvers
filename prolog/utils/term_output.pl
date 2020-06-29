@@ -1,10 +1,10 @@
 
 
 /* pretty-print term with print_term, capture the output into a string*/
-pretty_term_string(Term, String) :-
+ pretty_term_string(Term, String) :-
 	pretty_term_string(Term, String, []).
 
-pretty_term_string(Term, String, Options) :-
+ pretty_term_string(Term, String, Options) :-
 	setup_call_cleanup(
 		new_memory_file(X),
 		(

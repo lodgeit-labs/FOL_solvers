@@ -1,14 +1,3 @@
-/*
-╺┳┓┏━╸╺┳╸
- ┃┃┣╸  ┃
-╺┻┛┗━╸ ╹
-have exactly one solution,
-deterministic (det).
-a fully checking implementation.
-*/
-
-% first the basic version, then versions with more arguments, used for example in a maplist, ie, the "meta-predicate" ("A meta-predicate is a predicate that calls other predicates dynamically[..]") gets a !something, and it calls the '!' with a bunch of additional arguments
-
 '!'(Callable) :-
 	/*
 	setup and cleanup/throw
@@ -17,7 +6,7 @@ a fully checking implementation.
 	(	nb_setval(Call_id, 0)
 	;	(	nb_getval(Call_id, 1)
 		->	(	nb_delete(Call_id), fail)
-		;	throw_string(error(determinancy_checker(deterministic_call_failed(Callable)),_)))),
+		;	throw(error(determinancy_checker(deterministic_call_failed(Callable)),_)))),
 	/*
 	your call
 	*/
@@ -38,7 +27,7 @@ a fully checking implementation.
 	(	nb_setval(Call_id, 0)
 	;	(	nb_getval(Call_id, 1)
 		->	(	nb_delete(Call_id), fail)
-		;	throw_string(error(deterministic_call_failed((Callable, Arg1)),_)))),
+		;	throw(error(deterministic_call_failed((Callable, Arg1)),_)))),
 	/*
 	your call
 	*/

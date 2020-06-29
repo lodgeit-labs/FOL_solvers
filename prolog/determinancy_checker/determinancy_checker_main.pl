@@ -18,7 +18,6 @@
 :- else.
 :- [determinancy_checker_det_v2].
 :- [determinancy_checker_semidet_v1].
-:- [full].
 :- endif.
 
 
