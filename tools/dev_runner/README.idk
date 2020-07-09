@@ -1,0 +1,17 @@
+swipl_runner.py is a successor to dev_runner.pl
+
+
+
+<div about="http://rdf.lodgeit.net.au/sw_dev/swipl_runner.pl">
+  swipl_runner.py is a sucessor of 
+  <span 
+	property="http://www.ebi.ac.uk/swo/maturity/SWO_9000069"
+	content="http://rdf.lodgeit.net.au/sw_dev/dev_runner.pl"
+	>
+	<span 
+		about="http://rdf.lodgeit.net.au/sw_dev/dev_runner.pl"
+		>
+		dev_runner.pl
+	</span>
+  </span>
+</div>
