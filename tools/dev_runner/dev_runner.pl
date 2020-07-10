@@ -92,17 +92,11 @@ main :-
 	check_syntax(Optimization, Script),
 
 	(	memberchk(compile(true), Opts)
-	->	(
-			run_with_compilation(Optimization, Script, Viewer)
-		)
-	;	not_implemented).
+	->	run_with_compilation(Optimization, Script, Viewer)
+	;	run_without_compilation(Debug, Optimization, Script, Viewer)).
 
 /*
-			shell2([Load_Cmd, ' -g "', Goal, '." ', Redirection]),
 
-			(	nonvar(Viewer)
-			->	(maybe_halt_on_problems, shell2([Viewer, ' arrr.xml']))
-			;	true)
 
 		)
 	;	(
@@ -169,15 +163,88 @@ run_with_compilation(Optimization, Script, Viewer) :-
 			->	Redirection = [' 2>&1  1> arrr.xml']
 			;	Redirection = ''),
 
-			shell2(['./a.out', Redirection], Execution_exit_status),
+			%shell2(['/usr/bin/time -f "user time :%U secs, max ram:%M KB" ./a.out', Redirection], Execution_exit_status),
+			shell2(['/usr/bin/time -v ./a.out', Redirection], Execution_exit_status),
+
 			(	Execution_exit_status = 0
 			->	true
-			;	(format(user_error, 'dev_runner: script exited with non-zero status\n', []), halt(Execution_exit_status)))
+			;	(format(user_error, 'dev_runner: script exited with non-zero status\n', []), halt(Execution_exit_status))),
+
+			(	nonvar(Viewer)
+			->	(maybe_halt_on_problems, shell2([Viewer, ' arrr.xml']))
+			;	true)
+
 		)
 	),
 	halt.
 
 
+run_without_compilation(Debug, Optimization, Script, Viewer) :-
+	opts(Opts),
+	format(user_error, 'dev_runner: running script...\n', []),
+	memberchk(goal(Goal), Opts),
+
+	% if goal is passed and toplevel(true), compile without goal, otherwise compile Goal in
+	(	nonvar(Goal)
+	->	(	memberchk(toplevel(true), Opts)
+		->	Execution_goal = ' '
+		;	atomic_list_concat([' -g "', Goal, '." '], Execution_goal))
+	;	(
+			Execution_goal = '',
+			format(user_error, 'dev_runner: running without goal...\n', [])
+		)
+	),
+
+	(	memberchk(toplevel(true), Opts)
+	->	run_with_toplevel(Debug, Goal, Script)
+	;	(
+			(	nonvar(Viewer)
+			->	Redirection = [' 2>&1  1> arrr.xml']
+			;	Redirection = ''),
+
+			shell2(["swipl", Optimization, Execution_goal, ' -s ', Script, Redirection], Exit_status),
+
+			(	Exit_status = 0
+			->	true
+			;	(format(user_error, 'dev_runner: script failed\n', []), halt(Exit_status))),
+
+			(	nonvar(Viewer)
+			->	(maybe_halt_on_problems, shell2([Viewer, ' arrr.xml']))
+			;	true)
+		)
+	),
+	halt.
+
+
+
+optimization_flag2(Debug, Optimization) :-
+	(	Debug = true
+	->	(
+			Optimization = ['--debug=true'],
+			format(user_error, 'dev_runner: debug is true, no -O...\n', [])
+		)
+	;	(
+			Optimization = ['--debug=false', '-O'],
+			format(user_error, 'dev_runner: debug is false, using -O...\n', [])
+		)
+	).
+
+run_with_toplevel(Debug, Goal, Script) :-
+	optimization_flag2(Debug, Optimization),
+	Args0 = [Optimization, '-s', Script],
+	flatten(Args0, Args),
+	format(user_error, 'dev_runner: running with toplevel with args ~q ...\n', [Args]),
+	process_create(path(swipl), Args, [process(Pid), stdin(pipe(Stdin))]),
+	%write(Stdin, writeln('script output starts below'),
+	write(Stdin, Goal),
+	write(Stdin, '.\n'),
+	write(Stdin, 'a.\n'),
+	write(Stdin, 'halt.\n'),
+	flush_output(Stdin),
+	process_wait(Pid,Status),
+	(	Status = exit(Exit_status)
+	->	halt(Exit_status)
+	;	halt(1)).
 
 
 :- initialization(main).

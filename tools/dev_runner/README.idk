@@ -1,4 +1,4 @@
-swipl_runner.py is a successor to dev_runner.pl
+`swipl_runner.py is a successor to dev_runner.pl`
 
 
 
@@ -15,3 +15,6 @@ swipl_runner.py is a successor to dev_runner.pl
 	</span>
   </span>
 </div>
+
+
+note: don't try hard to find a matching ontology/term on the first time. use the mamespace http://rdf.lodgeit.net.au/misc or whatever, just mint your own, and align later.
