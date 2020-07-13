@@ -18,3 +18,14 @@
 
 
 note: don't try hard to find a matching ontology/term on the first time. use the mamespace http://rdf.lodgeit.net.au/misc or whatever, just mint your own, and align later.
+
+
+
+question then is if we want to link to, let's say the github page where dev_runner.pl can be seen, or we want to mint a new resource for it, ie <http://rdf.lodgeit.net.au/sw_dev/dev_runner.pl>. And if we want to treat the github link as a resource, ie, attach additional properties to it later. Minting a new resource is the more future-proof way, for one.
+confer:
+	https://www.w3.org/TR/cooluris/
+	https://www.w3.org/TR/ld-bp/
+	https://wiki.pro-ibiosphere.eu/wiki/Best_practices_for_stable_URIs
+	https://www.researchgate.net/publication/221466459_Making_URIs_Published_on_Data_Web_RDF_Dereferencable/link/0deec523127365156e000000/download
+	https://www.ebi.ac.uk/rdf/documentation/good_practice_uri/
+	
