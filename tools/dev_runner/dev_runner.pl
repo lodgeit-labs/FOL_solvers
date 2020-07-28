@@ -1,5 +1,9 @@
 #!/usr/bin/env swipl
 
+/*
+not all permutations of compilation and toplevel options are implemented. Compilation would be useful if swipl reported all errors, including DCG errors, upon loading, without a need to call 'make'. Right now, it is useless, and it gives no speed improvement.
+*/
+
 :- multifile user:message_hook/3.
 user:message_hook(initialization_error(_,X,_),Kind,_) :- print_message(Kind,X),halt(1).
 user:message_hook(string(S),_,_) :- format(user_error,'ERROR: ~w~n', [S]).

@@ -1,21 +1,122 @@
-:- op(900,xfx,<=).
+:- dynamic pyco3_rule/7.
+:- multifile r/1.
+
+%:- use_module(library(semweb/rdf11),except(['{}'/1])).
 :- use_module(library(fnotation)).
 :- fnotation_ops($>,<$).
 :- op(900,fx,<$).
 
 
-:- discontiguous pyco0_rule/2.
-:- discontiguous pyco0_rule/3.
-:- multifile pyco0_rule/2.
-:- multifile pyco0_rule/3.
+
+
+/*
+compile-time clause expansion, produces 'pyco3_rule' terms from 'r' declarations
+*/
+
+:- ['../utils/compile_with_variable_names_preserved.pl'].
+
+user:term_expansion(P, pyco3_rule(Id, Head, Body, Notes, Cnls, Names, Preps)) :-
+	P =.. [r|X],
+	gensym(r, Id),
+	term_variables(P, Vars),
+	maplist(try_get_variable_naming, Vars, Names),
+	p_decl_to_rule2(X, Head, Body, Notes, Cnls, Preps),
+	assertion(nonvar(Head)).
+
+try_get_variable_naming(Var, (Name = Var)) :-
+	var_property(Var, name(Name)),
+	!.
+try_get_variable_naming(Var, ('_' = Var)).
+
+
+/*
+expand the declarations.
+*/
+
+/*
+make "bc" a note. "bc" stands for "base case". Our code doesn't make any use of this information for now.
+*/
+p_decl_to_rule2(
+	[H|T],
+	Head,
+	Body,
+	Notes,
+	Cnls,
+	Preps
+) :-
+	H = bc,!,
+	p_decl_to_rule2(
+		[n - bc|T],
+		Head,
+		Body,
+		Notes,
+		Cnls,
+		Preps
+	).
+
+/* collect notes */
+p_decl_to_rule2([H|T], Head, Body, [Note|Notes], Cnls, Preps) :-
+	H = n - Note,!,
+	p_decl_to_rule2(T, Head, Body, Notes, Cnls, Preps).
+
+/* collect cnl syntaxes */
+p_decl_to_rule2([H|T], Head, Body, Notes, [(Lang - Cnl)|Cnls], Preps) :-
+	H = lang(Lang) - Cnl,!,
+	p_decl_to_rule2(T, Head, Body, Notes, Cnls, Preps).
+
+/* collect head with existential */
+p_decl_to_rule2([H|T], Head, Body, Notes, Cnls, Preps) :-
+	var(Head),
+	gtrace,
+	existential_head_and_prep(H, Head, Prep),
+	!,
+	p_decl_to_rule2([prep - Prep|T], Head, Body, Notes, Cnls, Preps).
+
+/* collect head */
+p_decl_to_rule2([H|T], Head, Body, Notes, Cnls, Preps) :-
+	var(Head),!,
+	flatten([H], Head),
+	(member((exists-_), Head)->throw(err);true),
+	p_decl_to_rule2(T, Head, Body, Notes, Cnls, Preps).
+
+/* collect prep */
+p_decl_to_rule2([H|T], Head, Body, Notes, Cnls, [Prep|Preps]) :-
+	H = prep - Prep,
+	p_decl_to_rule2(T, Head, Body, Notes, Cnls, Preps).
+
+/* collect body items */
+p_decl_to_rule2([H|T], Head, [Body_head|Body_tail], Notes, Cnls, Preps) :-
+	Body_head = H,
+	p_decl_to_rule2(T, Head, Body_tail, Notes, Cnls, Preps).
+
+p_decl_to_rule2([], _Head, [], [], [], []).
+
+
+/* existential head rule expansion */
+existential_head_and_prep(H, Head, Prep) :-
+	H = exists - (Name, Properties),
+	Prep = mkbn(Bn, Dict),
+	existential_head_and_prep2(Bn, Properties, Head, Kvs),
+	dict_create(Dict, Name, Kvs).
+
+existential_head_and_prep2(Bn, [Property|Properties], [Head_item|Head_items], [Kv_pair|Kv_pairs]) :-
+	Head_item =.. [Property, Bn, Value],
+	Kv_pair = Property - Value,
+	existential_head_and_prep2(Bn, Properties, Head_items, Kv_pairs).
+
+existential_head_and_prep2(_Bn, [], [], []).
 
 
 
 
+/*
+main entrypoint
+*/
 run(Quiet, Query) :-
 	b_setval(bn_log, []),
 	nb_setval(step, 0),
 	run2(Quiet, Query).
+
 
 /*
 repeat top-level query until depth_map of Proof stops changing, then finalize
@@ -25,6 +126,7 @@ run2(Quiet, Query) :-
 	debug(pyco_run, '~w final...', [$>trace_prefix(r, -1)]),
 	/* filter out proofs that didn't ground. In these cases, we only got here due to ep_yield'ing.	*/
 	run2_final(Query, Proof).
+
 
 run2_repeat(Quiet, Query, Proof) :-
 	debug(pyco_map, 'map0 for: ~q', [Proof]),
@@ -49,12 +151,13 @@ run2_final(Query, Proof) :-
 	debug(pyco_run, '~w result.', [$>trace_prefix(r, -1)]),
 	true.
 
-/* for debugging, try again and print that it failed */
+
+/* for debugging, try finalizing again and print that it failed */
 run2_final(Query, Proof) :-
-	debug(pyco_run, 'disproving...', [$>trace_prefix(r, -1)]),
 	\+proof([],0,eps{},ep_fail,quiet,Query,Proof),
 	debug(pyco_run, '~w failed.', [$>trace_prefix(r, -1)]),
 	fail.
+
 
 proof(
 	/* a unique path in the proof tree */
@@ -78,7 +181,7 @@ proof(
 	proof2(Path, Proof_id_str,Deeper_level,Eps0,Ep_yield,Quiet,Query,Proof).
 
 proof2(Path0, Proof_id_str,Level,Eps0,Ep_yield, Quiet,Query,Proof) :-
-	matching_rule2(Level, Query, Desc, Body_items, Prep, Query_ep_terms, Head_item_idx),
+	matching_rule(Level, Query, Desc, Body_items, Preps, Query_ep_terms, Head_item_idx),
 	(Quiet = noisy -> debug(pyco_proof, '~w match: ~q (~q)', [$>trace_prefix(Proof_id_str, Level), $>nicer_term(Query), Desc]); true),
 
 	append(Path0, [ri(Desc, Head_item_idx)], Path),
@@ -86,14 +189,14 @@ proof2(Path0, Proof_id_str,Level,Eps0,Ep_yield, Quiet,Query,Proof) :-
 
 	ep_list_for_rule(Eps0, Desc, Ep_List),
 	(Quiet = noisy -> ep_debug_print_1(Ep_List, Query_ep_terms); true),
-	proof3(Path, Proof_id_str, Eps0, Ep_List, Query_ep_terms, Desc, Prep, Level, Body_items, Ep_yield, Quiet, Query, Proof).
+	proof3(Path, Proof_id_str, Eps0, Ep_List, Query_ep_terms, Desc, Preps, Level, Body_items, Ep_yield, Quiet, Query, Proof).
 
 proof2(_Path, Proof_id_str,Level,_,_,Quiet,Query, call) :-
 	call_native(Proof_id_str,Level, Quiet, Query).
 
-proof3(Path, Proof_id_str, Eps0, Ep_List, Query_ep_terms, Desc, Prep, Level, Body_items, Ep_yield, Quiet, _Query, Proof) :-
+proof3(Path, Proof_id_str, Eps0, Ep_List, Query_ep_terms, Desc, Preps, Level, Body_items, Ep_yield, Quiet, _Query, Proof) :-
 	ep_ok(Ep_List, Query_ep_terms, Quiet),
-	prove_body(Path, Proof_id_str, Ep_yield, Eps0, Ep_List, Query_ep_terms, Desc, Prep, Level, Body_items, Quiet, Proof).
+	prove_body(Path, Proof_id_str, Ep_yield, Eps0, Ep_List, Query_ep_terms, Desc, Preps, Level, Body_items, Quiet, Proof).
 
 proof3(Path, Proof_id_str, _Eps0, Ep_List, Query_ep_terms, Desc, _Prep, Level, _Body_items, Ep_yield, Quiet, Query, Proof) :-
 	\+ep_ok(Ep_List, Query_ep_terms, Quiet),
@@ -109,11 +212,18 @@ proof_ep_fail(_Path, Proof_id_str, Desc, Level, Ep_yield, Quiet, Query, _Unbound
 	(Quiet = noisy -> debug(pyco_proof, '~w ep_fail: ~q (~q)', [$>trace_prefix(Proof_id_str, Level), $>nicer_term(Query), Desc]); true),
 	fail.
 
-prove_body(Path, Proof_id_str, Ep_yield, Eps0, Ep_List, Query_ep_terms, Desc, Prep, Level, Body_items, Quiet, Proof) :-
+prove_body(Path, Proof_id_str, Ep_yield, Eps0, Ep_List, Query_ep_terms, Desc, Preps, Level, Body_items, Quiet, Proof) :-
 	updated_ep_list(Eps0, Ep_List, Proof_id_str, Path, Query_ep_terms, Desc, Eps1),
-	call_prep(Prep, Path),
+	call_preps(Preps, Path),
 	bump_step,
 	body_proof(Path, Proof_id_str, Ep_yield, Level, Eps1, Body_items, Quiet, Proof).
+
+call_preps(Preps, Path) :-
+	maplist(call_prep(Path), Preps).
+
+call_prep(Path, Prep) :-
+	debug(pyco_prep, 'call prep: ~q', [Prep]),
+	call(Prep, Path).
 
 body_proof(Path, Proof_id_str, Ep_yield, Level, Eps1, Body_items, Quiet, Proof) :-
 	body_proof2(Path, Proof_id_str, Ep_yield, Level, Eps1, Body_items, Quiet, Proof).
@@ -149,6 +259,14 @@ depth_map(X, Map) :-
 	X =.. [_|Args],
 	maplist(depth_map, Args, Args2),
 	Map =.. [nv|Args2].
+
+
+
+
+
+
+
+
 
 
 
@@ -288,6 +406,18 @@ register_bn2(Entry) :-
 debug_print_bn_log_item(I) :-
 	debug(pyco_bn_log, '* ~q', [I]).
 
+ep_debug_print_1(Ep_List, Query_ep_terms) :-
+	debug(pyco_ep, 'seen:', []),
+	maplist(print_debug_ep_list_item, Ep_List),
+	debug(pyco_ep, 'now: ~q', [Query_ep_terms]).
+
+
+
+
+
+
+
+
 
 /*
  calling prolog
@@ -295,7 +425,7 @@ debug_print_bn_log_item(I) :-
 
 call_native(Proof_id_str, Level, Quiet, Query) :-
 	/* this case tries to handle calling native prolog predicates */
-	\+matching_rule2(Level, Query, _,_,_,_,_),
+	\+matching_rule(Level, Query, _,_,_,_,_),
 	(Quiet = noisy -> debug(pyco_proof, '~w prolog call:~q', [$>trace_prefix(Proof_id_str, Level), Query]); true),
 	call_native2(Proof_id_str, Level, Quiet, Query).
 
@@ -318,39 +448,66 @@ call_native3(Query) :-
 		fail
 	).
 
+
+
+
+
+/*
+utils
+*/
+
 bump_step :-
 	nb_getval(step, Step),
 	Step_next is Step + 1,
 	nb_setval(step, Step_next).
-
-call_prep(true, _Path).
-
-call_prep(Prep, Path) :-
-	Prep \= true,
-	debug(pyco_prep, 'call prep: ~q', [Prep]),
-	call(Prep, Path).
-
-ep_debug_print_1(Ep_List, Query_ep_terms) :-
-	debug(pyco_ep, 'seen:', []),
-	maplist(print_debug_ep_list_item, Ep_List),
-	debug(pyco_ep, 'now: ~q', [Query_ep_terms]).
 
 trace_prefix(Proof_id_str, Level, String) :-
 	Level2 is Level + 64,
 	char_code(Level_char, Level2),
 	format(string(String), '~q ~w ~w', [$>nb_getval(step), Level_char, Proof_id_str]).
 
-rule(Desc, Head_items, Body_items, Prep) :-
-	(	pyco0_rule(Desc, Head_items <= Body_items, Prep)
-	;	(
-			pyco0_rule(Desc, Head_items <= Body_items),
-			Prep = true)).
 
-matching_rule2(_Level, Query, Desc, Body_items, Prep, Query_ep_terms, Head_item_idx) :-
+
+
+
+
+
+/*
+runtime rule lookup
+*/
+matching_rule(_Level, Query, Id, Body_items, Preps, Query_ep_terms, Head_item_idx) :-
 	query_term_ep_terms(Query, Query_ep_terms),
-	rule(Desc, Head_items, Body_items, Prep),
+	pyco3_rule(Id, Head_items, Body_items, _Notes, _Cnls, _Names, Preps),
 	nth0(Head_item_idx, Head_items, Query).
 	%member(Query, Head_items).
+
+/*
+rule check/printout
+*/
+collect_rules :-
+	/* make sure no rule declarations remained unexpanded */
+	(
+		(
+				% see if there are any 'r' clauses to call. If there are not, we get an exception, catch it, all is well.
+				catch(r(Bad),_,false),
+				throw('p/1 declaration remained unexpanded'(Bad))
+		);
+		true
+	),
+	T = pyco3_rule(_,_,_,_,_,Names,_),
+	gtrace,
+	call(T),
+	print_term(T, [variable_names(Names)]),
+	nl,nl,
+	fail.
+
+
+
+
+
+
+
+
 
 
 
@@ -410,77 +567,3 @@ collect_items2(R, Rest) :-
 
 collect_items2(R, ['|_']) :-
 	var(R).
-
-/*
-probably it would be more correct/support more forms of rules, if bnodes could bind to uris. Prolog isnt making it easy to support this, but we could try: bnode would be just a variable with a unification hook.
-Possibly there'd be a global table keeping track of what bnode is unified to what and carrying the dict (and bnode type is the dict tag). So, exactly our current bn() term, but kindof "in the cloud".
-
-The only alternative to attrvars i see is to do all unifications explicitly. We could probably do that seamlessly within the interpreter somehow.
-
-I'd rather stay away from attrvars because then we'd have to worry about interactions with clpz/fd.
-
-The goal would be semantics like this:
-before reasoning, assert some facts: livestock_report has_opening_value 5; etc.
-then query:
-livestock_request 
-	has_opening_value OV,
-	has_profit P.
-
-mkbn :- 
-	...
-
-how would this work with lists?
-currently, they are implemented by a rule that produces an existential for a list cell, with a first and a rest, and all code depends on the fact that the existential doesn't bind to nil. A fix might be to simply add dif(Bn, nil) in the body of the rule, but what other behavior would be affected?
-
-*/
-
-/*
-notes on iterative deepening:
-or:
-	if a body item fails:
-		if there were no eps in its call tree:
-			fail
-		else:
-			put it at the end of the queue
-number of new binds
-number of new constraints
-bnode semantics:
-	there exists
-uri semantics:
-	there exists AND is distinct from everything else
-*/
-
-/*
-todo graphical debugging
-https://kahina-sld.github.io/trac/wiki/TreeView.html
-https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/Procedure-Box.html#Procedure-Box
-*/
-
-/*
-todo research https://www.swi-prolog.org/pldoc/man?section=WFS
-*/
-
-
-/*
-
-note on global data, for stuff like accounts:
-
-One method is to simply assert them as facts before reasoning starts. In this case, they can be disparate facts, they don't need to be contained in a list.
-
-if they are contained in a list:
-
-one way is to pass them around (or the global_data object) everywhere (possible with "second_chance"-style list arguments).
-
-third is to have a builtin pred, let's say global_data(D), that yields it anywhere.
-
-i believe that neither option will affect ep-checking in any way. Either they will be completely invisible to it, or they will be a bnode. treated only as a bnode type + creation time.
-
-First option doesnt allow any dynamic additions at runtime. Second option adds verbosity.
-
-But it is a question if any data should be treated as a-priori static.
-
-*/
-
-/*
-in v3, we'll use Id instead of Desc (for ep tables etc).
-*/
