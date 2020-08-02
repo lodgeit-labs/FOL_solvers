@@ -1,3 +1,6 @@
+
+:- ['../utils/exceptions.pl'].
+
 :- dynamic pyco3_rule/7.
 :- multifile r/1.
 
@@ -67,7 +70,6 @@ p_decl_to_rule2([H|T], Head, Body, Notes, [(Lang - Cnl)|Cnls], Preps) :-
 /* collect head with existential */
 p_decl_to_rule2([H|T], Head, Body, Notes, Cnls, Preps) :-
 	var(Head),
-	gtrace,
 	existential_head_and_prep(H, Head, Prep),
 	!,
 	p_decl_to_rule2([prep - Prep|T], Head, Body, Notes, Cnls, Preps).
@@ -76,7 +78,7 @@ p_decl_to_rule2([H|T], Head, Body, Notes, Cnls, Preps) :-
 p_decl_to_rule2([H|T], Head, Body, Notes, Cnls, Preps) :-
 	var(Head),!,
 	flatten([H], Head),
-	(member((exists-_), Head)->throw(err);true),
+	(member((exists-_), Head)->throw_string(err);true),
 	p_decl_to_rule2(T, Head, Body, Notes, Cnls, Preps).
 
 /* collect prep */
@@ -96,15 +98,26 @@ p_decl_to_rule2([], _Head, [], [], [], []).
 existential_head_and_prep(H, Head, Prep) :-
 	H = exists - (Name, Properties),
 	Prep = mkbn(Bn, Dict),
-	existential_head_and_prep2(Bn, Properties, Head, Kvs),
+
+	maplist(property_value_variable, Properties, Values),
+	existential_head_and_prep2(Name, Bn, Properties, Values, Head2, Kvs),
+
+
+	/* for example 'fr', 'verb'.. */
+	Head_first_item =.. [Name, Bn | Values],
+
+	Head = [Head_first_item | Head2],
 	dict_create(Dict, Name, Kvs).
 
-existential_head_and_prep2(Bn, [Property|Properties], [Head_item|Head_items], [Kv_pair|Kv_pairs]) :-
-	Head_item =.. [Property, Bn, Value],
-	Kv_pair = Property - Value,
-	existential_head_and_prep2(Bn, Properties, Head_items, Kv_pairs).
+/* produce a new Value variable for each property pred */
+property_value_variable(_Property, _Value).
 
-existential_head_and_prep2(_Bn, [], [], []).
+existential_head_and_prep2(Name, Bn, [Property|Properties], [Value|Values], [Head_item|Head_items], [Kv_pair|Kv_pairs]) :-
+	Head_item =.. [$>atomic_list_concat([Name, '_', Property]), Bn, Value],
+	Kv_pair = Property - Value,
+	existential_head_and_prep2(Name, Bn, Properties, Values, Head_items, Kv_pairs).
+
+existential_head_and_prep2(_, _, [], [], [], []).
 
 
 
@@ -490,12 +503,11 @@ collect_rules :-
 		(
 				% see if there are any 'r' clauses to call. If there are not, we get an exception, catch it, all is well.
 				catch(r(Bad),_,false),
-				throw('p/1 declaration remained unexpanded'(Bad))
+				throw_string('p/1 declaration remained unexpanded'(Bad))
 		);
 		true
 	),
 	T = pyco3_rule(_,_,_,_,_,Names,_),
-	gtrace,
 	call(T),
 	print_term(T, [variable_names(Names)]),
 	nl,nl,
@@ -518,7 +530,7 @@ collect_rules :-
 nicer_term(T, Nicer) :-
 	(	nicer_term2(T, Nicer)
 	->	true
-	;	throw(err)).
+	;	throw_string(err)).
 
 nicer_term2(T, Nicer) :-
 %gtrace,
@@ -540,7 +552,7 @@ nicer_arg2(Bn, Nicer) :-
 
 nicer_bn(Bn, Nicer) :-
 	nonvar(Bn),
-	\+ \+ Bn = bn(_, 'list cell exists'{first:_,rest:_}),
+	\+ \+ Bn = bn(_, _{first:_,rest:_}),
 	nicer_bn2(Bn, Nice_items),
 	Bn = bn(Id, _),
 	'='(Nice_functor, $>atomic_list_concat([
@@ -557,8 +569,8 @@ collect_items(Bn, []) :-
 
 collect_items(Bn, [F|Rest]) :-
 	nonvar(Bn),
-	\+ \+ Bn = bn(_, 'list cell exists'{first:_,rest:_}),/*?*/
-	Bn = bn(_, 'list cell exists'{first:F,rest:R}),
+	\+ \+ Bn = bn(_, _{first:_,rest:_}),/*?*/
+	Bn = bn(_, _{first:F,rest:R}),
 	collect_items2(R, Rest).
 
 collect_items2(R, Rest) :-
