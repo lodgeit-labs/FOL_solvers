@@ -1,7 +1,10 @@
 
 :- ['../utils/exceptions.pl'].
+:- ['../determinancy_checker/determinancy_checker_main.pl'].
 
+:- multifile delay/2.
 :- dynamic pyco3_rule/7.
+:- discontiguous pyco3_rule/7.
 :- multifile r/1.
 
 %:- use_module(library(semweb/rdf11),except(['{}'/1])).
@@ -250,19 +253,57 @@ body_proof(Path, Proof_id_str, Ep_yield, Level, Eps1, Body_items, Quiet, Proof) 
 	false.
 */
 body_proof2(Path, Proof_id, Ep_yield, Level, Eps1, Body_items, Quiet, Proof) :-
-	/* this repetition might be one way to solve the ep problem, but it leads to many duplicate results */
-	%body_proof3(Path, Proof_id, 0, Ep_yield, Level, Eps1, Body_items, Quiet, Proof),
-	body_proof3(Path, Proof_id, 0, Ep_yield, Level, Eps1, Body_items, Quiet, Proof).
+	/*1. collect all delays at the beginning of rule body processing*/
+	sorted_body_items_with_delays1(Body_items, Body_items2),
+	body_proof3(Path, Proof_id, 0, Ep_yield, Level, Eps1, Body_items2, Quiet, Proof).
 
 /* base case */
 body_proof3(_Path, _Proof_id_str, _, _Ep_yield, _Level, _Eps1, [], _Quiet, []).
 
-body_proof3(Path, Proof_id_str, Bi_idx, Ep_yield, Level, Eps1, [Body_item|Body_items], Quiet, [ProofH|ProofT]) :-
+
+/*
+2. body_proof3: either:
+	a) grab 0 delay item
+	b) re-collect delays of non-zero items, sort, grab first item.
+*/
+
+
+body_proof3(Path, Proof_id_str, Bi_idx, Ep_yield, Level, Eps1, Body_items, Quiet, [ProofH|ProofT]) :-
+	(	append([Bis_head, [bi_with_delay(Body_item,0)], Bis_tail], Body_items)
+	->	(	/* nice, we found a zero-delay body item */
+			append(Bis_head, Bis_tail, Body_items2)
+		)
+	;	(
+			sorted_body_items_with_delays2(Body_items, Body_items_sorted),
+			Body_items_sorted = [bi_with_delay(Body_item,_) | Body_items2]
+		)
+	),
 	ProofH = Body_item-Proof,
 	append(Path, [bi(Bi_idx)], Bi_Path),
 	proof(Bi_Path, Level, Eps1, Ep_yield, Quiet, Body_item, Proof),
 	Bi_idx_next is Bi_idx + 1,
-	body_proof3(Path, Proof_id_str, Bi_idx_next, Ep_yield, Level, Eps1, Body_items, Quiet, ProofT).
+	body_proof3(Path, Proof_id_str, Bi_idx_next, Ep_yield, Level, Eps1, Body_items2, Quiet, ProofT).
+
+bi_with_delay2(bi_with_delay(Bi,_), bi_with_delay(Bi,Delay)) :-
+	!body_item_delay(Bi, Delay).
+
+bi_with_delay1(Bi, bi_with_delay(Bi,Delay)) :-
+	!body_item_delay(Bi, Delay).
+
+sorted_body_items_with_delays1(Body_items, Body_items_sorted) :-
+	maplist(bi_with_delay1, Body_items, Items),
+	sort(2, @=<, Items, Body_items_sorted).
+
+sorted_body_items_with_delays2(Body_items, Body_items_sorted) :-
+	maplist(bi_with_delay2, Body_items, Items),
+	sort(2, @=<, Items, Body_items_sorted).
+
+body_item_delay(Bi, Delay) :-
+	findall(Delay, delay(Bi, Delay), Delays),
+	sum_list(Delays, Delay).
+
+
+
 
 depth_map(X, v) :-
 	var(X).
@@ -492,7 +533,7 @@ matching_rule(_Level, Query, Id, Body_items, Preps, Query_ep_terms, Head_item_id
 	query_term_ep_terms(Query, Query_ep_terms),
 	pyco3_rule(Id, Head_items, Body_items, _Notes, _Cnls, _Names, Preps),
 	nth0(Head_item_idx, Head_items, Query).
-	%member(Query, Head_items).
+
 
 /*
 rule check/printout
