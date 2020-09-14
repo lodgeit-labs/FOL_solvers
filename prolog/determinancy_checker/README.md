@@ -47,7 +47,7 @@ You can also include determinancy_checker_det_v1 instead, but v2 is a more abstr
 * less code repetition
 * when you step inside a '!', it takes one skip to get to the wrapped call
 ###### v2 downsides:
-* throws don't happen right in the '!' predicate, so you cannot just press 'r' in gtrace to try the call again, you have to step out of the helper pred first.
+* throws don't happen right in the '!' predicate, so you cannot just press 'r' in guitracer to try the call again, you have to step out of the helper pred first.
  
 ##### determinancy_checker_semidet
 
@@ -63,7 +63,7 @@ cases with multiple arguments are todo.
 #### rdet
 See docs/rdet.txt for some tips. Main difference between rdet and determinancy_checker is that with rdet, you declare determinancy of a predicate, while with this, you declare determinancy of a call. I would like to add a "goal_expansion mode" at some point.
 #### downsides of rdet
-* uses goal expansion, which is imo pretty broken (breaks gtrace)
+* uses goal expansion, which is imo pretty broken (breaks g trace)
 * requires keeping `:- rdet my_pred/arity.` in sync with your code
 #### upsides of rdet
 * maybe you have a usecase for declaring determinancy at the level of predicate declarations, rather than for particular invocations. Maybe i'll adapt this into determinancy_checker as optional functionality someday. 

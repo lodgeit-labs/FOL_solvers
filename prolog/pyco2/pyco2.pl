@@ -251,18 +251,17 @@ came_before(A, B) :-
 	;	true).
 
 mkbn(Bn, Dict, Path) :-
-	%gtrace,
-(
+	(
 	/* avoid creating new bnode if we are already called with one. this eases tracking them for ep check purposes */
-(	nonvar(Bn),
-	Bn = bn(_, Dict)
-)
-;
-(
-	var(Bn),
-	Bn = bn(_, Dict),
-	register_bn(Bn, Path)
-)).
+	(	nonvar(Bn),
+		Bn = bn(_, Dict)
+	)
+	;
+	(
+		var(Bn),
+		Bn = bn(_, Dict),
+		register_bn(Bn, Path)
+	)).
 
 register_bn(bn(Uid, Dict), Path) :-
 	is_dict(Dict, Tag),
@@ -364,7 +363,6 @@ nicer_term(T, Nicer) :-
 	;	throw(err)).
 
 nicer_term2(T, Nicer) :-
-%gtrace,
 	T =.. [F|Args],
 	maplist(nicer_arg, Args, Nicer_args),
 	Nicer =.. [F|Nicer_args].

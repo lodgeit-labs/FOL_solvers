@@ -47,7 +47,6 @@ parse_n3(FilePath,Triples):-
 	assertz(base_uri(FilePath)),
 	repeat,
 	tokens(In, Tokens),
-	%gtrace,
 	phrase(document(Triples), Tokens, Rest),
 	(   Rest = []
 	->  writeq(Triples)

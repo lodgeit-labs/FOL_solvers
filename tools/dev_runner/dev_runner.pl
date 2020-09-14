@@ -77,7 +77,7 @@ main :-
 		,[opt(compile), type(boolean), default(false), shortflags([c]), longflags([compile]),
 			help('compile first?')]
 		,[opt(toplevel), type(boolean), default(true), shortflags([t]), longflags([toplevel]),
-			help('pass goal interactively into toplevel instead of with -g? Allows gtrace to run after exception')]
+			help('pass goal interactively into toplevel instead of with -g? Allows guitracer to run after exception')]
 		,[opt(halt_on_problems), type(boolean), default(true), shortflags([h]), longflags([halt_on_problems])]
 		,[opt(problem_lines_whitelist), type(atom), longflags([problem_lines_whitelist])]
 		,[opt(viewer), type(atom), shortflags([v]), longflags([viewer]),
@@ -254,4 +254,4 @@ run_with_toplevel(Debug, Goal, Script) :-
 :- initialization(main).
 
 
-% todo for python rewrite:  --tty=true -q? pipe goal (not rpc message) to swipl. get gtrace working. (gtrace is only invoked from the toplevel)
+% todo for python rewrite:  --tty=true -q? pipe goal (not rpc message) to swipl. get g trace working. (g trace is only invoked from the toplevel)

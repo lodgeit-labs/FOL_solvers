@@ -84,7 +84,7 @@ x :-
 	(	Debug = true
 	->	Optimization = ''
 	;	Optimization = '-O'),
-	% todo for python rewrite:  --tty=true -q? pipe goal (not rpc message) to swipl. get gtrace working.
+	% todo for python rewrite:  --tty=true -q? pipe goal (not rpc message) to swipl. get g trace working.
 	atomic_list_concat(['swipl ', Optimization, ' -s ', Script], Load_Cmd),
 	%maybe_clean_terminal,
 	/* make forces compilation of dcg's or something. Ideally, we would have two steps: 1)compile 2) run the compiled file. But for this i'd like to review what kind of dcg declaration errors 'make' reported that just loading the prolog file didnt, because we would lose that reporting.  */
