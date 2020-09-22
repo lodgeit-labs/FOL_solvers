@@ -72,7 +72,7 @@ fields(Dom, [Name_String, Value_And_Default|Rest]) :-
 	fields(Dom, Rest).
 
 /* if default is not passed, throw error if field's tag is not found*/
-fields(Dom, [Name_String, Value|Rest]) :-
+ fields(Dom, [Name_String, Value|Rest]) :-
 	(
 		(
 			trimmed_field(Dom, //Name_String, Value),
@@ -87,15 +87,15 @@ fields(Dom, [Name_String, Value|Rest]) :-
 	),
 	fields(Dom, Rest).
 
-fields(_, []).
+ fields(_, []).
 
 
 /* try to extract a field, possibly fail*/
-field_nothrow(Dom, [Name_String, Value]) :-
+ field_nothrow(Dom, [Name_String, Value]) :-
 	trimmed_field(Dom, //Name_String, Value).
 
 /* extract fields and convert to numbers*/
-numeric_fields(Dom, [Name_String, Value_And_Default|Rest]) :-
+ numeric_fields(Dom, [Name_String, Value_And_Default|Rest]) :-
 	nonvar(Value_And_Default),
 	!,
 	(Value, Default_Value) = Value_And_Default,
