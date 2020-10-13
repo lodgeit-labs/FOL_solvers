@@ -71,22 +71,25 @@ main :-
 		[opt(script), type(atom), shortflags([s]), longflags([script]),
 			help('the .pl file you wish to run')]
 		,[opt(goal), type(atom), shortflags([g]), longflags([goal]),
-			help('the -g you wish to pass to your .pl file')]
+			help('the -g you wish to pass to swipl')]
+		%,[opt(args), type(atom), default(''), shortflags([a]), longflags([args]),
+		%	help('the command-line arguments you wish to pass to your script')]
 		,[opt(debug), type(boolean), default(true), shortflags([d]), longflags([debug]),
-			help('run swipl with -O or without?')]
+			help('run swipl with -O?')]
 		,[opt(compile), type(boolean), default(false), shortflags([c]), longflags([compile]),
 			help('compile first?')]
 		,[opt(toplevel), type(boolean), default(true), shortflags([t]), longflags([toplevel]),
-			help('pass goal interactively into toplevel instead of with -g? Allows guitracer to run after exception')]
+			help('pass goal interactively into toplevel instead of with -g? Allows guitracer to run after exception.')]
 		,[opt(halt_on_problems), type(boolean), default(true), shortflags([h]), longflags([halt_on_problems])]
 		,[opt(problem_lines_whitelist), type(atom), longflags([problem_lines_whitelist])]
 		,[opt(viewer), type(atom), shortflags([v]), longflags([viewer]),
 			help('invoke a program on the stdout output of your .pl file')]
 		,[opt(clear_terminal), type(boolean), default(false), longflags([clear_terminal])]
 	],
-	opt_arguments(Spec, Opts, Args),
-	(Args = [] -> true ; throw(string('no positional arguments accepted'))),
+	opt_arguments(Spec, Opts, ScriptArgs),
+	%(Args = [] -> true ; throw(string('no positional arguments accepted'))),
 	assert(opts(Opts)),
+	assert(scriptargs(ScriptArgs)),
 	memberchk(debug(Debug), Opts),
 	memberchk(viewer(Viewer), Opts),
 	memberchk(script(Script), Opts),
@@ -200,7 +203,7 @@ run_without_compilation(Debug, Optimization, Script, Viewer) :-
 	),
 
 	(	memberchk(toplevel(true), Opts)
-	->	run_with_toplevel(Debug, Goal, Script)
+	->	run_with_toplevel(Debug, Goal, Script, Opts)
 	;	(
 			(	nonvar(Viewer)
 			->	Redirection = [' 2>&1  1> arrr.xml']
@@ -233,16 +236,17 @@ optimization_flag2(Debug, Optimization) :-
 		)
 	).
 
-run_with_toplevel(Debug, Goal, Script) :-
+run_with_toplevel(Debug, Goal, Script, _Opts) :-
 	optimization_flag2(Debug, Optimization),
-	Args0 = [Optimization, '-s', Script],
+	scriptargs(ScriptArgs),
+	Args0 = [Optimization, '-s', Script, '--', ScriptArgs],
 	flatten(Args0, Args),
 	format(user_error, 'dev_runner: running with toplevel with args ~q ...\n', [Args]),
 	process_create(path(swipl), Args, [process(Pid), stdin(pipe(Stdin))]),
 	%write(Stdin, writeln('script output starts below'),
 	write(Stdin, Goal),
 	write(Stdin, '.\n'),
-	write(Stdin, 'a.\n'),
+	write(Stdin, 'a.\n'),% to cause an abort after an exception, i think
 	write(Stdin, 'halt.\n'),
 	flush_output(Stdin),
 	process_wait(Pid,Status),

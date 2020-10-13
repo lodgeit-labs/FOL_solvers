@@ -1,5 +1,17 @@
 #!/usr/bin/env swipl
 
+
+/*
+
+WARNING: you must edit /usr/local/lib/swipl/library/semweb/sparql_client.pl (or wherever it is on your system) and make sure that application/sparql-results+json goes before xml. Otherwise, agraph sends back xml, and sparql_client.pl sparql_read_xml_result/2 has "space(remove)", which removes whitespace (including newlines) from literals. See also https://github.com/SWI-Prolog/packages-semweb/issues/91 .
+
+
+
+
+
+*/
+
+
 /*
 :- use_module(library(fnotation)).
 :- fnotation_ops($>,<$).
@@ -7,31 +19,29 @@
 */
 
 
-:- ['../determinancy_checker/determinancy_checker_main.pl'].
-:- use_module(library(semweb/rdf11)).
+%:- ['../determinancy_checker/determinancy_checker_main.pl'].
 :- [library(sparqlprog)].
+:- use_module(n3).
+:- ['../utils/utils.pl'].
 
 
 
-rdf_equal2(X,Y) :-
-	!rdf_global_id(X, X2),
-	!rdf_global_id(Y, Y2),
-	X2 = Y2.
-
-
-:- rdf_register_prefix(rdf,
-'http://www.w3.org/1999/02/22-rdf-syntax-ns#').
-:- rdf_register_prefix(rdfs,
-'http://www.w3.org/2000/01/rdf-schema#').
 :- rdf_register_prefix(rdf2,
 'https://rdf.lodgeit.net.au/rdf2/').
 :- rdf_register_prefix(tc,
 'https://rdf.lodgeit.net.au/testcase/').
 
 
-main :-
-	sparql_endpoint( l, 'http://localhost:10035/repositories/repo/'),
 
+main :-
+	debug(sparqlprog),
+	sparql_endpoint( l, 'http://localhost:10035/repositories/repo/'),
+	
+	/*sparql_endpoint( l, 'https://integbio.jp/rdf/sparql'),
+	(l ?? rdf(S, P, O, Graph)),
+	halt,*/
+	
+	%?results-format=sparql-json
 	format(user_error, 'pyco3 starting...\n', []),
 	Spec = [
 			[opt(task), type(atom), longflags([task]),
@@ -45,7 +55,6 @@ process_task_pointer(Pointer) :-
 
 	% Task has to be an iri, if it's a bnode, we have no way to find it among the triples obtained in fetch_triples.
 	(l ?? rdf(Pointer, rdf:value, Task)),
-
 		% wrt the possibility of getting multiple results for the above query, this would be a good place to introduce something like scopes or configurations of the determinancy checker. That is, !! is the default/only scope, you control what exactly it does by prolog flags, but you could also have, let's say, !!(db), that would have a separate debug level. Ie, i may want to trust my code to run in release mode, but still won't trust the db data.
 	(l ?? rdf(Pointer, rdf2:data_is_in_graph, Graph)),
 	fetch_triples(Graph),
@@ -57,7 +66,7 @@ fetch_triples(Graph) :-
 	rdf_global_id(tc:text, P),
 	findall((S,P,O),
 		(
-			gtrace,
+			%gtrace,
 			
 			
 			
@@ -111,12 +120,18 @@ load_kbs(Nil, []) :-
 
 load_kb(X, Quad_list) :-
 	rdf(X, tc:text, Text),
-	writeq(Text),nl.
+	rdf(X, tc:base_uri, Base_uri),
+	format("parse text>>>~n~w~n<<<~n", [Text]),
+	call_with_string_read_stream(Text, {Base_uri, Quad_list}/[Stream]>>parse_n3_stream(Base_uri, Stream, Quad_list)).
 
 
 
 
 
 
-:- initialization(main).
+
+
+
+% initialization() would never work along with dev_runner. That's just another hillarious feature of swipl.
+%:- initialization(main).
 
