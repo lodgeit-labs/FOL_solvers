@@ -3,10 +3,10 @@
 
 /*
 
-WARNING: you must edit /usr/local/lib/swipl/library/semweb/sparql_client.pl (or wherever it is on your system) and make sure that application/sparql-results+json goes before xml. Otherwise, agraph sends back xml, and sparql_client.pl sparql_read_xml_result/2 has "space(remove)", which removes whitespace (including newlines) from literals. See also https://github.com/SWI-Prolog/packages-semweb/issues/91 .
+https://github.com/SWI-Prolog/packages-semweb/issues/99#event-3875382029
+Should be fixed with https://github.com/SWI-Prolog/packages-semweb/commit/ef7ee735df9445b061cecc23c5d707d51e470edd
 
-
-
+WARNING: you must edit /usr/local/lib/swipl/library/semweb/sparql_client.pl (or wherever it is on your system) and make sure that application/sparql-results+json goes before xml. Otherwise, agraph sends back xml, and sparql_client.pl sparql_read_xml_result/2 has "space(remove)", which removes whitespace (including newlines) from literals.
 
 
 */
@@ -34,15 +34,11 @@ WARNING: you must edit /usr/local/lib/swipl/library/semweb/sparql_client.pl (or 
 
 
 main :-
-	debug(sparqlprog),
-	sparql_endpoint( l, 'http://localhost:10035/repositories/repo/'),
-	
-	/*sparql_endpoint( l, 'https://integbio.jp/rdf/sparql'),
-	(l ?? rdf(S, P, O, Graph)),
-	halt,*/
-	
-	%?results-format=sparql-json
 	format(user_error, 'pyco3 starting...\n', []),
+
+	%debug(sparqlprog),
+	sparql_endpoint( l, 'http://localhost:10035/repositories/repo/'),
+
 	Spec = [
 			[opt(task), type(atom), longflags([task]),
 			help('Task Pointer URI')]],
@@ -63,25 +59,11 @@ process_task_pointer(Pointer) :-
 
 fetch_triples(Graph) :-
 	writeln('got triples:\n====='),
-	rdf_global_id(tc:text, P),
+	%rdf_global_id(tc:text, P),
 	findall((S,P,O),
 		(
-			%gtrace,
-			
-			
-			
-			/*
-			sparql_read_xml_result(Input, Result) :-
-    load_structure(Input, DOM,
-                   [ dialect(xmlns),
-                     space(remove)
-                     ^^^ that's a problem, newlines are stripped.
-*/
-			
-			
 			(l ?? rdf(S, P, O, Graph)),
-			writeq((S, P, O)),
-			nl,
+			%writeq((S, P, O)),	nl,
    			rdf_assert(S, P, O)
         ),
 	_Triples),
@@ -91,27 +73,22 @@ fetch_triples(Graph) :-
 
 
 process_task(Task) :-
-	writeq(
-		process_task(Task)
-	),nl,
-	
+	writeq(process_task(Task)),nl,
+
 	(	rdf(Task, tc:source_file, (Task_source_file_name^^_))
 	->	format("Processing testcase from file: ~w~n", [Task_source_file_name])
 	;	true),
 
-	rdf(Task, tc:kb_texts, Kb_texts),
+	!rdf(Task, tc:kb_texts, Kb_texts),
 	%writeq(Kb_texts),nl,writeln(yahooo),
 	%ok, time to load the kbs.
 	load_kbs(Kb_texts, _).
-	
-	
-	%tc.query_text = text
 
 
 
 load_kbs(Kb_texts, [Quad_list|Quad_lists]) :-
 	rdf(Kb_texts, rdf:first, F),
-	rdf(Kb_texts, rdf:rest, R),
+	!rdf(Kb_texts, rdf:rest, R),
 	load_kb(F, Quad_list),
 	load_kbs(R, Quad_lists).
 	
@@ -119,10 +96,11 @@ load_kbs(Nil, []) :-
 	rdf_equal2(rdf:nil, Nil).
 
 load_kb(X, Quad_list) :-
-	rdf(X, tc:text, Text),
-	rdf(X, tc:base_uri, Base_uri),
-	format("parse text>>>~n~w~n<<<~n", [Text]),
-	call_with_string_read_stream(Text, {Base_uri, Quad_list}/[Stream]>>parse_n3_stream(Base_uri, Stream, Quad_list)).
+	!rdf(X, tc:text, Text),
+	!rdf(X, tc:base_uri, Base_uri),
+	!rdf(X, tc:text_with_line_numbers, (Text_with_line_numbers^^_)),
+	!format("parse text>>>~n~w~n<<<~n", [Text_with_line_numbers]),
+	!call_with_string_read_stream(Text, {Base_uri, Quad_list}/[Stream]>>parse_n3_stream(Base_uri, Stream, Quad_list)).
 
 
 
@@ -134,4 +112,6 @@ load_kb(X, Quad_list) :-
 
 % initialization() would never work along with dev_runner. That's just another hillarious feature of swipl.
 %:- initialization(main).
+
+%a :- halt(0).
 
