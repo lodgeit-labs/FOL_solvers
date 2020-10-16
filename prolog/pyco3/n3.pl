@@ -73,11 +73,11 @@ parse_n3_stream(Base_uri, In, Triples) :-
     nb_setval(smod, true),
 	retractall(base_uri(_)),
 	assertz(base_uri(Base_uri)),
-	gtrace,
+	%gtrace,
 	tokens(In, Tokens),
 	phrase(document(Triples), Tokens, Rest),
 	(   Rest = []
-	->  writeq(Triples)
+	->  (writeq(Triples),nl)
 	;   nb_getval(line_number, Ln),
 		throw(invalid_document(after_line(Ln),remaining(Rest)))
 	).

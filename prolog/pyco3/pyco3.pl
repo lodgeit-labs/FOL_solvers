@@ -96,8 +96,8 @@ load_kbs(Nil, []) :-
 	rdf_equal2(rdf:nil, Nil).
 
 load_kb(X, Quad_list) :-
-	!rdf(X, tc:text, Text),
-	!rdf(X, tc:base_uri, Base_uri),
+	!rdf(X, tc:text, (Text^^_)),
+	!rdf(X, tc:base_uri, (Base_uri^^_)),
 	!rdf(X, tc:text_with_line_numbers, (Text_with_line_numbers^^_)),
 	!format("parse text>>>~n~w~n<<<~n", [Text_with_line_numbers]),
 	!call_with_string_read_stream(Text, {Base_uri, Quad_list}/[Stream]>>parse_n3_stream(Base_uri, Stream, Quad_list)).
@@ -105,7 +105,29 @@ load_kb(X, Quad_list) :-
 
 
 
+/*
 
+load_kb(X, _Quad_list) :-
+	!rdf(X, tc:text, Text),
+	!rdf(X, tc:text_with_line_numbers, (Text_with_line_numbers^^_)),
+	!format("parse text>>>~n~w~n<<<~n", [Text_with_line_numbers]),
+	!call_with_string_read_stream(Text, {}/[Stream]>>fu(Stream)).
+
+fu(Stream) :-
+	gtrace,
+	%read_stream_to_codes(Stream,Codes),writeq(Codes),nl,
+
+	findall(_,(
+		get_code(Stream, C0),
+		writeq(C0),nl,
+		get_code(Stream, C1),
+		writeq(C1),nl,
+		true
+	),_).
+
+
+
+*/
 
 
 
