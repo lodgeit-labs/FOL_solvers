@@ -71,13 +71,14 @@ parse_n3_stream(Base_uri, In, Triples) :-
 	nb_setval(line_number, 1),
 	nb_setval(fdepth, 0),
     nb_setval(smod, true),
+    nb_setval(var_ns, 'http://josd.github.io/.well-known/genid/#'),
 	retractall(base_uri(_)),
 	assertz(base_uri(Base_uri)),
 	%gtrace,
 	tokens(In, Tokens),
 	phrase(document(Triples), Tokens, Rest),
 	(   Rest = []
-	->  (writeq(Triples),nl)
+	->  true %(writeq(Triples),nl)
 	;   nb_getval(line_number, Ln),
 		throw(invalid_document(after_line(Ln),remaining(Rest)))
 	).

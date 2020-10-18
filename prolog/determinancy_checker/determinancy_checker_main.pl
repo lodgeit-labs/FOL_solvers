@@ -31,4 +31,10 @@ prolog:message(E) --> {E = error(determinancy_checker(X),_), term_string(X, Str)
 /*
 todo:
 :- maplist(!member, [1], _).
+
+	% wrt the possibility of getting multiple results for the above query, this would be a good place to introduce something like scopes or configurations into determinancy checker. That is, '!' would mean the default/only scope, you control what exactly it does by prolog flags, but you could also have, let's say, !(db), that would have a separate debug level. Ie, i may want to trust my code to run in release mode, but still don't trust the db data.
+
+
 */
+
+
