@@ -1,5 +1,7 @@
 #!/usr/bin/env swipl
 
+:- ['../../prolog/determinancy_checker/determinancy_checker_main.pl'].
+
 /*
 not all permutations of compilation and toplevel options are implemented. Compilation would be useful if swipl reported all errors, including DCG errors, upon loading, without a need to call 'make'. Right now, it is useless, and it gives no speed improvement.
 */
@@ -89,7 +91,7 @@ main :-
 	% accept positional arguments after a '--'. These will be the arguments passed to the script.
 
 	current_prolog_flag(argv, Args),
-	split_list_by_last_occurence_of(Args,'--',Args2, ScriptArgs),
+	!split_list_by_last_occurence_of(Args,'--',Args2, ScriptArgs),
 	opt_parse(Spec, Args2, Opts, []),
 
 	assert(opts(Opts)),
@@ -121,8 +123,8 @@ main :-
 split_list_by_last_occurence_of(In,Separator,Before,After) :-
 	reverse(In, In2),
 	split_list_by_last_occurence_of2(In2,Separator,Before0, After0),
-	reverse(Before0, Before),
-	reverse(After0, After).
+	reverse(Before0, After),
+	reverse(After0, Before).
 
 split_list_by_last_occurence_of2([Separator|L1t],Separator,L1t,[]) :- !.
 
@@ -131,7 +133,7 @@ split_list_by_last_occurence_of2([H|L1t],Separator,Before,[H|L2t]) :-
 	split_list_by_last_occurence_of2(L1t,Separator,Before,L2t),
 	!.
 
-
+split_list_by_last_occurence_of2([],_,[],[]) :- !.
 
 
 optimization_flag(Debug, Optimization) :-
