@@ -656,6 +656,12 @@ doc_value(S, P, V, G) :-
 	doc(S, P, O, G),
 	doc(O, rdf:value, V).
 
+value(O,V) :-
+	doc(O, rdf:value, V).
+
+values(Os,Vs) :-
+	maplist(value, Os, Vs).
+
 
 doc_add_value(S, P, V) :-
 	b_getval(default_graph, G),

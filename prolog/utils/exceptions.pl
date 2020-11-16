@@ -6,6 +6,26 @@
 	flatten([List_Or_Atom], List),
 	maplist(stringize, List, List2),
 	atomic_list_concat(List2, String),
+	gtrace_if_have_display,
+	context_string(Ctx_str),
+	atomics_to_string([String,'\n',Ctx_str], Str),
+	throw(error(msg(Str),_)).
+
+context_string(Str) :-
+	get_context(C),
+	(	C = []
+	->	Str = ''
+	;	(
+			maplist(context_string2, C, Item_strings),
+			atomics_to_string(['during:\n' | Item_strings], Str)
+		)
+	).
+
+context_string2(C, Str) :-
+	format(string(Str), '~q~n', [C]).
+
+
+gtrace_if_have_display :-
 	(
 		(
 			getenv('DISPLAY', Display),
@@ -14,8 +34,7 @@
 		)
 		-> gtrace
 		; true
-	),
-	throw(error(msg(String),_)).
+	).
 
 stringize(X, X) :-
 	atomic(X).
