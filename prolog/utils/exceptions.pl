@@ -16,13 +16,22 @@ context_string(Str) :-
 	(	C = []
 	->	Str = ''
 	;	(
-			maplist(context_string2, C, Item_strings),
+			context_string1(1, C, Item_strings),
 			atomics_to_string(['during:\n' | Item_strings], Str)
 		)
 	).
 
-context_string2(C, Str) :-
-	format(string(Str), '~q~n', [C]).
+context_string1(Number, [C|Rest], [Str|Str_rest]) :-
+	context_string2(Number, C, Str),
+	Next is Number + 1,
+	context_string1(Next, Rest, Str_rest).
+
+context_string1(_, [],[]).
+
+context_string2(Number, C, Str) :-
+	(	atomic(C)
+	->	atomics_to_string([Number, ') ', C, '\n'], Str)
+	;	format(string(Str), '~q) ~q~n', [Number, C])).
 
 
 gtrace_if_have_display :-
