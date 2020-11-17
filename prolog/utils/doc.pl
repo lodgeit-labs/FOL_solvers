@@ -942,11 +942,28 @@ about namespaces:
 
 :- dynamic(exception_doc_dump/2).
 :- dynamic(exception_ctx_dump/1).
-:- dynamic(fuckitall/0).
 
-prolog_exception_hook(E,E, _Frame, _CatcherFrame) :-
-	fuckitall,
-	print_message(information, "im in a prolog_exception_hookim in a prolog_exception_hookim in a prolog_exception_hookim in a prolog_exception_hookim in a prolog_exception_hookim in a prolog_exception_hookim in aa prolog_exception_hook"),
+
+
+/*
+problem with doing this along with using library(prolog_stack):
+only one prolog_exception_hook is ever called. So, we'll save the prolog_stack clause, retract it, and call it ourselves.
+*/
+:-
+	%gtrace,
+	clause(prolog_exception_hook(A,B,C,D),Body),
+	assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
+	retractall(prolog_exception_hook(A,B,C,D)).
+	% !!!!!! does retractall only retract the import?
+
+
+
+prolog_exception_hook(E,F, Frame, CatcherFrame) :-
+	print_message(information, "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"),
+
+	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame),
+
+	print_message(information, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"),
 
 	/* a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe? */
 
