@@ -1,3 +1,6 @@
+:- b_setval(context, []).
+
+
 :- use_module(library(semweb/rdf11),except(['{}'/1])).
 :- use_module(library(semweb/turtle)).
 :- use_module(library(http/json)).
@@ -21,6 +24,7 @@
 :- [dict_vars].
 :- [doc].
 :- [exceptions].
+:- [execution_context].
 :- [files].
 :- [higher_order].
 :- [json].

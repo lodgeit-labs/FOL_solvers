@@ -672,6 +672,8 @@ doc_add_value(S, P, V, G) :-
 	doc_add(S, P, Uri, G),
 	doc_add(Uri, rdf:value, V).
 
+
+
 /*
 user:goal_expansion(
 	vague_props(X, variable_names(Names))
@@ -700,10 +702,17 @@ pondering a syntax for triples..
 	  l:ledger_account_opening_balance_part [
 	  	l:coord $>coord_inverse(<$, Opening_Balance),
 		l:ledger_account_name $>account_by_role('Accounts'/'Equity')];
-	*/
+*/
+
+
 
 gu(Prefixed, Full) :-
 	rdf_global_id(Prefixed, Full).
+
+
+
+
+
 
 
 
@@ -778,16 +787,16 @@ xml_to_doc(Root, element(Name, _Atts, Children)) :-
 
 */
 
-omg :-
+'watch doc-dumper command pipe' :-
     open(fo, read, Fo),
     read_term(Fo, X,[]),
     open(X,append,Out_Stream),
-    writeq(Out_Stream, bananana),
+    writeq(Out_Stream, 'asking main thread to dump doc..'),
     close(Out_Stream),
     thread_signal(main, doc_dump),
-    omg.
+    'watch doc-dumper command pipe'.
 
-:- thread_create(omg, _).
+:- thread_create('watch doc-dumper command pipe', _).
 
 doc_dump :-
 	once(save_doc).
@@ -921,10 +930,49 @@ take, as an example account role. (RoleParent/RoleChild), posibly nested. For al
 
 */
 
-
-
 /*
 about namespaces:
 	i think it'll be ideal if a contracted form is the default and used everywhere, ie, nodes are normalized into the contracted form when put into the store or queried.
 */
 
+
+
+
+
+
+:- dynamic(exception_doc_dump/2).
+:- dynamic(exception_ctx_dump/1).
+:- dynamic(fuckitall/0).
+
+prolog_exception_hook(E,E, _Frame, _CatcherFrame) :-
+	fuckitall,
+	print_message(information, "im in a prolog_exception_hookim in a prolog_exception_hookim in a prolog_exception_hookim in a prolog_exception_hookim in a prolog_exception_hookim in a prolog_exception_hookim in aa prolog_exception_hook"),
+
+	/* a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe? */
+
+	'store doc data for reporting after exception',
+	'store ctx data for reporting after exception'.
+
+doc_data(G,Ng) :-
+	catch(
+		(
+			b_getval(the_theory, G),
+			b_getval(the_theory_nonground, Ng)
+		),
+		_,
+		false
+	).
+
+'store doc data for reporting after exception' :-
+	(	doc_data(G,Ng)
+	->	(
+			retractall(exception_doc_dump(_,_)),
+			assert(exception_doc_dump(G,Ng))
+		)
+	;	true).
+
+'store ctx data for reporting after exception' :-
+	get_context(Ctx_list),
+	print_message(information, Ctx_list),
+	retractall(exception_ctx_dump(_)),
+	assert(exception_ctx_dump(Ctx_list)).
