@@ -72,7 +72,7 @@ context_string(C,Str) :-
 	->	Str = ''
 	;	(
 			context_string1(1, C, Item_strings),
-			atomics_to_string(['during:\n' | Item_strings], Str)
+			atomics_to_string(['during: ' | Item_strings], Str)
 		)
 	).
 
@@ -85,6 +85,6 @@ context_string1(_, [],[]).
 
 context_string2(Number, C, Str) :-
 	(	atomic(C)
-	->	atomics_to_string([Number, ') ', C, '\n'], Str)
-	;	format(string(Str), '~q) ~q~n', [Number, C])).
+	->	atomics_to_string([Number, ': ', C, ' '], Str)
+	;	format(string(Str), '~q: ~q ', [Number, C])).
 

@@ -954,16 +954,12 @@ only one prolog_exception_hook is ever called. So, we'll save the prolog_stack c
 	clause(prolog_exception_hook(A,B,C,D),Body),
 	assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
 	retractall(prolog_exception_hook(A,B,C,D)).
-	% !!!!!! does retractall only retract the import?
-
 
 
 prolog_exception_hook(E,F, Frame, CatcherFrame) :-
-	print_message(information, "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"),
-
+	print_message(information, "prolog_stack__prolog_exception_hook"),
 	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame),
-
-	print_message(information, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"),
+	%print_message(information, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"),
 
 	/* a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe? */
 
@@ -990,6 +986,6 @@ doc_data(G,Ng) :-
 
 'store ctx data for reporting after exception' :-
 	get_context(Ctx_list),
-	print_message(information, Ctx_list),
+	print_message(information, 'storing context:'(Ctx_list)),
 	retractall(exception_ctx_dump(_)),
 	assert(exception_ctx_dump(Ctx_list)).
