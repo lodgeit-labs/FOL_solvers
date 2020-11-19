@@ -1,4 +1,10 @@
+see also https://github.com/lodgeit-labs/FOL_solvers/tree/master/prolog/determinancy_checker
+
+
+# rdet
+
 https://github.com/rla/rdet
+http://www.swi-prolog.org/pack/list?p=rdet
 
 how to get useful behavior out of rdet:
 

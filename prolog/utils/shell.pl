@@ -1,12 +1,27 @@
+
+:- use_module(library(http/http_json)).
+:- use_module(library(http/json)).
+:- use_module(library(http/http_client)).
+:- use_module(library(http/http_open)).
+
+
+services_server(S) :-
+	current_prolog_flag(services_server, S).
+
+json_post(Url, Payload, Response) :-
+	http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)]).
+
+services_server_shell_cmd(Cmd) :-
+	format(string(Url), '~w/shell/rpc/', [$>services_server(<$)]),
+	debug(shell, 'POST: ~w', Url),
+	json_post(Url, _{cmd:Cmd,quiet_success:true}, _).
+
 /* shell4: to be used probably everywhere instead of shell2 or swipl shell.
-swipl shell has a bug making it stuck for long time
-*/
+swipl shell has a bug making it stuck for long time */
 
 shell4(Cmd_In, Exit_Status) :-
 	%format(user_error, 'shell4: ~q ...\n', [Cmd_In]),
-	%shell2(Cmd_In, Exit_Status),
 	services_server_shell_cmd(Cmd_In),Exit_Status=0,
-	%(Exit_Status = 0, format(user_error, 'faking:~q\n', [Cmd_In])),
 	%format(user_error, 'shell4: done\n', []),
 	true.
 

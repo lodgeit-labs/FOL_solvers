@@ -1,4 +1,4 @@
-:- module(_, [parse_n3/2]).
+:- module(_, [parse_n3_file/2, parse_n3_stream/3]).
 
 
 version_info('EYE v20.0910.0008 josd').
@@ -34,28 +34,54 @@ SOFTWARE.').
 :- dynamic(query/2).
 :- dynamic(quvar/3).
 :- dynamic(rule_uvar/1).
+:- dynamic(evar/3).
+:- dynamic(ns/2).
 
 
 
-parse_n3(FilePath,Triples):-
+prolog_sym(abolish, abolish, rel).
+
+so_uri('http://').
+so_uri('https://').
+so_uri('ftp://').
+so_uri('file://').
+
+
+:- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#biconditional>'/2).
+:- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#call>'/2).
+:- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#conditional>'/2).
+:- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#finalize>'/2).
+:- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#relabel>'/2).
+:- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#tactic>'/2).
+:- dynamic('<http://eulersharp.sourceforge.net/2003/03swap/log-rules#transaction>'/2).
+:- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>'/2).
+:- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>'/2).
+:- dynamic('<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'/2).
+:- dynamic('<http://www.w3.org/2000/01/rdf-schema#subClassOf>'/2).
+:- dynamic('<http://www.w3.org/2000/10/swap/log#implies>'/2).
+:- dynamic('<http://www.w3.org/2000/10/swap/log#outputString>'/2).
+
+
+
+parse_n3_file(FilePath,Triples):-
 	open(FilePath, read, In, [encoding(utf8)]),
+    parse_n3_stream(FilePath, In, Triples).
+
+parse_n3_stream(Base_uri, In, Triples) :-
 	nb_setval(line_number, 1),
 	nb_setval(fdepth, 0),
     nb_setval(smod, true),
-
+    nb_setval(var_ns, 'http://josd.github.io/.well-known/genid/#'),
 	retractall(base_uri(_)),
-	assertz(base_uri(FilePath)),
-	repeat,
+	assertz(base_uri(Base_uri)),
+	%gtrace,
 	tokens(In, Tokens),
 	phrase(document(Triples), Tokens, Rest),
 	(   Rest = []
-	->  writeq(Triples)
+	->  true %(writeq(Triples),nl)
 	;   nb_getval(line_number, Ln),
 		throw(invalid_document(after_line(Ln),remaining(Rest)))
 	).
-
-
-
 
 
 
@@ -1796,3 +1822,158 @@ numeral(A, B) :-
     append(A, [0'0], B),
     !.
 numeral(A, A).
+
+
+del([], _, []).
+del([A|B], C, D) :-
+    copy_term_nat(A, Ac),
+    copy_term_nat(C, Cc),
+    unify(Ac, Cc),
+    !,
+    del(B, C, D).
+del([A|B], C, [A|D]) :-
+    del(B, C, D).
+
+escape_squote([], []) :-
+    !.
+escape_squote([0''|A], [0'\\, 0''|B]) :-
+    !,
+    escape_squote(A, B).
+escape_squote([A|B], [A|C]) :-
+    escape_squote(B, C).
+
+
+escape_string([], []) :-
+    !.
+escape_string([0'\t|A], [0'\\, 0't|B]) :-
+    !,
+    escape_string(A, B).
+escape_string([0'\b|A], [0'\\, 0'b|B]) :-
+    !,
+    escape_string(A, B).
+escape_string([0'\n|A], [0'\\, 0'n|B]) :-
+    !,
+    escape_string(A, B).
+escape_string([0'\r|A], [0'\\, 0'r|B]) :-
+    !,
+    escape_string(A, B).
+escape_string([0'\f|A], [0'\\, 0'f|B]) :-
+    !,
+    escape_string(A, B).
+escape_string([0'"|A], [0'\\, 0'"|B]) :-
+    !,
+    escape_string(A, B).
+escape_string([0'\\|A], [0'\\, 0'\\|B]) :-
+    !,
+    escape_string(A, B).
+escape_string([A|B], [A|C]) :-
+    escape_string(B, C).
+
+subst(_, [], []).
+subst(A, B, C) :-
+    member([D, E], A),
+    append(D, F, B),
+    !,
+    append(E, G, C),
+    subst(A, F, G).
+subst(A, [B|C], [B|D]) :-
+    subst(A, C, D).
+
+unify(A, B) :-
+    nonvar(A),
+    A = exopred(P, S, O),
+    (   (   nonvar(B)
+        ;   nonvar(P)
+        )
+    ->  (   nonvar(P)
+        ->  atom(P)
+        ;   true
+        ),
+        B =.. [P, T, R],
+        atom(P),
+        unify(S, T),
+        unify(O, R)
+    ;   B = exopred(P, T, R),
+        unify(S, T),
+        unify(O, R)
+    ),
+    !.
+unify(A, B) :-
+    nonvar(B),
+    B = exopred(P, S, O),
+    (   (   nonvar(A)
+        ;   nonvar(P)
+        )
+    ->  (   nonvar(P)
+        ->  atom(P)
+        ;   true
+        ),
+        A =.. [P, T, R],
+        atom(P),
+        unify(S, T),
+        unify(O, R)
+    ;   A = exopred(P, T, R),
+        unify(S, T),
+        unify(O, R)
+    ),
+    !.
+unify(A, B) :-
+    is_list(A),
+    !,
+    getlist(B, C),
+    C = A.
+unify(A, B) :-
+    is_list(B),
+    !,
+    getlist(A, C),
+    C = B.
+unify(A, B) :-
+    nonvar(A),
+    nonvar(B),
+    (   A = (_, _)
+    ;   B = (_, _)
+    ),
+    !,
+    conj_list(A, C),
+    conj_list(B, D),
+    includes(C, D),
+    includes(D, C).
+unify(A, B) :-
+    nonvar(A),
+    nonvar(B),
+    A =.. [P, S, O],
+    B =.. [P, T, R],
+    !,
+    unify(S, T),
+    unify(O, R).
+unify(A, A).
+
+
+getlist(A, A) :-
+    var(A),
+    !.
+getlist(set(A), A) :-
+    !.
+getlist('<http://www.w3.org/1999/02/22-rdf-syntax-ns#nil>', []) :-
+    !.
+getlist([], []) :-
+    !.
+getlist([A|B], [C|D]) :-
+    getlist(A, C),
+    !,
+    getlist(B, D).
+getlist([A|B], [A|D]) :-
+    !,
+    getlist(B, D).
+getlist(A, [B|C]) :-
+    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#first>'(A, B),
+    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>'(A, D),
+    getlist(D, C).
+
+includes(_, []) :-
+    !.
+includes(X, [Y|Z]) :-
+    member(U, X),
+    unify(U, Y),
+    includes(X, Z).
+

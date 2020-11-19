@@ -64,3 +64,15 @@ round_term(Digits, X, Y) :-
 
 
 
+unify_numbers(A,B) :-
+	(	A = B
+	->	true
+	;	/* allow for integer vs float */
+		A =:= B).
+
+/* todo unify_numbers(Z, 0)?*/
+ is_zero_number(Z) :-
+	var(Z), Z = 0.
+ is_zero_number(Z) :-
+	atomic(Z),
+	Z =:= 0.

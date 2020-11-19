@@ -1,5 +1,7 @@
 #!/usr/bin/env swipl
 
+:- ['../../prolog/determinancy_checker/determinancy_checker_main.pl'].
+
 /*
 not all permutations of compilation and toplevel options are implemented. Compilation would be useful if swipl reported all errors, including DCG errors, upon loading, without a need to call 'make'. Right now, it is useless, and it gives no speed improvement.
 */
@@ -18,7 +20,7 @@ shell2(Cmd) :-
 shell2(Cmd_In, Exit_Status) :-
 	flatten([Cmd_In], Cmd_Flat),
 	atomic_list_concat(Cmd_Flat, Cmd),
-	format(user_error, '~w\n\n', [Cmd]),
+	debug(dev_runner, '~w\n\n', [Cmd]),
 	shell(Cmd, Exit_Status).
 
 /* call halt_on_problems if halt_on_problems(true) */
@@ -66,27 +68,34 @@ make_temp_err_file :-
 	close(Stream).
 
 main :-
-	format(user_error, 'dev_runner: starting...\n', []),
+	debug(dev_runner, 'dev_runner: starting...\n', []),
 	Spec = [
 		[opt(script), type(atom), shortflags([s]), longflags([script]),
 			help('the .pl file you wish to run')]
 		,[opt(goal), type(atom), shortflags([g]), longflags([goal]),
-			help('the -g you wish to pass to your .pl file')]
+			help('the -g you wish to pass to swipl')]
+		%,[opt(args), type(atom), default(''), shortflags([a]), longflags([args]),
+		%	help('the command-line arguments you wish to pass to your script')]
 		,[opt(debug), type(boolean), default(true), shortflags([d]), longflags([debug]),
-			help('run swipl with -O or without?')]
+			help('run swipl with -O?')]
 		,[opt(compile), type(boolean), default(false), shortflags([c]), longflags([compile]),
 			help('compile first?')]
 		,[opt(toplevel), type(boolean), default(true), shortflags([t]), longflags([toplevel]),
-			help('pass goal interactively into toplevel instead of with -g? Allows guitracer to run after exception')]
+			help('pass goal interactively into toplevel instead of with -g? Allows guitracer to run after exception.')]
 		,[opt(halt_on_problems), type(boolean), default(true), shortflags([h]), longflags([halt_on_problems])]
 		,[opt(problem_lines_whitelist), type(atom), longflags([problem_lines_whitelist])]
 		,[opt(viewer), type(atom), shortflags([v]), longflags([viewer]),
 			help('invoke a program on the stdout output of your .pl file')]
 		,[opt(clear_terminal), type(boolean), default(false), longflags([clear_terminal])]
 	],
-	opt_arguments(Spec, Opts, Args),
-	(Args = [] -> true ; throw(string('no positional arguments accepted'))),
+	% accept positional arguments after a '--'. These will be the arguments passed to the script.
+
+	current_prolog_flag(argv, Args),
+	!split_list_by_last_occurence_of(Args,'--',Args2, ScriptArgs),
+	opt_parse(Spec, Args2, Opts, []),
+
 	assert(opts(Opts)),
+	assert(scriptargs(ScriptArgs)),
 	memberchk(debug(Debug), Opts),
 	memberchk(viewer(Viewer), Opts),
 	memberchk(script(Script), Opts),
@@ -111,15 +120,31 @@ main :-
 */
 
 
+split_list_by_last_occurence_of(In,Separator,Before,After) :-
+	reverse(In, In2),
+	split_list_by_last_occurence_of2(In2,Separator,Before0, After0),
+	reverse(Before0, After),
+	reverse(After0, Before).
+
+split_list_by_last_occurence_of2([Separator|L1t],Separator,L1t,[]) :- !.
+
+split_list_by_last_occurence_of2([H|L1t],Separator,Before,[H|L2t]) :-
+	dif(H,Separator),
+	split_list_by_last_occurence_of2(L1t,Separator,Before,L2t),
+	!.
+
+split_list_by_last_occurence_of2([],_,[],[]) :- !.
+
+
 optimization_flag(Debug, Optimization) :-
 	(	Debug = true
 	->	(
 			Optimization = ' ',
-			format(user_error, 'dev_runner: debug is true, no -O...\n', [])
+			debug(dev_runner, 'dev_runner: debug is true, no -O...\n', [])
 		)
 	;	(
 			Optimization = ' -O ',
-			format(user_error, 'dev_runner: debug is false, using -O...\n', [])
+			debug(dev_runner, 'dev_runner: debug is false, using -O...\n', [])
 		)
 	).
 
@@ -130,16 +155,16 @@ check_syntax(Optimization, Script) :-
 	make_temp_err_file,
 	atomic_list_concat(['swipl ', Optimization, ' -s ', Script], Load_Cmd),
 	get_flag(err_file, Err_File),
-	format(user_error, 'dev_runner: checking syntax...\n', []),
+	debug(dev_runner, 'dev_runner: checking syntax...\n', []),
 	shell2([Load_Cmd, ' -g "make,halt."  2>&1  |  tee ', Err_File, ' | head -n 150 1>&2']),
 	maybe_halt_on_problems,
-	format(user_error, 'dev_runner: syntax seems ok...\n', []).
+	debug(dev_runner, 'dev_runner: syntax seems ok...\n', []).
 
 
 
 run_with_compilation(Optimization, Script, Viewer) :-
 	opts(Opts),
-	format(user_error, 'dev_runner: compiling...\n', []),
+	debug(dev_runner, 'dev_runner: compiling...\n', []),
 	memberchk(goal(Goal), Opts),
 
 	% if goal is passed and toplevel(true), compile without goal, otherwise compile Goal in
@@ -185,7 +210,7 @@ run_with_compilation(Optimization, Script, Viewer) :-
 
 run_without_compilation(Debug, Optimization, Script, Viewer) :-
 	opts(Opts),
-	format(user_error, 'dev_runner: running script...\n', []),
+	debug(dev_runner, 'dev_runner: running script...\n', []),
 	memberchk(goal(Goal), Opts),
 
 	% if goal is passed and toplevel(true), compile without goal, otherwise compile Goal in
@@ -195,12 +220,12 @@ run_without_compilation(Debug, Optimization, Script, Viewer) :-
 		;	atomic_list_concat([' -g "', Goal, '." '], Execution_goal))
 	;	(
 			Execution_goal = '',
-			format(user_error, 'dev_runner: running without goal...\n', [])
+			debug(dev_runner, 'dev_runner: running without goal...\n', [])
 		)
 	),
 
 	(	memberchk(toplevel(true), Opts)
-	->	run_with_toplevel(Debug, Goal, Script)
+	->	run_with_toplevel(Debug, Goal, Script, Opts)
 	;	(
 			(	nonvar(Viewer)
 			->	Redirection = [' 2>&1  1> arrr.xml']
@@ -225,25 +250,27 @@ optimization_flag2(Debug, Optimization) :-
 	(	Debug = true
 	->	(
 			Optimization = ['--debug=true'],
-			format(user_error, 'dev_runner: debug is true, no -O...\n', [])
+			debug(dev_runner, 'dev_runner: debug is true, no -O...\n', [])
 		)
 	;	(
 			Optimization = ['--debug=false', '-O'],
-			format(user_error, 'dev_runner: debug is false, using -O...\n', [])
+			debug(dev_runner, 'dev_runner: debug is false, using -O...\n', [])
 		)
 	).
 
-run_with_toplevel(Debug, Goal, Script) :-
+run_with_toplevel(Debug, Goal, Script, _Opts) :-
 	optimization_flag2(Debug, Optimization),
-	Args0 = [Optimization, '-s', Script],
+	scriptargs(ScriptArgs),
+	Args0 = [Optimization, '-s', Script, '--', ScriptArgs],
 	flatten(Args0, Args),
-	format(user_error, 'dev_runner: running with toplevel with args ~q ...\n', [Args]),
+	debug(dev_runner, 'dev_runner: running with toplevel with args ~q ...\n', [Args]),
 	process_create(path(swipl), Args, [process(Pid), stdin(pipe(Stdin))]),
 	%write(Stdin, writeln('script output starts below'),
-	write(Stdin, Goal),
-	write(Stdin, '.\n'),
-	write(Stdin, 'a.\n'),
-	write(Stdin, 'halt.\n'),
+	atomics_to_string(['(',Goal,',halt(0));halt(1).\n'], Goal2),
+	write(Stdin, Goal2),
+	% to cause an abort after an exception, i think:
+	write(Stdin, 'a. '),
+	write(Stdin, 'halt(1).\n'),
 	flush_output(Stdin),
 	process_wait(Pid,Status),
 	(	Status = exit(Exit_status)

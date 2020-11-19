@@ -1,4 +1,8 @@
+:- b_setval(context, []).
 
+
+:- use_module(library(semweb/rdf11),except(['{}'/1])).
+:- use_module(library(semweb/turtle)).
 :- use_module(library(http/json)).
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_open)).
@@ -18,12 +22,15 @@
 :- [compare_xml].
 :- [compile_with_variable_names_preserved].
 :- [dict_vars].
+:- [doc].
 :- [exceptions].
+:- [execution_context].
 :- [files].
 :- [higher_order].
 :- [json].
 :- [magic_formula].
 :- [numbers].
+:- [request_files].
 :- [shell].
 :- [string_manipulation].
 :- [structured_xml].
