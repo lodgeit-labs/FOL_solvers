@@ -36,7 +36,7 @@ halt_on_problems :-
 	get_flag(err_file, Err_File),
 	opts(Opts),
 	(	(memberchk(problem_lines_whitelist(Whitelist_File), Opts), nonvar(Whitelist_File))
-	->	Err_Grep = ['grep -E -i "Warn|err" ', Err_File, ' | grep -q -v -x -F -f ', Whitelist_File]
+	->	Err_Grep = ['grep -E -i "Warn|err" ', Err_File, ' | grep -q -v -F -f ', Whitelist_File]
 	;	Err_Grep = ['grep -q -E -i "Warn|err" ', Err_File]
 	),
 	(	shell2(Err_Grep, 0)

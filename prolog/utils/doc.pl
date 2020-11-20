@@ -942,13 +942,28 @@ about namespaces:
 
 :- dynamic(exception_doc_dump/2).
 :- dynamic(exception_ctx_dump/1).
-
+:- dynamic(prolog_stack__prolog_exception_hook/4).
 
 
 /*
 problem with doing this along with using library(prolog_stack):
 only one prolog_exception_hook is ever called. So, we'll save the prolog_stack clause, retract it, and call it ourselves.
+This workaround worked most of the time, but not always, in V8.1.15. In versions 8.3, it never seems to work.
+
+so, option 0: try to isolate the issue: prolog_exception_hook is sometimes ignored?
+
+option 1: give up library(prolog_stack). Given how unreadable the stack usually is, this doesn't seem to be a big loss. When there's a problem, i gtrace anyway. I hoped the stack would be a "last resort" for users, once it would be presented in the rdf viewer, with clickable/explorable resurce uris.. But i guess i can focus on making sure that everything has a nice execution_stack..
+
+option 2: thread a global State through everything. Would DCGs make that tolerable? if every rule was something like
+rule --> {
+	bla,
+	bla
+	},
+would we get OldState->NewState threaded implicitly everywhere? Or some other macro lib? eeek.
+Anyway, we could store both doc and context in State.
+
 */
+
 :-
 	%gtrace,
 	clause(prolog_exception_hook(A,B,C,D),Body),
@@ -958,7 +973,9 @@ only one prolog_exception_hook is ever called. So, we'll save the prolog_stack c
 
 prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 	print_message(information, "prolog_stack__prolog_exception_hook"),
-	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame),
+	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
+	->	true
+	;	F = E),
 	%print_message(information, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"),
 
 	/* a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe? */
