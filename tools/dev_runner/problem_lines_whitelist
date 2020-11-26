@@ -1,45 +1,32 @@
-The predicates below are not defined. If these are defined
-at runtime using assert/1, use :- dynamic Name/Arity.
+Warning: The predicates below are not defined. If these are defined
+Warning: at runtime using assert/1, use :- dynamic Name/Arity.
+Warning: 
+Warning: bv_r:detach_bounds/1, which is referenced by
+Warning: 	/usr/lib/swi-prolog/library/clp/clpqr/redund.pl:286:30: 2-nd clause of detach_bounds/2
+Warning: bv_r:dump_nz/5, which is referenced by
+Warning: 	/usr/lib/swi-prolog/library/clp/clpqr/itf.pl:101:29: 2-nd clause of dump_nz/6
+Warning: bv_r:dump_var/6, which is referenced by
+Warning: 	/usr/lib/swi-prolog/library/clp/clpqr/itf.pl:86:33: 2-nd clause of dump_v/7
+Warning: bv_r:intro_at/3, which is referenced by
+Warning: 	/usr/lib/swi-prolog/library/clp/clpqr/redund.pl:289:29: 2-nd clause of intro_at/4
+Warning: bv_r:pivot/5, which is referenced by
+Warning: 	/usr/lib/swi-prolog/library/clp/clpqr/project.pl:209:44: 2-nd clause of pivot/6
+Warning: bv_r:var_intern/2, which is referenced by
+Warning: 	/usr/lib/swi-prolog/library/clp/clpqr/ordering.pl:110:21: 2-nd clause of join_class/2
+Warning: fourmotz_r:fm_elim/3, which is referenced by
+Warning: 	/usr/lib/swi-prolog/library/clp/clpqr/project.pl:96:43: 2-nd clause of fm_elim/4
+Warning: itf_r:do_checks/8, which is referenced by
+Warning: 	/usr/lib/swi-prolog/library/clp/clpqr/itf.pl:124:14: 2-nd clause of do_checks/9
+Warning: store_r:indep/2, which is referenced by
+Warning: 	/usr/lib/swi-prolog/library/clp/clpqr/project.pl:206:32: 2-nd clause of indep/3
+Warning: store_r:renormalize/2, which is referenced by
+Warning: 	/usr/lib/swi-prolog/library/clp/clpqr/project.pl:212:37: 2-nd clause of renormalize/3
+% Updating index for library /usr/local/lib/swipl/xpce/prolog/lib/
+% Updating index for library /usr/local/lib/swipl/library/
+% The graphical front-end will be used for subsequent tracing
+Welcome to SWI-Prolog (threaded, 64 bits, version 8.1.15-DIRTY)
+SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
+Please run ?- license. for legal details.
 
-bv_r:detach_bounds/1, which is referenced by
-/usr/lib/swi-prolog/library/clp/clpqr/redund.pl:286:30: 2-nd clause of detach_bounds/2
-bv_r:dump_nz/5, which is referenced by
-/usr/lib/swi-prolog/library/clp/clpqr/itf.pl:101:29: 2-nd clause of dump_nz/6
-bv_r:dump_var/6, which is referenced by
-/usr/lib/swi-prolog/library/clp/clpqr/itf.pl:86:33: 2-nd clause of dump_v/7
-bv_r:intro_at/3, which is referenced by
-/usr/lib/swi-prolog/library/clp/clpqr/redund.pl:289:29: 2-nd clause of intro_at/4
-bv_r:pivot/5, which is referenced by
-/usr/lib/swi-prolog/library/clp/clpqr/project.pl:209:44: 2-nd clause of pivot/6
-bv_r:var_intern/2, which is referenced by
-/usr/lib/swi-prolog/library/clp/clpqr/ordering.pl:110:21: 2-nd clause of join_class/2
-fourmotz_r:fm_elim/3, which is referenced by
-/usr/lib/swi-prolog/library/clp/clpqr/project.pl:96:43: 2-nd clause of fm_elim/4
-itf_r:do_checks/8, which is referenced by
-/usr/lib/swi-prolog/library/clp/clpqr/itf.pl:124:14: 2-nd clause of do_checks/9
-store_r:indep/2, which is referenced by
-/usr/lib/swi-prolog/library/clp/clpqr/project.pl:206:32: 2-nd clause of indep/3
-store_r:renormalize/2, which is referenced by
-/usr/lib/swi-prolog/library/clp/clpqr/project.pl:212:37: 2-nd clause of renormalize/3
-
-
-bv_r:detach_bounds/1, which is referenced by
-/usr/local/lib/swi-prolog/library/clp/clpqr/redund.pl:286:30: 2-nd clause of detach_bounds/2
-bv_r:dump_nz/5, which is referenced by
-/usr/local/lib/swi-prolog/library/clp/clpqr/itf.pl:101:29: 2-nd clause of dump_nz/6
-bv_r:dump_var/6, which is referenced by
-/usr/local/lib/swi-prolog/library/clp/clpqr/itf.pl:86:33: 2-nd clause of dump_v/7
-bv_r:intro_at/3, which is referenced by
-/usr/local/lib/swi-prolog/library/clp/clpqr/redund.pl:289:29: 2-nd clause of intro_at/4
-bv_r:pivot/5, which is referenced by
-/usr/local/lib/swi-prolog/library/clp/clpqr/project.pl:209:44: 2-nd clause of pivot/6
-bv_r:var_intern/2, which is referenced by
-/usr/local/lib/swi-prolog/library/clp/clpqr/ordering.pl:110:21: 2-nd clause of join_class/2
-fourmotz_r:fm_elim/3, which is referenced by
-/usr/local/lib/swi-prolog/library/clp/clpqr/project.pl:96:43: 2-nd clause of fm_elim/4
-itf_r:do_checks/8, which is referenced by
-/usr/local/lib/swi-prolog/library/clp/clpqr/itf.pl:124:14: 2-nd clause of do_checks/9
-store_r:indep/2, which is referenced by
-/usr/local/lib/swi-prolog/library/clp/clpqr/project.pl:206:32: 2-nd clause of indep/3
-store_r:renormalize/2, which is referenced by
-/usr/local/lib/swi-prolog/library/clp/clpqr/project.pl:212:37: 2-nd clause of renormalize/3
+For online help and background, visit http://www.swi-prolog.org
+For built-in help, use ?- help(Topic). or ?- apropos(Word).

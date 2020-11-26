@@ -942,8 +942,6 @@ about namespaces:
 
 :- dynamic(exception_doc_dump/2).
 :- dynamic(exception_ctx_dump/1).
-:- dynamic(prolog_stack__prolog_exception_hook/4).
-
 
 /*
 problem with doing this along with using library(prolog_stack):
@@ -964,15 +962,20 @@ Anyway, we could store both doc and context in State.
 
 */
 
+:- dynamic(prolog_stack__prolog_exception_hook/4).
+
+/* save the original clause and delete it */
 :-
-	%gtrace,
-	clause(prolog_exception_hook(A,B,C,D),Body),
-	assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
-	retractall(prolog_exception_hook(A,B,C,D)).
+	(	clause(prolog_exception_hook(A,B,C,D),Body)
+	->	(
+			assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
+			retractall(prolog_exception_hook(A,B,C,D))
+		)
+	;	true).
 
 
 prolog_exception_hook(E,F, Frame, CatcherFrame) :-
-	print_message(information, "prolog_stack__prolog_exception_hook"),
+	%print_message(information, "prolog_stack__prolog_exception_hook"),
 	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
 	->	true
 	;	F = E),
@@ -1003,6 +1006,6 @@ doc_data(G,Ng) :-
 
 'store ctx data for reporting after exception' :-
 	get_context(Ctx_list),
-	print_message(information, 'storing context:'(Ctx_list)),
+	%print_message(information, 'storing context:'(Ctx_list)),
 	retractall(exception_ctx_dump(_)),
 	assert(exception_ctx_dump(Ctx_list)).
