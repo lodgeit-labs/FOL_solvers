@@ -3,6 +3,7 @@
 	throw a msg(Message) term, these errors are caught by our http server code and turned into nice error messages
 */
  throw_string(List_Or_Atom) :-
+ 	/* and then this could be removd in favor of the repl loop gtrace..*/
 	gtrace_if_have_display,
 	flatten([List_Or_Atom], List),
 	maplist(stringize, List, List2),
