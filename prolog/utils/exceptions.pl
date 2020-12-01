@@ -12,9 +12,11 @@
 
 
  have_display :-
+ 	format(user_error, 'have_display?', []),
 	getenv('DISPLAY', Display),
 	atom_length(Display, X),
-	X > 0.
+	X > 0,
+	format(user_error, 'yes', []).
 
  gtrace_if_have_display :-
 	(	have_display

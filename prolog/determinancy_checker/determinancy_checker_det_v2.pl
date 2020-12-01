@@ -22,11 +22,13 @@ det_with(Call_id, Call) :-
 				nb_delete(Call_id),
 				fail
 			)
-		;	throw(error(deterministic_call_failed(Call),_))
+		;	determinancy_checker_throw_error(error(deterministic_call_failed(Call),_))
 	)).
 
 det_nbinc(Call_id, Call) :-
 	nb_getval(Call_id, Sols),
 	(	Sols = 0
 	->	nb_setval(Call_id, 1)
-	;	throw((deterministic_call_found_a_second_solution(Call)))).
+	;	determinancy_checker_throw_error((deterministic_call_found_a_second_solution(Call)))).
+
+

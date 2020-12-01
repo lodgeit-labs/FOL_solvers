@@ -12,7 +12,7 @@ determinancy_checker_semidet_nbinc(Call_id, X) :-
 	catch(
 		nb_getval(Call_id, _),
 		_,
-		throw(semideterministic_call_has_multiple_solutions(X))
+		determinancy_checker_throw_error(semideterministic_call_has_multiple_solutions(X))
 	),
 	nb_delete(Call_id).
 

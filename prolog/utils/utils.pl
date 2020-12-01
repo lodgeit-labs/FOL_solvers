@@ -15,6 +15,7 @@
 :- op(900,fx,<$).
 
 :- use_module('../determinancy_checker/determinancy_checker_main.pl').
+:- assert(user:determinancy_checker_thrower(throw_string)).
 
 :- multifile user:goal_expansion/2.
 :- dynamic user:goal_expansion/2.

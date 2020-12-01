@@ -13,7 +13,25 @@
 :- meta_predicate '!'(2, ?, ?).
 
 
-:- if(getenv('DETERMINANCY_CHECKER__USE__ENFORCER', true)).
+:- dynamic determinancy_checker_thrower/1.
+
+
+determinancy_checker_throw_error(E) :-
+	user:determinancy_checker_thrower(T),!,
+	call(T,E).
+
+determinancy_checker_throw_error(E) :-
+	throw(E).
+
+env_bool_is_true(Env_var_value) :-
+	downcase_atom(Env_var_value, V),
+	member(V, [1, '1', 'true', 'yes', 'on']),!.
+
+env_bool_true(Key) :-
+	getenv(Key, Val),
+	env_bool_is_true(Val).
+
+:- if(env_bool_true('DETERMINANCY_CHECKER__USE__ENFORCER')).
 :- [determinancy_enforcer].
 :- else.
 :- [determinancy_checker_det_v2].
