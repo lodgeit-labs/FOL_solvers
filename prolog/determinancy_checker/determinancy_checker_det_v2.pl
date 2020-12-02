@@ -13,6 +13,11 @@
 	call(X, Y, Z),
 	det_nbinc(Call_id, (X, Y, Z)).
 
+'!'(X, Y, Z, ZZ) :-
+	det_with(Call_id, (X, Y, Z, ZZ)),
+	call(X, Y, Z, ZZ),
+	det_nbinc(Call_id, (X, Y, Z, ZZ)).
+
 det_with(Call_id, Call) :-
 	gensym(determinancy_checker__deterministic_call__progress, Call_id),
 	(	nb_setval(Call_id, 0)

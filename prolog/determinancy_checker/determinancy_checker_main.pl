@@ -4,6 +4,7 @@
 	'!'/1,
 	'!'/2,
 	'!'/3,
+	'!'/4,
 	'?'/1
 ]).
 
@@ -11,6 +12,7 @@
 :- meta_predicate '!'(0).
 :- meta_predicate '!'(1, ?).
 :- meta_predicate '!'(2, ?, ?).
+:- meta_predicate '!'(3, ?, ?, ?).
 
 
 :- dynamic determinancy_checker_thrower/1.

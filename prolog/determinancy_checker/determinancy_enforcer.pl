@@ -12,6 +12,9 @@ a "performant" implmentation/stub, it cuts after first solution and doesn't chec
 '!'(X,A1,A2) :-
 	(call(X,A1,A2)->true;determinancy_checker_throw_error(deterministic_call_failed((X,A1,A2)))).
 
+'!'(X,A1,A2,A3) :-
+	(call(X,A1,A2,A3)->true;determinancy_checker_throw_error(deterministic_call_failed((X,A1,A2,A3)))).
+
 '?'(X) :-
 	call(X),!.
 
