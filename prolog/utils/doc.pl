@@ -592,21 +592,25 @@ request(R) :-
 	request(Request),
 	doc(Request, l:has_request_data, D).
 
-request_accounts(As) :-
+ request_accounts(As) :-
 	request_data(D),
 	!doc(D, l:has_accounts, As).
 
-result(R) :-
+ result(R) :-
 	doc(R, rdf:type, l:'Result').
 
+
  add_alert(Type, Msg) :-
+ 	add_alert(Type, Msg, _).
+
+ add_alert(Type, Msg, Uri) :-
 	result(R),
 	doc_new_uri(alert, Uri),
 	doc_add(R, l:alert, Uri),
 	doc_add(Uri, l:type, Type),
 	doc_add(Uri, l:message, Msg).
 
-assert_alert(Type, Msg) :-
+ assert_alert(Type, Msg) :-
 	/*todo*/
 	result(R),
 	doc_new_uri(alert, Uri),
@@ -614,38 +618,38 @@ assert_alert(Type, Msg) :-
 	doc_add(Uri, l:type, Type),
 	doc_add(Uri, l:message, Msg).
 
-get_alert(Type, Msg) :-
+ get_alert(Type, Msg, Uri) :-
 	result(R),
 	docm(R, l:alert, Uri),
 	doc(Uri, l:type, Type),
 	doc(Uri, l:message, Msg).
 
-add_comment_stringize(Title, Term) :-
+ add_comment_stringize(Title, Term) :-
 	pretty_term_string(Term, String),
 	add_comment_string(Title, String).
 
-add_comment_string(Title, String) :-
+ add_comment_string(Title, String) :-
 	doc_new_uri(comment, Uri),
 	doc_add(Uri, title, Title, comments),
 	doc_add(Uri, body, String, comments).
 
-doc_list_member(M, L) :-
+ doc_list_member(M, L) :-
 	doc(L, rdf:first, M).
 
-doc_list_member(M, L) :-
+ doc_list_member(M, L) :-
 	doc(L, rdf:rest, R),
 	doc_list_member(M, R).
 
-doc_list_items(L, Items) :-
+ doc_list_items(L, Items) :-
 	findall(Item, doc_list_member(Item, L), Items).
 
-doc_add_list([H|T], Uri) :-
+ doc_add_list([H|T], Uri) :-
 	doc_new_uri(rdf_list, Uri),
 	doc_add(Uri, rdf:first, H),
 	doc_add_list(T, Uri2),
 	doc_add(Uri, rdf:rest, Uri2).
 
-doc_add_list([], rdf:nil).
+ doc_add_list([], rdf:nil).
 
 
 doc_value(S, P, V) :-

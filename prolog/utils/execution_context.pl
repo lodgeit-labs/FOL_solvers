@@ -49,12 +49,48 @@ get_context(Ctx_list) :-
 	call(Callable),
 	pop_context.
 
+ c(Context, Callable, Arg1) :-
+	push_context(Context),
+	call(Callable, Arg1),
+	pop_context.
+
+ c(Context, Callable, Arg1, Arg2) :-
+	push_context(Context),
+	call(Callable, Arg1, Arg2),
+	pop_context.
+
+ c(Context, Callable, Arg1, Arg2, Arg3) :-
+	push_context(Context),
+	call(Callable, Arg1, Arg2, Arg3),
+	pop_context.
+
+ c(Context, Callable, Arg1, Arg2, Arg3, Arg4) :-
+	push_context(Context),
+	call(Callable, Arg1, Arg2, Arg3, Arg4),
+	pop_context.
+
  c(Callable) :-
 	c(Callable,Callable).
 
  cf(Callable) :-
 	Callable =.. [Functor|_],
 	c(Functor,Callable).
+
+ cf(Callable, Arg1) :-
+	Callable =.. [Functor|_],
+	c(Functor,Callable, Arg1).
+
+ cf(Callable, Arg1, Arg2) :-
+	Callable =.. [Functor|_],
+	c(Functor,Callable, Arg1, Arg2).
+
+ cf(Callable, Arg1, Arg2, Arg3) :-
+	Callable =.. [Functor|_],
+	c(Functor,Callable, Arg1, Arg2, Arg3).
+
+ cf(Callable, Arg1, Arg2, Arg3, Arg4) :-
+	Callable =.. [Functor|_],
+	c(Functor,Callable, Arg1, Arg2, Arg3, Arg4).
 
 
 
