@@ -1013,3 +1013,28 @@ doc_data(G,Ng) :-
 	%print_message(information, 'storing context:'(Ctx_list)),
 	retractall(exception_ctx_dump(_)),
 	assert(exception_ctx_dump(Ctx_list)).
+
+
+/*
+┏━┓┏━┓╻ ╻
+┣┳┛┣━┛┃┏┛
+╹┗╸╹  ┗┛
+Required Property Value
+*/
+
+rpv(S,P,V) :-
+	(	doc(S,P,V)
+	->	true
+	;	(
+			(	doc(P, rdfs:label, Label)
+			->	true
+			;	rdf_global_id(Label, P)),
+			throw_format(
+				'missing %q of item at %w.',
+				[
+					Label,
+					$>sheet_and_cell_string(S)
+				]
+			)
+		)
+	).
