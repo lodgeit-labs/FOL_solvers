@@ -802,6 +802,8 @@ xml_to_doc(Root, element(Name, _Atts, Children)) :-
 
 :- thread_create('watch doc-dumper command pipe', _).
 
+:- [doc_dump_server].
+
 doc_dump :-
 	once(save_doc).
 
@@ -971,25 +973,29 @@ Anyway, we could store both doc and context in State.
 /* save the original clause and delete it */
 
 
-:-
+:- initialization(
 	(	clause(prolog_exception_hook(A,B,C,D),Body)
 	->	(
 			assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
 			retractall(prolog_exception_hook(A,B,C,D))
 		)
-	;	true).
+	;	true)).
 
 prolog_exception_hook(E,F, Frame, CatcherFrame) :-
-	%print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+
 	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
 	->	true
 	;	F = E),
-	%print_message(information, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"),
+
+	print_message(information, "................."),
 
 	% a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe?
 
 	catch('store doc data for reporting after exception',E,format(user_error,'~q~n',[E])),
-	catch('store ctx data for reporting after exception',E,format(user_error,'~q~n',[E])).
+	catch('store ctx data for reporting after exception',E,format(user_error,'~q~n',[E])),
+
+	print_message(information, ".").
 /*
 */
 
@@ -1026,8 +1032,8 @@ Required Property Value
 */
 
 rpv(S,P,V) :-
-	(	doc(S,P,V)
-	->	true
+	(	doc(S,P,V0)
+	->	!doc(V0, rdf:value, V)
 	;	(
 			(	doc(P, rdfs:label, Label)
 			->	true
