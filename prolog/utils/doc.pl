@@ -969,6 +969,8 @@ Anyway, we could store both doc and context in State.
 :- dynamic(prolog_stack__prolog_exception_hook/4).
 
 /* save the original clause and delete it */
+
+
 :-
 	(	clause(prolog_exception_hook(A,B,C,D),Body)
 	->	(
@@ -977,7 +979,6 @@ Anyway, we could store both doc and context in State.
 		)
 	;	true).
 
-
 prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 	%print_message(information, "prolog_stack__prolog_exception_hook"),
 	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
@@ -985,10 +986,12 @@ prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 	;	F = E),
 	%print_message(information, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"),
 
-	/* a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe? */
+	% a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe?
 
-	'store doc data for reporting after exception',
-	'store ctx data for reporting after exception'.
+	catch('store doc data for reporting after exception',E,format(user_error,'~q~n',[E])),
+	catch('store ctx data for reporting after exception',E,format(user_error,'~q~n',[E])).
+/*
+*/
 
 doc_data(G,Ng) :-
 	catch(
