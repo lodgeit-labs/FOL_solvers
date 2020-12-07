@@ -80,8 +80,17 @@ maybe this program will even run faster without this?*/
 :- rdf_meta doc_add_value(r,r,r).
 :- rdf_meta doc_add_value(r,r,r,r).
 
+'check that there is only one exception hook and it\'s ours' :-
+	findall(
+		_,
+		(
+			!clause(prolog_exception_hook(A,B,C,D),Body1),
+			assertion(Body1 = user:my_prolog_exception_hook(A,B,C,D))
+		),
+	_).
 
 doc_init :-
+	'check that there is only one exception hook and it\'s ours',
 	doc_init_trace_0,
 	doc_clear.
 
@@ -969,19 +978,23 @@ Anyway, we could store both doc and context in State.
 */
 
 :- dynamic(prolog_stack__prolog_exception_hook/4).
+:- dynamic(prolog_exception_hook/4).
 
-/* save the original clause and delete it */
-
-
-:- initialization(
+'save old prolog exception hook' :-
 	(	clause(prolog_exception_hook(A,B,C,D),Body)
 	->	(
 			assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
 			retractall(prolog_exception_hook(A,B,C,D))
 		)
-	;	true)).
+	;	true).
 
-prolog_exception_hook(E,F, Frame, CatcherFrame) :-
+init_prolog_exception_hook :-
+	'save old prolog exception hook',
+	assert(prolog_exception_hook(E,F, Frame, CatcherFrame) :- my_prolog_exception_hook(E,F, Frame, CatcherFrame)).
+
+:- initialization(init_prolog_exception_hook).
+
+my_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 	print_message(information, "prolog_stack__prolog_exception_hook"),
 
 	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
@@ -993,6 +1006,7 @@ prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 	% a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe?
 
 	catch('store doc data for reporting after exception',E,format(user_error,'~q~n',[E])),
+	print_message(information, "........."),
 	catch('store ctx data for reporting after exception',E,format(user_error,'~q~n',[E])),
 
 	print_message(information, ".").
