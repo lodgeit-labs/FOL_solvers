@@ -573,6 +573,14 @@ doc_new_theory(T) :-
 	doc_new_uri(T),
 	doc_add(T, rdf:type, l:theory).
 
+request_data_property(P, O) :-
+	request_data(Request_Data),
+	doc(Request_Data, O).
+
+report_details_property_value(P, V) :-
+	!request_data_property(ic_ui:report_details, Details),
+	doc_value(Details, P, V).
+
 
 request_has_property(P, O) :-
 	result(R),
