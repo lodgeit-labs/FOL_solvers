@@ -19,18 +19,17 @@ c(callable): calls push_context(callable), then calls callable
 c(blabla, callable): calls push_context(blabla), then calls callable
 */
 
-/*
+
 get_context(Ctx_list) :-
 	catch(
 		b_getval(context, Ctx_list),
 		_,
 		Ctx_list = []
 	).
-	*/
 
- get_context(Ctx_list) :-
+ /*get_context(Ctx_list) :-
 	b_getval(context, Ctx_list).
-
+*/
  push_context(C) :-
 	get_context(Ctx_list),
 	append(Ctx_list, [C], New_ctx_list),

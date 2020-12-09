@@ -575,7 +575,7 @@ doc_new_theory(T) :-
 
 request_data_property(P, O) :-
 	request_data(Request_Data),
-	doc(Request_Data, O).
+	doc(Request_Data, P, O).
 
 report_details_property_value(P, V) :-
 	!request_data_property(ic_ui:report_details, Details),
