@@ -30,3 +30,13 @@ Please run ?- license. for legal details.
 
 For online help and background, visit http://www.swi-prolog.org
 For built-in help, use ?- help(Topic). or ?- apropos(Word).
+Warning: 	/usr/local/lib/swipl/library/clp/clpqr/redund.pl:286:30: 2-nd clause of detach_bounds/2
+Warning: 	/usr/local/lib/swipl/library/clp/clpqr/itf.pl:101:29: 2-nd clause of dump_nz/6
+Warning: 	/usr/local/lib/swipl/library/clp/clpqr/itf.pl:86:33: 2-nd clause of dump_v/7
+Warning: 	/usr/local/lib/swipl/library/clp/clpqr/redund.pl:289:29: 2-nd clause of intro_at/4
+Warning: 	/usr/local/lib/swipl/library/clp/clpqr/project.pl:209:44: 2-nd clause of pivot/6
+Warning: 	/usr/local/lib/swipl/library/clp/clpqr/ordering.pl:110:21: 2-nd clause of join_class/2
+Warning: 	/usr/local/lib/swipl/library/clp/clpqr/project.pl:96:43: 2-nd clause of fm_elim/4
+Warning: 	/usr/local/lib/swipl/library/clp/clpqr/itf.pl:124:14: 2-nd clause of do_checks/9
+Warning: 	/usr/local/lib/swipl/library/clp/clpqr/project.pl:206:32: 2-nd clause of indep/3
+Warning: 	/usr/local/lib/swipl/library/clp/clpqr/project.pl:212:37: 2-nd clause of renormalize/3

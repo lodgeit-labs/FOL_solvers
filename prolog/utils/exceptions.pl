@@ -2,12 +2,20 @@
 /*
 	throw a msg(Message) term, these errors are caught by our http server code and turned into nice error messages
 */
- throw_string(List_Or_Atomic) :-
+
+throw_string_with_html(List_Or_Atomic, Html) :-
+	prepare_throw(List_Or_Atomic, String),
+	throw(error(with_html(msg(String), Html),_)).
+
+prepare_throw(List_Or_Atomic, String) :-
  	/* and then this could be removd in favor of the repl loop gtrace..*/
 	gtrace_if_have_display,
 	flatten([List_Or_Atomic], List),
 	maplist(stringize, List, List2),
-	atomic_list_concat(List2, String),
+	atomic_list_concat(List2, String).
+
+ throw_string(List_Or_Atomic) :-
+ 	prepare_throw(List_Or_Atomic, String),
 	throw(error(msg(String),_)).
 
  throw_format(Format, Args) :-
