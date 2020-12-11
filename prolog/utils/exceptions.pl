@@ -5,7 +5,7 @@
 
 throw_string_with_html(List_Or_Atomic, Html) :-
 	prepare_throw(List_Or_Atomic, String),
-	throw(error(with_html(msg(String), Html),_)).
+	throw(error(msg(with_html(String, Html)),_)).
 
 prepare_throw(List_Or_Atomic, String) :-
  	/* and then this could be removd in favor of the repl loop gtrace..*/

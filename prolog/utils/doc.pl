@@ -1034,16 +1034,16 @@ doc_data(G,Ng) :-
 'store doc data for reporting after exception' :-
 	(	doc_data(G,Ng)
 	->	(
-			retractall(exception_doc_dump(_,_)),
-			assert(exception_doc_dump(G,Ng))
+			retractall(user:exception_doc_dump(_,_)),
+			assert(user:exception_doc_dump(G,Ng))
 		)
 	;	true).
 
 'store ctx data for reporting after exception' :-
 	get_context(Ctx_list),
-	%print_message(information, 'storing context:'(Ctx_list)),
-	retractall(exception_ctx_dump(_)),
-	assert(exception_ctx_dump(Ctx_list)).
+	print_message(information, 'storing context:'(Ctx_list)),
+	retractall(user:exception_ctx_dump(_)),
+	assert(user:exception_ctx_dump(Ctx_list)).
 
 
 /*
