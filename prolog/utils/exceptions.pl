@@ -9,10 +9,18 @@ throw_string_with_html(List_Or_Atomic, Html) :-
 
 prepare_throw(List_Or_Atomic, String) :-
  	/* and then this could be removd in favor of the repl loop gtrace..*/
-	gtrace_if_have_display,
-	flatten([List_Or_Atomic], List),
-	maplist(stringize, List, List2),
-	atomic_list_concat(List2, String).
+	(
+		(
+			flatten([List_Or_Atomic], List),
+			maplist(stringize, List, List2),
+			atomic_list_concat(List2, String)
+		)
+		->	true
+		;	throw(internal_error)
+	),
+	(	current_prolog_flag(debug, true)
+	->	gtrace_if_have_display
+	;	true).
 
  throw_string(List_Or_Atomic) :-
  	prepare_throw(List_Or_Atomic, String),
