@@ -43,50 +43,61 @@ get_context(Ctx_list) :-
 	!append(New_ctx_list,[_],Ctx_list),
 	b_setval(context, New_ctx_list).
 
+%:- meta_predicate 'c'(?, 3).
  c(Context, Callable) :-
 	push_context(Context),
 	call(Callable),
 	pop_context.
 
+%:- meta_predicate 'c'(?, 1, ?).
  c(Context, Callable, Arg1) :-
 	push_context(Context),
 	call(Callable, Arg1),
 	pop_context.
 
+%:- meta_predicate 'c'(?, 2, ?, ?).
  c(Context, Callable, Arg1, Arg2) :-
 	push_context(Context),
 	call(Callable, Arg1, Arg2),
 	pop_context.
 
+%:- meta_predicate 'c'(?, 3, ?, ?, ?).
  c(Context, Callable, Arg1, Arg2, Arg3) :-
 	push_context(Context),
 	call(Callable, Arg1, Arg2, Arg3),
 	pop_context.
 
+%:- meta_predicate 'c'(?, 4, ?, ?, ?, ?).
  c(Context, Callable, Arg1, Arg2, Arg3, Arg4) :-
 	push_context(Context),
 	call(Callable, Arg1, Arg2, Arg3, Arg4),
 	pop_context.
 
+%:- meta_predicate 'c'(0).
  c(Callable) :-
 	c(Callable,Callable).
 
+%:- meta_predicate 'cf'(3).
  cf(Callable) :-
 	Callable =.. [Functor|_],
 	c(Functor,Callable).
 
+%:- meta_predicate 'c'(1, ?).
  cf(Callable, Arg1) :-
 	Callable =.. [Functor|_],
 	c(Functor,Callable, Arg1).
 
+%:- meta_predicate 'c'(2, ?, ?).
  cf(Callable, Arg1, Arg2) :-
 	Callable =.. [Functor|_],
 	c(Functor,Callable, Arg1, Arg2).
 
+%:- meta_predicate 'c'(2, ?, ?, ?).
  cf(Callable, Arg1, Arg2, Arg3) :-
 	Callable =.. [Functor|_],
 	c(Functor,Callable, Arg1, Arg2, Arg3).
 
+%:- meta_predicate 'c'(2, ?, ?, ?, ?).
  cf(Callable, Arg1, Arg2, Arg3, Arg4) :-
 	Callable =.. [Functor|_],
 	c(Functor,Callable, Arg1, Arg2, Arg3, Arg4).
