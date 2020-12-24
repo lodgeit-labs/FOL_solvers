@@ -42,6 +42,8 @@
 'https://rdf.lodgeit.net.au/v1/calcs/smsf/computation#').
 :- rdf_register_prefix(reallocation,
 'https://rdf.lodgeit.net.au/v1/calcs/ic/reallocation#').
+:- rdf_register_prefix(bs,
+'https://rdf.lodgeit.net.au/v1/bank_statement#').
 :- rdf_register_prefix(rdf,
 'http://www.w3.org/1999/02/22-rdf-syntax-ns#').
 :- rdf_register_prefix(rdfs,
