@@ -19,7 +19,10 @@ prepare_throw(List_Or_Atomic, String) :-
 		;	throw(internal_error)
 	),
 	(	current_prolog_flag(debug, true)
-	->	gtrace_if_have_display
+	->	(
+			format(user_error, 'debug is true..'),
+			gtrace_if_have_display
+		)
 	;	true).
 
  throw_string(List_Or_Atomic) :-
