@@ -276,12 +276,14 @@ run_with_toplevel(Debug, Goal, Script, _Opts) :-
 	scriptargs(ScriptArgs),
 	Args0 = [Optimization, '-s', Script, '--', ScriptArgs],
 	flatten(Args0, Args),
-	debug(dev_runner, 'dev_runner: running with toplevel with args ~q ...\n', [Args]),
+	debug(dev_runner, 'dev_runner: will run with toplevel with args: ~q\n', [Args]),
+	atomics_to_string(['(',Goal,',halt(0));halt(1).\n'], Goal2),
+	debug(dev_runner, 'dev_runner: will pipe goal: ~w\n', [Goal2]),
 	process_create(path(swipl), Args, [process(Pid), stdin(pipe(Stdin))]),
 	%write(Stdin, writeln('script output starts below'),
-	atomics_to_string(['(',Goal,',halt(0));halt(1).\n'], Goal2),
+	%write(Stdin, "current_prolog_flag(debug,Debug),format(user_error,'debug=~q~n',[Debug]).\n\n"),
 	write(Stdin, Goal2),
-	% to cause an abort after an exception, i think:
+	% "a" to cause an abort after an exception. "." to pretend that was a query, in case tracer isnt on.
 	write(Stdin, 'a. '),
 	write(Stdin, 'halt(1).\n'),
 	flush_output(Stdin),

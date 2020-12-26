@@ -44,6 +44,8 @@
 'https://rdf.lodgeit.net.au/v1/calcs/ic/reallocation#').
 :- rdf_register_prefix(bs,
 'https://rdf.lodgeit.net.au/v1/bank_statement#').
+:- rdf_register_prefix(av,
+'https://rdf.lodgeit.net.au/v1/action_verbs#').
 :- rdf_register_prefix(rdf,
 'http://www.w3.org/1999/02/22-rdf-syntax-ns#').
 :- rdf_register_prefix(rdfs,
@@ -73,11 +75,11 @@ maybe this program will even run faster without this?*/
 :- rdf_meta docm(r,r,r).
 :- rdf_meta docm(r,r,r,r).
 :- rdf_meta doc_new_(r,-).
-:- rdf_meta request_has_property(r,r).
-:- rdf_meta request_add_property(r,r).
-:- rdf_meta request_add_property(r,r,r).
-:- rdf_meta request_assert_property(r,r,r).
-:- rdf_meta request_assert_property(r,r,r,r).
+:- rdf_meta result_has_property(r,r).
+:- rdf_meta result_add_property(r,r).
+:- rdf_meta result_add_property(r,r,r).
+:- rdf_meta result_assert_property(r,r,r).
+:- rdf_meta result_assert_property(r,r,r,r).
 :- rdf_meta doc_value(r,r,r).
 :- rdf_meta doc_add_value(r,r,r).
 :- rdf_meta doc_add_value(r,r,r,r).
@@ -567,56 +569,57 @@ replace_atom_prefix(X, Replaced_prefix, Replacement_prefix, X2) :-
 */
 
 
-doc_new_(Type, Uri) :-
+ doc_new_(Type, Uri) :-
 	doc_new_uri(Uri),
 	doc_add(Uri, rdf:type, Type).
 
-doc_new_theory(T) :-
+ doc_new_theory(T) :-
 	doc_new_uri(T),
 	doc_add(T, rdf:type, l:theory).
 
-request_data_property(P, O) :-
+ request_data_property(P, O) :-
 	request_data(Request_Data),
 	doc(Request_Data, P, O).
 
-report_details_property_value(P, V) :-
+ report_details_property_value(P, V) :-
 	!request_data_property(ic_ui:report_details, Details),
 	doc_value(Details, P, V).
 
 
-request_has_property(P, O) :-
+ result_has_property(P, O) :-
 	result(R),
 	doc(R, P, O).
 
-request_add_property(P, O) :-
+ result_add_property(P, O) :-
 	b_getval(default_graph, G),
-	request_add_property(P, O, G).
+	result_add_property(P, O, G).
 
-request_add_property(P, O, G) :-
+ result_add_property(P, O, G) :-
 	result(R),
 	doc_add(R, P, O, G).
 
-request_assert_property(P, O) :-
+result_assert_property(P, O) :-
 	b_getval(default_graph, G),
-	request_assert_property(P, O, G).
+	result_assert_property(P, O, G).
 
-request_assert_property(P, O, G) :-
+ result_assert_property(P, O, G) :-
 	result(R),
 	doc_assert(R, P, O, G).
 
-request(R) :-
+ request(R) :-
 	doc(R, rdf:type, l:'Request').
 
- request_data(D) :-
-	request(Request),
-	doc(Request, l:has_request_data, D).
-
- request_accounts(As) :-
-	request_data(D),
-	!doc(D, l:has_accounts, As).
-
  result(R) :-
-	doc(R, rdf:type, l:'Result').
+	!doc(R, rdf:type, l:'Result').
+
+ request_data(D) :-
+	!request(Request),
+	!doc(Request, l:has_request_data, D).
+
+
+ result_accounts(As) :-
+	result(D),
+	!doc(D, l:has_accounts, As).
 
 
  add_alert(Type, Msg) :-
@@ -1062,8 +1065,7 @@ rpv(S,P,V) :-
 			(	doc(P, rdfs:label, Label)
 			->	true
 			;	rdf_global_id(Label, P)),
-			throw_format(
-				'missing %q of item at %w.',
+			throw_format('missing ~q of item at ~w.',
 				[
 					Label,
 					$>sheet_and_cell_string(S)

@@ -43,7 +43,7 @@ get_context(Ctx_list) :-
 	!append(New_ctx_list,[_],Ctx_list),
 	b_setval(context, New_ctx_list).
 
-%:- meta_predicate 'c'(?, 3).
+%:- meta_predicate 'c'(?, 0).
  c(Context, Callable) :-
 	push_context(Context),
 	call(Callable),

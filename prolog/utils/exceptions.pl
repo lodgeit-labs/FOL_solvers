@@ -20,14 +20,18 @@ prepare_throw(List_Or_Atomic, String) :-
 	),
 	(	current_prolog_flag(debug, true)
 	->	(
-			format(user_error, 'debug is true..'),
+			format(user_error, 'debug is true..', []),
 			gtrace_if_have_display
 		)
 	;	true).
 
  throw_string(List_Or_Atomic) :-
  	prepare_throw(List_Or_Atomic, String),
-	throw(error(msg(String),_)).
+ 	%throw(error(msg(String),_)).
+
+	get_prolog_backtrace(200, Backtrace, [goal_depth(7)]),
+	stt(Backtrace, Backtrace_str),
+	throw(with_backtrace_str(error(msg(String),_),Backtrace_str)).
 
  throw_format(Format, Args) :-
  	length(Args,_),
@@ -44,8 +48,13 @@ prepare_throw(List_Or_Atomic, String) :-
 
  gtrace_if_have_display :-
 	(	have_display
-		-> gtrace
-		; true).
+	->	(	\+current_prolog_flag(gtrace, false)
+		->	(
+				backtrace(200),
+				gtrace
+			)
+		;	true)
+	; true).
 
  stringize(X, X) :-
 	atomic(X).
