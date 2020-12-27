@@ -1065,7 +1065,7 @@ rpv(S,P,V) :-
 			(	doc(P, rdfs:label, Label)
 			->	true
 			;	rdf_global_id(Label, P)),
-			throw_format('missing ~q of item at ~w.',
+			throw_format('missing ~q of item in ~w.',
 				[
 					Label,
 					$>sheet_and_cell_string(S)

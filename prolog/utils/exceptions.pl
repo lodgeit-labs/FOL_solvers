@@ -26,6 +26,9 @@ prepare_throw(List_Or_Atomic, String) :-
 	;	true).
 
  throw_string(List_Or_Atomic) :-
+ 	%get_context(Ctx_list),
+	%context_string(Ctx_list,Ctx_str),
+
  	prepare_throw(List_Or_Atomic, String),
  	%throw(error(msg(String),_)).
 
