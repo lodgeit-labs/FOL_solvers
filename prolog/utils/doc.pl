@@ -46,6 +46,8 @@
 'https://rdf.lodgeit.net.au/v1/bank_statement#').
 :- rdf_register_prefix(av,
 'https://rdf.lodgeit.net.au/v1/action_verbs#').
+:- rdf_register_prefix(uv,
+'https://rdf.lodgeit.net.au/v1/unit_values#').
 :- rdf_register_prefix(rdf,
 'http://www.w3.org/1999/02/22-rdf-syntax-ns#').
 :- rdf_register_prefix(rdfs,
@@ -95,7 +97,9 @@ maybe this program will even run faster without this?*/
 
 doc_init :-
 	'check that there is only one exception hook and it\'s ours',
-	doc_init_trace_0,
+	(	nb_current(doc_trail, _)
+	->	true
+	;	doc_init_trace_0),
 	doc_clear.
 
 doc_init_trace_0 :-
@@ -113,8 +117,13 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 
 doc_trace0(Term) :-
 	b_getval(doc_trail, Stream),
-	writeq(Stream, Term),
-	writeln(Stream, ',').
+	(	Stream \= []
+	->	(
+			writeq(Stream, Term),
+			writeln(Stream, ',')
+		)
+	;	true).
+
 
 dump :-
 	findall(_,
@@ -452,10 +461,12 @@ node_rdf_vs_doc(Atom, Atom) :- atom(Atom),!.
 
 node_rdf_vs_doc(String, Term) :-
 	var(String),
-	/*compound(Term), */term_string(Term, String),
+	String = String2^^'http://www.w3.org/2001/XMLSchema#string',
+	/*compound(Term), */term_string(Term, String2),
 	!.
 
 triple_rdf_vs_doc((S,P,O), (S,P,O2)) :-
+	(var(S);atom(S)),
 	catch(
 		(	node_rdf_vs_doc(O,O2)
 		->	true
@@ -485,10 +496,14 @@ add_to_rdf((X,Y,Z,G)) :-
 	(
 		triple_rdf_vs_doc((X2,Y2,Z2),(X,Y,Z)),
 		debug(doc, 'to_rdf:~q~n', [(X2,Y2,Z2,G)]),
-		catch(rdf_assert(X2,Y2,Z2,G),E,format(user_error,'~q~n while saving triple:~n~q~n',[E, (X,Y,Z,G)]))
+		catch(
+			rdf_assert(X2,Y2,Z2,G),
+			E,
+			format(user_error,'~q~n -while saving triple:~n~q~n',[E, (X,Y,Z,G)])
+		)
 	)
 	->	true
-	;	throw((X,Y,Z,G)).
+	;	format(user_error, 'add_to_rdf failed on: ~q~n', [(X,Y,Z,G)]).
 
 
 /*:- comment(lib:doc_to_rdf_all_graphs, "if necessary, modify to not wipe out whole rdf database and to check that G doesn't already exist */
@@ -531,10 +546,11 @@ make_rdf_report :-
 
 
 doc_from_rdf(Rdf_Graph, Replaced_prefix, Replacement_prefix) :-
-	findall((X2,Y,Z2),
+	findall((X2,Y2,Z2),
 		(
 			rdf(X,Y,Z,Rdf_Graph),
 			replace_uri_node_prefix(X, Replaced_prefix, Replacement_prefix, X2),
+			replace_uri_node_prefix(Y, Replaced_prefix, Replacement_prefix, Y2),
 			replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2)
 		),
 		Triples),
@@ -1014,15 +1030,16 @@ my_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 	->	true
 	;	F = E),
 
-	print_message(information, "................."),
+	%print_message(information, "................."),
 
 	% a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe?
 
 	catch('store doc data for reporting after exception',E,format(user_error,'~q~n',[E])),
-	print_message(information, "........."),
+	%print_message(information, "........."),
 	catch('store ctx data for reporting after exception',E,format(user_error,'~q~n',[E])),
 
-	print_message(information, ".").
+	%print_message(information, "."),
+	true.
 /*
 */
 
@@ -1046,7 +1063,7 @@ doc_data(G,Ng) :-
 
 'store ctx data for reporting after exception' :-
 	get_context(Ctx_list),
-	print_message(information, 'storing context:'(Ctx_list)),
+	%print_message(information, 'storing context:'(Ctx_list)),
 	retractall(user:exception_ctx_dump(_)),
 	assert(user:exception_ctx_dump(Ctx_list)).
 

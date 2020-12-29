@@ -80,3 +80,6 @@ unify_numbers(A,B) :-
 
  is_numeric(X) :-
 	number(X);rational(X),!.
+
+rat(X, Y) :-
+	Y is rational(X).

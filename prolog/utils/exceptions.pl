@@ -20,8 +20,9 @@ prepare_throw(List_Or_Atomic, String) :-
 	),
 	(	current_prolog_flag(debug, true)
 	->	(
-			format(user_error, 'debug is true..', []),
-			gtrace_if_have_display
+			format(user_error, 'debug is true..\n', []),
+			trace
+			%gtrace_if_have_display
 		)
 	;	true).
 
@@ -47,14 +48,17 @@ prepare_throw(List_Or_Atomic, String) :-
 	getenv('DISPLAY', Display),
 	atom_length(Display, X),
 	X > 0,
-	format(user_error, 'yes', []).
+	format(user_error, 'yes\n', []).
 
  gtrace_if_have_display :-
 	(	have_display
-	->	(	\+current_prolog_flag(gtrace, false)
+	->	(	(	\+current_prolog_flag(gtrace, false)
+			-> 	format(user_error, '\\+current_prolog_flag(gtrace, false)\n', [])
+			; 	format(user_error, 'current_prolog_flag(gtrace, false)\n', [])
+		)
 		->	(
 				backtrace(200),
-				gtrace
+				trace
 			)
 		;	true)
 	; true).

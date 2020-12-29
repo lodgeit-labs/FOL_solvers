@@ -297,3 +297,8 @@ run_with_toplevel(Debug, Goal, Script, _Opts) :-
 
 
 % todo for python rewrite:  --tty=true -q? pipe goal (not rpc message) to swipl. get g trace working. (g trace is only invoked from the toplevel)
+
+/*
+--debug-on-interrupt
+    Enable debugging on an interrupt signal (Control-C, SIGINT) immediately. Normally debugging on interrupt is enabled when entering the interactive toplevel. This flag can be used to start the debugger on an interrupt while executing goals from -g or initialization/[1,2]. See also the Prolog flag debug_on_interrupt.
+    */
