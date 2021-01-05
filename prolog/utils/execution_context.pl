@@ -27,12 +27,29 @@ get_context(Ctx_list) :-
 		Ctx_list = []
 	).
 
- /*get_context(Ctx_list) :-
-	b_getval(context, Ctx_list).
-*/
+get_context_depth(D) :-
+	catch(
+		b_getval(context_depth, D),
+		_,
+		D = 0
+	).
+
+get_context_trace(X) :-
+	catch(
+		b_getval(context_trace, X),
+		_,
+		X = []
+	).
+
  push_context(C) :-
 	get_context(Ctx_list),
+	get_context_depth(Depth),
+	get_context_trace(Trace),
 	append(Ctx_list, [C], New_ctx_list),
+	New_depth is Depth + 1,
+	append([(Depth,C)], Trace, New_trace),
+	b_setval(context_trace, New_trace),
+	b_setval(context_depth, New_depth),
 	b_setval(context, New_ctx_list).
 
  push_format(Format_string, Args) :-
@@ -40,6 +57,9 @@ get_context(Ctx_list) :-
 
  pop_context :-
 	b_getval(context, Ctx_list),
+	get_context_depth(Depth),
+	New_depth is Depth - 1,
+	b_setval(context_depth, New_depth),
 	!append(New_ctx_list,[_],Ctx_list),
 	b_setval(context, New_ctx_list).
 
