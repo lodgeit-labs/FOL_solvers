@@ -64,63 +64,90 @@ get_context_trace(X) :-
 	b_setval(context, New_ctx_list).
 
 %:- meta_predicate 'c'(?, 0).
- c(Context, Callable) :-
+ ct(Context, Callable) :-
 	push_context(Context),
 	call(Callable),
 	pop_context.
 
 %:- meta_predicate 'c'(?, 1, ?).
- c(Context, Callable, Arg1) :-
+ ct(Context, Callable, Arg1) :-
 	push_context(Context),
 	call(Callable, Arg1),
 	pop_context.
 
 %:- meta_predicate 'c'(?, 2, ?, ?).
- c(Context, Callable, Arg1, Arg2) :-
+ ct(Context, Callable, Arg1, Arg2) :-
 	push_context(Context),
 	call(Callable, Arg1, Arg2),
 	pop_context.
 
 %:- meta_predicate 'c'(?, 3, ?, ?, ?).
- c(Context, Callable, Arg1, Arg2, Arg3) :-
+ ct(Context, Callable, Arg1, Arg2, Arg3) :-
 	push_context(Context),
 	call(Callable, Arg1, Arg2, Arg3),
 	pop_context.
 
 %:- meta_predicate 'c'(?, 4, ?, ?, ?, ?).
- c(Context, Callable, Arg1, Arg2, Arg3, Arg4) :-
+ ct(Context, Callable, Arg1, Arg2, Arg3, Arg4) :-
 	push_context(Context),
 	call(Callable, Arg1, Arg2, Arg3, Arg4),
 	pop_context.
 
 %:- meta_predicate 'c'(0).
  c(Callable) :-
-	c(Callable,Callable).
+	push_context(Callable),
+	call(Callable),
+	pop_context.
+
+ c(Callable, Arg1) :-
+	push_context(Callable),
+	call(Callable, Arg1),
+	pop_context.
+
+%:- meta_predicate 'c'(?, 2, ?, ?).
+ c(Callable, Arg1, Arg2) :-
+	push_context(Callable),
+	call(Callable, Arg1, Arg2),
+	pop_context.
+
+%:- meta_predicate 'c'(?, 3, ?, ?, ?).
+ c(Callable, Arg1, Arg2, Arg3) :-
+	push_context(Callable),
+	call(Callable, Arg1, Arg2, Arg3),
+	pop_context.
+
+%:- meta_predicate 'c'(?, 4, ?, ?, ?, ?).
+ c(Callable, Arg1, Arg2, Arg3, Arg4) :-
+	push_context(Callable),
+	call(Callable, Arg1, Arg2, Arg3, Arg4),
+	pop_context.
+
+
 
 %:- meta_predicate 'cf'(3).
  cf(Callable) :-
 	Callable =.. [Functor|_],
-	c(Functor,Callable).
+	ct(Functor,Callable).
 
 %:- meta_predicate 'c'(1, ?).
  cf(Callable, Arg1) :-
 	Callable =.. [Functor|_],
-	c(Functor,Callable, Arg1).
+	ct(Functor,Callable, Arg1).
 
 %:- meta_predicate 'c'(2, ?, ?).
  cf(Callable, Arg1, Arg2) :-
 	Callable =.. [Functor|_],
-	c(Functor,Callable, Arg1, Arg2).
+	ct(Functor,Callable, Arg1, Arg2).
 
 %:- meta_predicate 'c'(2, ?, ?, ?).
  cf(Callable, Arg1, Arg2, Arg3) :-
 	Callable =.. [Functor|_],
-	c(Functor,Callable, Arg1, Arg2, Arg3).
+	ct(Functor,Callable, Arg1, Arg2, Arg3).
 
 %:- meta_predicate 'c'(2, ?, ?, ?, ?).
  cf(Callable, Arg1, Arg2, Arg3, Arg4) :-
 	Callable =.. [Functor|_],
-	c(Functor,Callable, Arg1, Arg2, Arg3, Arg4).
+	ct(Functor,Callable, Arg1, Arg2, Arg3, Arg4).
 
 
 
