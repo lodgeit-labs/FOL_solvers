@@ -150,3 +150,7 @@ take(Src, N, L) :-
 rebmem(Hay, Needle) :-
 	member(Needle, Hay).
 
+
+assert_ground(X) :-
+	assertion(ground(X)).
+

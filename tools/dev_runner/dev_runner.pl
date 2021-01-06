@@ -17,6 +17,8 @@ running this takes a while because it first does just a load to find compile err
 shell2(Cmd) :-
 	shell2(Cmd, _).
 
+:- debug(dev_runner).
+
 shell2(Cmd_In, Exit_Status) :-
 	flatten([Cmd_In], Cmd_Flat),
 	atomic_list_concat(Cmd_Flat, Cmd),
@@ -36,7 +38,7 @@ halt_on_problems :-
 	get_flag(err_file, Err_File),
 	opts(Opts),
 	(	(memberchk(problem_lines_whitelist(Whitelist_File), Opts), nonvar(Whitelist_File))
-	->	Err_Grep = ['grep -E -i "Warn|err" ', Err_File, ' | grep -q -v -F -f ', Whitelist_File]
+	->	Err_Grep = ['grep -E -i "Warn|err" ', Err_File, ' | grep -q -v -x -F -f ', Whitelist_File]
 	;	Err_Grep = ['grep -q -E -i "Warn|err" ', Err_File]
 	),
 	(	shell2(Err_Grep, 0)
@@ -156,7 +158,13 @@ check_syntax(Optimization, Script) :-
 	atomic_list_concat(['swipl ', Optimization, ' -s ', Script], Load_Cmd),
 	get_flag(err_file, Err_File),
 	debug(dev_runner, 'dev_runner: checking syntax...\n', []),
-	shell2([Load_Cmd, ' -g "make,halt."  2>&1  |  tee ', Err_File, ' | head -n 150 1>&2']),
+
+	opts(Opts),
+	(	(memberchk(problem_lines_whitelist(Whitelist_File), Opts), nonvar(Whitelist_File))
+	->	Err_Grep = ['| grep -v -x -F -f ', Whitelist_File]
+	;	Err_Grep = ''),
+
+	shell2([Load_Cmd, ' -g "make,halt."  2>&1  |  tee ', Err_File, Err_Grep, ' | head -n 150 1>&2']),
 	maybe_halt_on_problems,
 	debug(dev_runner, 'dev_runner: syntax seems ok...\n', []).
 
@@ -231,7 +239,12 @@ run_without_compilation(Debug, Optimization, Script, Viewer) :-
 			->	Redirection = [' 2>&1  1> arrr.xml']
 			;	Redirection = ''),
 
-			shell2(["swipl", Optimization, Execution_goal, ' -s ', Script, Redirection], Exit_status),
+			(	(memberchk(problem_lines_whitelist(Whitelist_File), Opts), nonvar(Whitelist_File))
+			%	http://burgerbum.com/stderr_pipe.html
+			->	Err_Grep = [' 3>&1 1>&2 2>&3 | grep -v -x -F -f ', Whitelist_File, ' ) 3>&1 1>&2 2>&3']
+			;	Err_Grep = ')'),
+
+			shell2(["(swipl", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
 
 			(	Exit_status = 0
 			->	true
@@ -263,12 +276,14 @@ run_with_toplevel(Debug, Goal, Script, _Opts) :-
 	scriptargs(ScriptArgs),
 	Args0 = [Optimization, '-s', Script, '--', ScriptArgs],
 	flatten(Args0, Args),
-	debug(dev_runner, 'dev_runner: running with toplevel with args ~q ...\n', [Args]),
+	debug(dev_runner, 'dev_runner: will run with toplevel with args: ~q\n', [Args]),
+	atomics_to_string(['(',Goal,',halt(0));halt(1).\n'], Goal2),
+	debug(dev_runner, 'dev_runner: will pipe goal: ~w\n', [Goal2]),
 	process_create(path(swipl), Args, [process(Pid), stdin(pipe(Stdin))]),
 	%write(Stdin, writeln('script output starts below'),
-	atomics_to_string(['(',Goal,',halt(0));halt(1).\n'], Goal2),
+	%write(Stdin, "current_prolog_flag(debug,Debug),format(user_error,'debug=~q~n',[Debug]).\n\n"),
 	write(Stdin, Goal2),
-	% to cause an abort after an exception, i think:
+	% "a" to cause an abort after an exception. "." to pretend that was a query, in case tracer isnt on.
 	write(Stdin, 'a. '),
 	write(Stdin, 'halt(1).\n'),
 	flush_output(Stdin),
@@ -282,3 +297,8 @@ run_with_toplevel(Debug, Goal, Script, _Opts) :-
 
 
 % todo for python rewrite:  --tty=true -q? pipe goal (not rpc message) to swipl. get g trace working. (g trace is only invoked from the toplevel)
+
+/*
+--debug-on-interrupt
+    Enable debugging on an interrupt signal (Control-C, SIGINT) immediately. Normally debugging on interrupt is enabled when entering the interactive toplevel. This flag can be used to start the debugger on an interrupt while executing goals from -g or initialization/[1,2]. See also the Prolog flag debug_on_interrupt.
+    */

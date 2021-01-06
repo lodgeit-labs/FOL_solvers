@@ -1,13 +1,13 @@
 :- thread_local user:my_request_tmp_dir/1.
 :- thread_local asserted_server_public_url/1.
 
-:- initialization(generate_unique_tmp_directory_prefix).
+%:- initialization(generate_unique_tmp_directory_prefix).
 
 /*
   assert a base for tmp directory names that should be unique for each run of the server (current time)
   det.
 */
-generate_unique_tmp_directory_prefix :-
+/*generate_unique_tmp_directory_prefix :-
    get_time(Current_Time),
    %format("generate_unique_tmp_directory_prefix:get_time(~w)~n", [Current_Time]),
    atomic_list_concat([Current_Time, '.'], Base),
@@ -15,11 +15,11 @@ generate_unique_tmp_directory_prefix :-
    asserta(session_tmp_directory_base(tmp_directory_name_prefix(Base))),
    %format("generate_unique_tmp_directory_prefix:asserta(session_tmp_directory_base(tmp_directory_name_prefix(~w)))~n",[Base]).
    true.
-
+*/
 /*
   create a new unique directory under my_tmp
 */
-bump_tmp_directory_id :-
+/*bump_tmp_directory_id :-
 	generate_unique_tmp_directory_name(Dir_Name),
 	create_tmp_directory(Dir_Name).
 
@@ -28,7 +28,7 @@ generate_unique_tmp_directory_name(Name) :-
 	session_tmp_directory_base(tmp_directory_name_prefix(Base)),
 	gensym(Base, Dir),
 	set_unique_tmp_directory_name(Name).
-
+*/
 set_unique_tmp_directory_name(Name) :-
 	retractall(my_request_tmp_dir(_)),
 	asserta(my_request_tmp_dir(Name)).

@@ -42,6 +42,12 @@
 'https://rdf.lodgeit.net.au/v1/calcs/smsf/computation#').
 :- rdf_register_prefix(reallocation,
 'https://rdf.lodgeit.net.au/v1/calcs/ic/reallocation#').
+:- rdf_register_prefix(bs,
+'https://rdf.lodgeit.net.au/v1/bank_statement#').
+:- rdf_register_prefix(av,
+'https://rdf.lodgeit.net.au/v1/action_verbs#').
+:- rdf_register_prefix(uv,
+'https://rdf.lodgeit.net.au/v1/unit_values#').
 :- rdf_register_prefix(rdf,
 'http://www.w3.org/1999/02/22-rdf-syntax-ns#').
 :- rdf_register_prefix(rdfs,
@@ -71,18 +77,29 @@ maybe this program will even run faster without this?*/
 :- rdf_meta docm(r,r,r).
 :- rdf_meta docm(r,r,r,r).
 :- rdf_meta doc_new_(r,-).
-:- rdf_meta request_has_property(r,r).
-:- rdf_meta request_add_property(r,r).
-:- rdf_meta request_add_property(r,r,r).
-:- rdf_meta request_assert_property(r,r,r).
-:- rdf_meta request_assert_property(r,r,r,r).
+:- rdf_meta result_has_property(r,r).
+:- rdf_meta result_add_property(r,r).
+:- rdf_meta result_add_property(r,r,r).
+:- rdf_meta result_assert_property(r,r,r).
+:- rdf_meta result_assert_property(r,r,r,r).
 :- rdf_meta doc_value(r,r,r).
 :- rdf_meta doc_add_value(r,r,r).
 :- rdf_meta doc_add_value(r,r,r,r).
 
+'check that there is only one exception hook and it\'s ours' :-
+	findall(
+		_,
+		(
+			!clause(prolog_exception_hook(A,B,C,D),Body1),
+			assertion(Body1 = user:my_prolog_exception_hook(A,B,C,D))
+		),
+	_).
 
 doc_init :-
-	doc_init_trace_0,
+	'check that there is only one exception hook and it\'s ours',
+	(	nb_current(doc_trail, _)
+	->	true
+	;	doc_init_trace_0),
 	doc_clear.
 
 doc_init_trace_0 :-
@@ -100,8 +117,13 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 
 doc_trace0(Term) :-
 	b_getval(doc_trail, Stream),
-	writeq(Stream, Term),
-	writeln(Stream, ',').
+	(	Stream \= []
+	->	(
+			writeq(Stream, Term),
+			writeln(Stream, ',')
+		)
+	;	true).
+
 
 dump :-
 	findall(_,
@@ -439,10 +461,12 @@ node_rdf_vs_doc(Atom, Atom) :- atom(Atom),!.
 
 node_rdf_vs_doc(String, Term) :-
 	var(String),
-	/*compound(Term), */term_string(Term, String),
+	String = String2^^'http://www.w3.org/2001/XMLSchema#string',
+	/*compound(Term), */term_string(Term, String2),
 	!.
 
 triple_rdf_vs_doc((S,P,O), (S,P,O2)) :-
+	(var(S);atom(S)),
 	catch(
 		(	node_rdf_vs_doc(O,O2)
 		->	true
@@ -472,10 +496,14 @@ add_to_rdf((X,Y,Z,G)) :-
 	(
 		triple_rdf_vs_doc((X2,Y2,Z2),(X,Y,Z)),
 		debug(doc, 'to_rdf:~q~n', [(X2,Y2,Z2,G)]),
-		catch(rdf_assert(X2,Y2,Z2,G),E,format(user_error,'~q~n while saving triple:~n~q~n',[E, (X,Y,Z,G)]))
+		catch(
+			rdf_assert(X2,Y2,Z2,G),
+			E,
+			format(user_error,'~q~n -while saving triple:~n~q~n',[E, (X,Y,Z,G)])
+		)
 	)
 	->	true
-	;	throw((X,Y,Z,G)).
+	;	format(user_error, 'add_to_rdf failed on: ~q~n', [(X,Y,Z,G)]).
 
 
 /*:- comment(lib:doc_to_rdf_all_graphs, "if necessary, modify to not wipe out whole rdf database and to check that G doesn't already exist */
@@ -518,10 +546,11 @@ make_rdf_report :-
 
 
 doc_from_rdf(Rdf_Graph, Replaced_prefix, Replacement_prefix) :-
-	findall((X2,Y,Z2),
+	findall((X2,Y2,Z2),
 		(
 			rdf(X,Y,Z,Rdf_Graph),
 			replace_uri_node_prefix(X, Replaced_prefix, Replacement_prefix, X2),
+			replace_uri_node_prefix(Y, Replaced_prefix, Replacement_prefix, Y2),
 			replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2)
 		),
 		Triples),
@@ -556,57 +585,70 @@ replace_atom_prefix(X, Replaced_prefix, Replacement_prefix, X2) :-
 */
 
 
-doc_new_(Type, Uri) :-
+ doc_new_(Type, Uri) :-
 	doc_new_uri(Uri),
 	doc_add(Uri, rdf:type, Type).
 
-doc_new_theory(T) :-
+ doc_new_theory(T) :-
 	doc_new_uri(T),
 	doc_add(T, rdf:type, l:theory).
 
+ request_data_property(P, O) :-
+	request_data(Request_Data),
+	doc(Request_Data, P, O).
 
-request_has_property(P, O) :-
+ report_details_property_value(P, V) :-
+	!request_data_property(ic_ui:report_details, Details),
+	doc_value(Details, P, V).
+
+
+ result_has_property(P, O) :-
 	result(R),
 	doc(R, P, O).
 
-request_add_property(P, O) :-
+ result_add_property(P, O) :-
 	b_getval(default_graph, G),
-	request_add_property(P, O, G).
+	result_add_property(P, O, G).
 
-request_add_property(P, O, G) :-
+ result_add_property(P, O, G) :-
 	result(R),
 	doc_add(R, P, O, G).
 
-request_assert_property(P, O) :-
+result_assert_property(P, O) :-
 	b_getval(default_graph, G),
-	request_assert_property(P, O, G).
+	result_assert_property(P, O, G).
 
-request_assert_property(P, O, G) :-
+ result_assert_property(P, O, G) :-
 	result(R),
 	doc_assert(R, P, O, G).
 
-request(R) :-
+ request(R) :-
 	doc(R, rdf:type, l:'Request').
 
- request_data(D) :-
-	request(Request),
-	doc(Request, l:has_request_data, D).
+ result(R) :-
+	!doc(R, rdf:type, l:'Result').
 
-request_accounts(As) :-
-	request_data(D),
+ request_data(D) :-
+	!request(Request),
+	!doc(Request, l:has_request_data, D).
+
+
+ result_accounts(As) :-
+	result(D),
 	!doc(D, l:has_accounts, As).
 
-result(R) :-
-	doc(R, rdf:type, l:'Result').
 
  add_alert(Type, Msg) :-
+ 	add_alert(Type, Msg, _).
+
+ add_alert(Type, Msg, Uri) :-
 	result(R),
 	doc_new_uri(alert, Uri),
 	doc_add(R, l:alert, Uri),
 	doc_add(Uri, l:type, Type),
 	doc_add(Uri, l:message, Msg).
 
-assert_alert(Type, Msg) :-
+ assert_alert(Type, Msg) :-
 	/*todo*/
 	result(R),
 	doc_new_uri(alert, Uri),
@@ -614,38 +656,38 @@ assert_alert(Type, Msg) :-
 	doc_add(Uri, l:type, Type),
 	doc_add(Uri, l:message, Msg).
 
-get_alert(Type, Msg) :-
+ get_alert(Type, Msg, Uri) :-
 	result(R),
 	docm(R, l:alert, Uri),
 	doc(Uri, l:type, Type),
 	doc(Uri, l:message, Msg).
 
-add_comment_stringize(Title, Term) :-
+ add_comment_stringize(Title, Term) :-
 	pretty_term_string(Term, String),
 	add_comment_string(Title, String).
 
-add_comment_string(Title, String) :-
+ add_comment_string(Title, String) :-
 	doc_new_uri(comment, Uri),
 	doc_add(Uri, title, Title, comments),
 	doc_add(Uri, body, String, comments).
 
-doc_list_member(M, L) :-
+ doc_list_member(M, L) :-
 	doc(L, rdf:first, M).
 
-doc_list_member(M, L) :-
+ doc_list_member(M, L) :-
 	doc(L, rdf:rest, R),
 	doc_list_member(M, R).
 
-doc_list_items(L, Items) :-
+ doc_list_items(L, Items) :-
 	findall(Item, doc_list_member(Item, L), Items).
 
-doc_add_list([H|T], Uri) :-
+ doc_add_list([H|T], Uri) :-
 	doc_new_uri(rdf_list, Uri),
 	doc_add(Uri, rdf:first, H),
 	doc_add_list(T, Uri2),
 	doc_add(Uri, rdf:rest, Uri2).
 
-doc_add_list([], rdf:nil).
+ doc_add_list([], rdf:nil).
 
 
 doc_value(S, P, V) :-
@@ -798,6 +840,8 @@ xml_to_doc(Root, element(Name, _Atts, Children)) :-
 
 :- thread_create('watch doc-dumper command pipe', _).
 
+:- [doc_dump_server].
+
 doc_dump :-
 	once(save_doc).
 
@@ -942,8 +986,6 @@ about namespaces:
 
 :- dynamic(exception_doc_dump/2).
 :- dynamic(exception_ctx_dump/1).
-:- dynamic(prolog_stack__prolog_exception_hook/4).
-
 
 /*
 problem with doing this along with using library(prolog_stack):
@@ -964,24 +1006,42 @@ Anyway, we could store both doc and context in State.
 
 */
 
-:-
-	%gtrace,
-	clause(prolog_exception_hook(A,B,C,D),Body),
-	assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
-	retractall(prolog_exception_hook(A,B,C,D)).
+:- dynamic(prolog_stack__prolog_exception_hook/4).
+:- dynamic(prolog_exception_hook/4).
 
+'save old prolog exception hook' :-
+	(	clause(prolog_exception_hook(A,B,C,D),Body)
+	->	(
+			assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
+			retractall(prolog_exception_hook(A,B,C,D))
+		)
+	;	true).
 
-prolog_exception_hook(E,F, Frame, CatcherFrame) :-
+init_prolog_exception_hook :-
+	'save old prolog exception hook',
+	assert(prolog_exception_hook(E,F, Frame, CatcherFrame) :- my_prolog_exception_hook(E,F, Frame, CatcherFrame)).
+
+:- initialization(init_prolog_exception_hook).
+
+my_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 	print_message(information, "prolog_stack__prolog_exception_hook"),
+
 	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
 	->	true
 	;	F = E),
-	%print_message(information, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"),
 
-	/* a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe? */
+	%print_message(information, "................."),
 
-	'store doc data for reporting after exception',
-	'store ctx data for reporting after exception'.
+	% a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe?
+
+	catch('store doc data for reporting after exception',E,format(user_error,'~q~n',[E])),
+	%print_message(information, "........."),
+	catch('store ctx data for reporting after exception',E,format(user_error,'~q~n',[E])),
+
+	%print_message(information, "."),
+	true.
+/*
+*/
 
 doc_data(G,Ng) :-
 	catch(
@@ -996,13 +1056,37 @@ doc_data(G,Ng) :-
 'store doc data for reporting after exception' :-
 	(	doc_data(G,Ng)
 	->	(
-			retractall(exception_doc_dump(_,_)),
-			assert(exception_doc_dump(G,Ng))
+			retractall(user:exception_doc_dump(_,_)),
+			assert(user:exception_doc_dump(G,Ng))
 		)
 	;	true).
 
 'store ctx data for reporting after exception' :-
 	get_context(Ctx_list),
-	print_message(information, 'storing context:'(Ctx_list)),
-	retractall(exception_ctx_dump(_)),
-	assert(exception_ctx_dump(Ctx_list)).
+	%print_message(information, 'storing context:'(Ctx_list)),
+	retractall(user:exception_ctx_dump(_)),
+	assert(user:exception_ctx_dump(Ctx_list)).
+
+
+/*
+┏━┓┏━┓╻ ╻
+┣┳┛┣━┛┃┏┛
+╹┗╸╹  ┗┛
+Required Property Value
+*/
+
+rpv(S,P,V) :-
+	(	doc(S,P,V0)
+	->	!doc(V0, rdf:value, V)
+	;	(
+			(	doc(P, rdfs:label, Label)
+			->	true
+			;	rdf_global_id(Label, P)),
+			throw_format('missing ~q of item in ~w.',
+				[
+					Label,
+					$>sheet_and_cell_string(S)
+				]
+			)
+		)
+	).

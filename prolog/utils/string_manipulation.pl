@@ -73,3 +73,7 @@ call_with_string_read_stream(String, Callable) :-
 'use grammar to interpret text'(Grammar, Text) :-
 	phrase(Grammar, $>string_codes(Text)).
 
+'use grammar to generate text'(Grammar, Text) :-
+	phrase(Grammar, Codes),
+	string_codes(Text, Codes).
+

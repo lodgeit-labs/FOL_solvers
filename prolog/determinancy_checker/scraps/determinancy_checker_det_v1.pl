@@ -6,7 +6,7 @@
 	(	nb_setval(Call_id, 0)
 	;	(	nb_getval(Call_id, 1)
 		->	(	nb_delete(Call_id), fail)
-		;	throw(error(determinancy_checker(deterministic_call_failed(Callable)),_)))),
+		;	determinancy_checker_throw_error(error(determinancy_checker(deterministic_call_failed(Callable)),_)))),
 	/*
 	your call
 	*/
@@ -17,7 +17,7 @@
 	nb_getval(Call_id, Sols),
 	(	Sols = 0
 	->	nb_setval(Call_id, 1)
-	;	throw((deterministic_call_found_a_second_solution(Callable)))).
+	;	determinancy_checker_throw_error((deterministic_call_found_a_second_solution(Callable)))).
 
 '!'(Callable, Arg1) :-
 	/*
@@ -27,7 +27,7 @@
 	(	nb_setval(Call_id, 0)
 	;	(	nb_getval(Call_id, 1)
 		->	(	nb_delete(Call_id), fail)
-		;	throw(error(deterministic_call_failed((Callable, Arg1)),_)))),
+		;	determinancy_checker_throw_error(error(deterministic_call_failed((Callable, Arg1)),_)))),
 	/*
 	your call
 	*/
@@ -38,7 +38,7 @@
 	nb_getval(Call_id, Sols),
 	(	Sols = 0
 	->	nb_setval(Call_id, 1)
-	;	throw_string((deterministic_call_found_a_second_solution((Callable, Arg1))))).
+	;	determinancy_checker_throw_error(deterministic_call_found_a_second_solution((Callable, Arg1)))).
 
 '!'(Callable, Arg1, Arg2) :-
 	/*
@@ -48,7 +48,7 @@
 	(	nb_setval(Call_id, 0)
 	;	(	nb_getval(Call_id, 1)
 		->	(	nb_delete(Call_id), fail)
-		;	throw(error(deterministic_call_failed((Callable, Arg1, Arg2)),_)))),
+		;	determinancy_checker_throw_error(error(deterministic_call_failed((Callable, Arg1, Arg2)),_)))),
 	/*
 	your call
 	*/
@@ -59,5 +59,5 @@
 	nb_getval(Call_id, Sols),
 	(	Sols = 0
 	->	nb_setval(Call_id, 1)
-	;	throw((deterministic_call_found_a_second_solution((Callable, Arg1, Arg2))))).
+	;	determinancy_checker_throw_error(deterministic_call_found_a_second_solution((Callable, Arg1, Arg2)))).
 

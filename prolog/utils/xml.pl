@@ -175,7 +175,8 @@ validate_xml(loc(absolute_path,Instance_File), loc(absolute_path,Schema_File), S
 	setup_call_cleanup(
 		!http_open(Request_URI, In, [request_header('Accept'='application/json')]),
 		!json_read_dict(In, Response_JSON),
-		!close(In)
+		/* todo is this correct, or can In be unbound here? */
+		(var(In) -> true ; close(In))
     ),
 	%format("Result: ~w~n", [Response_JSON.result]),
 	(

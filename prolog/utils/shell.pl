@@ -9,7 +9,12 @@ services_server(S) :-
 	current_prolog_flag(services_server, S).
 
 json_post(Url, Payload, Response) :-
-	http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)]).
+	%format(user_error, '~q~n', [http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)])]),
+	catch(
+		http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)]),
+		E,
+		throw(during(E,http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)])))
+	).
 
 services_server_shell_cmd(Cmd) :-
 	format(string(Url), '~w/shell/rpc/', [$>services_server(<$)]),

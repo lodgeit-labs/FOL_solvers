@@ -76,3 +76,10 @@ unify_numbers(A,B) :-
  is_zero_number(Z) :-
 	atomic(Z),
 	Z =:= 0.
+
+
+ is_numeric(X) :-
+	number(X);rational(X),!.
+
+rat(X, Y) :-
+	Y is rational(X).
