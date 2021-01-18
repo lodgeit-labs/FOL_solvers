@@ -67,7 +67,7 @@ https://github.com/jarble/functional-prolog/blob/master/functional_prolog.pl (?)
 https://github.com/mndrix/func/issues/12 (?)
 
 https://github.com/awto/fnotation
-	confuses gtrace? with so many bugs, it would be better if gtrace showed the generated codo, like it happens with my dict macro, but it doesnt
+	confuses gtrace? with so many bugs, it would be better if gtrace showed the generated code, like it happens with my dict macro, but it doesnt
 	puts statements in the wrong place: 
 		doesnt play with ( -> ; ), 
 		doesnt play with yall
@@ -204,6 +204,7 @@ test(0, forall(x(X)), all((X=X))) :-
 
 # SICSTUS
 bundled clpfd is constrained to "[-2^60,2^60-1] on 64-bit platforms". This means we wouldn't be able to emulate rationals.
+^ err not anymore?
 how far along is https://github.com/triska/clpz ?
 https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/FDBG-Introduction.html
 
