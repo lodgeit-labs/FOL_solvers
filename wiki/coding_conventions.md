@@ -4,16 +4,34 @@ nothing's set in stone, this is mainly an explanation of some inconsistencies cu
 
 ```
 
- bank_account_names(Bank_account_names) :- 
+ xbrl_bank_account_names(Xbrl_bank_account_names) :- 
 	bla,
 	bla,
 	(	condition
 	->	then
 	;	else).
-
 	
 ```
+or:
+```
+
+ 'xbrl bank account names'(Xbrl_bank_account_names) :- 
+	bla,
+	bla,
+	(	condition
+	->	then
+	;	else).
 	
+```
+not:
+```
+
+ xbrlBankAccountNames(XBRLBankAccountNames) :-
+	...	
+	
+```
+
+
 * Underscores everywhere, no camelCase.
 * Variable_names - only first letter capitalized
 * Rule definition is preceded by one space. Coupled with otherwise indentation by tabs, this allows jumping to declarations by simply fulltext-searching relatively painlessly.
