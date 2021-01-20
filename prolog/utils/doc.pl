@@ -79,7 +79,7 @@ maybe this program will even run faster without this?*/
 :- rdf_meta docm(r,r,r).
 :- rdf_meta docm(r,r,r,r).
 :- rdf_meta doc_new_(r,-).
-:- rdf_meta result_has_property(r,r).
+:- rdf_meta result_property(r,r).
 :- rdf_meta result_add_property(r,r).
 :- rdf_meta result_add_property(r,r,r).
 :- rdf_meta result_assert_property(r,r,r).
@@ -603,8 +603,7 @@ replace_atom_prefix(X, Replaced_prefix, Replacement_prefix, X2) :-
 	!request_data_property(ic_ui:report_details, Details),
 	doc_value(Details, P, V).
 
-
- result_has_property(P, O) :-
+ result_property(P, O) :-
 	result(R),
 	doc(R, P, O).
 
