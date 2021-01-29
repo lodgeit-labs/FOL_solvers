@@ -224,3 +224,5 @@ bundled clpfd is constrained to "[-2^60,2^60-1] on 64-bit platforms". This means
 how far along is https://github.com/triska/clpz ?
 https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/FDBG-Introduction.html
 
+# SWIPL RPC
+https://github.com/rla/node-swipl-stdio
