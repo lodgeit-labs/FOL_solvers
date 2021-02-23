@@ -1,11 +1,18 @@
 :- module(_, [
 	op(812,fx,!),
 	op(812,fx,?),
+
+	/* must have one solution */
 	'!'/1,
 	'!'/2,
 	'!'/3,
 	'!'/4,
+
+	/* must have zero or one solution */
 	'?'/1
+
+	/* must have one or more solutions(to be done) */
+	/*'+'/1*/
 ]).
 
 

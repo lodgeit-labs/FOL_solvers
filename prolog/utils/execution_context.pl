@@ -55,6 +55,9 @@ get_context_trace(X) :-
  push_format(Format_string, Args) :-
  	push_context($>format(string(<$), Format_string, Args)).
 
+ pop_format :-
+	pop_context.
+
  pop_context :-
 	b_getval(context, Ctx_list),
 	get_context_depth(Depth),

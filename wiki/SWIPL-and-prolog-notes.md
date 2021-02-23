@@ -67,7 +67,7 @@ https://github.com/jarble/functional-prolog/blob/master/functional_prolog.pl (?)
 https://github.com/mndrix/func/issues/12 (?)
 
 https://github.com/awto/fnotation
-	confuses gtrace? with so many bugs, it would be better if gtrace showed the generated codo, like it happens with my dict macro, but it doesnt
+	confuses gtrace? with so many bugs, it would be better if gtrace showed the generated code, like it happens with my dict macro, but it doesnt
 	puts statements in the wrong place: 
 		doesnt play with ( -> ; ), 
 		doesnt play with yall
@@ -101,7 +101,6 @@ https://www.google.com/search?q=prolog+declarative+debugging
 
 https://arxiv.org/pdf/0911.2899.pdf
 
-https://github.com/fnogatz/plammar
 https://arxiv.org/pdf/1909.08230.pdf
 
 https://github.com/wysiib/plspec
@@ -172,7 +171,7 @@ It hides the conceptual difference between text and program symbols. Where conte
 ```
 
 # pecularities of swipl plunit
-variables arent preserved during the macro expansion phase as you would expect?
+variables arent preserved during the macro expansion phase as you would expect? The fact that plunit is based on macro expansion makes it possibe that your tests are silently ignored because of expansion errors / conflicts wiith other libraries..
 ```
 :- begin_tests(x).
 
@@ -200,10 +199,30 @@ test(0, forall(x(X)), all((X=X))) :-
 ```
 
 
+# parsing prolog code
+	https://github.com/fnogatz/plammar
+		almost works but not quite
+	github.com:JanWielemaker/reindent
+		just tokenizes and then does some smartness to fix indentation, not useful
+	github.com:SWI-Prolog/packages-indent
+		seems to be the way to go. queries prolog_read_source_term, then we can pattern-match the clause terms..
+		```
+		?- [A|B] =.. X.
+		X = ['[|]', A, B].
+		% so this actually works 
+
+		```
+		```
+			comments suck in general. It hurts to accept it, but if you think about it, how could a parser ever read you mind to figure out what commment is associated to what part of your code? Comments on their own lines, comments at line ends, comments in arg lists, commented out code, crap crap crap. So, my idea is, comment with structure, right in prolog code. Add :- comment(predicate, blablabla), put nop(blabla) inside rule bodies, wrap calls in with_comment(....), whatever it takes.. 
+		```
+		hackery2/data/swipl/parse_prolog.pl
 
 
 # SICSTUS
 bundled clpfd is constrained to "[-2^60,2^60-1] on 64-bit platforms". This means we wouldn't be able to emulate rationals.
+^ err not anymore?
 how far along is https://github.com/triska/clpz ?
 https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/FDBG-Introduction.html
 
+# SWIPL RPC
+https://github.com/rla/node-swipl-stdio
