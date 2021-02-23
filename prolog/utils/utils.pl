@@ -22,6 +22,7 @@
 
 :- [compare_xml].
 :- [compile_with_variable_names_preserved].
+:- [days].
 :- [dict_vars].
 :- [doc].
 :- [exceptions].
