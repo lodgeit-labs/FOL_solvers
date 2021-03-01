@@ -841,7 +841,7 @@ xml_to_doc(Root, element(Name, _Atts, Children)) :-
 
 :- thread_create('watch doc-dumper command pipe', _).
 
-:- [doc_dump_server].
+
 
 doc_dump :-
 	once(save_doc).
