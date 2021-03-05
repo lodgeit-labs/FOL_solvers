@@ -35,6 +35,17 @@ round(X,D,Y2) :-
 	Y2 is float(Y).
 
 
+terms_with_floats_close_enough(X,Y) :-
+	(number(X);rational(X)),!,
+	(number(Y);rational(Y)),!,
+	floats_close_enough(X, Y).
+
+terms_with_floats_close_enough(X,Y) :-
+	X =.. [Functor|Args1],
+	Y =.. [Functor|Args2],
+	maplist(terms_with_floats_close_enough, Args1, Args2).
+
+
 
 round_term(X, unbound) :-
 	var(X).
@@ -43,15 +54,15 @@ round_term(X, Y) :-
 	float_comparison_significant_digits(D),
 	round_term(D, X, Y).
 
-round_term(Digits, X, Y) :-
-	maplist(round_term(Digits), X, Y),!.
+/*round_term(Digits, X, Y) :-
+	maplist(round_term(Digits), X, Y),!.*/
 
-round_term(Digits, value(U,V), value(U2,V2)) :- !,
+/*round_term(Digits, value(U,V), value(U2,V2)) :- !,
 	round_term(Digits, U, U2),
 	round_term(Digits, V,V2).
 
 round_term(Digits, coord(U,V), coord(U2,V2)) :- !,
-	round_term(Digits, value(U,V), value(U2,V2)).
+	round_term(Digits, value(U,V), value(U2,V2)).*/
 
 round_term(Digits, X, Y) :-
 	(number(X);rational(X)),

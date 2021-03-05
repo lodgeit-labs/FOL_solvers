@@ -1025,7 +1025,7 @@ init_prolog_exception_hook :-
 :- initialization(init_prolog_exception_hook).
 
 my_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
-	print_message(information, "prolog_stack__prolog_exception_hook"),
+	%print_message(information, "prolog_stack__prolog_exception_hook"),
 
 	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
 	->	true
@@ -1091,3 +1091,40 @@ rpv(S,P,V) :-
 			)
 		)
 	).
+
+
+
+
+
+
+/*
+┏━╸╻ ╻┏━╸┏━╸╻
+┣╸ ┏╋┛┃  ┣╸ ┃
+┗━╸╹ ╹┗━╸┗━╸┗━╸
+*/
+ sheet_and_cell_string_for_property(Item, Prop, Str) :-
+	!doc(Item, Prop, Value),
+	!sheet_and_cell_string(Value, Str).
+
+ sheet_and_cell_string(Value, Str) :-
+	!doc(Value, excel:sheet_name, Sheet_name),
+	!doc(Value, excel:col, Col),
+	!doc(Value, excel:row, Row),
+	!atomics_to_string(['sheet "', Sheet_name, '", cell ', Col, ':', Row], Str).
+
+ read_coord_vector_from_doc_string(Item, Prop, Default_currency, Side, VectorA) :-
+	doc_value(Item, Prop, Amount_string),
+	(	vector_from_string(Default_currency, Side, Amount_string, VectorA)
+	->	true
+	;	throw_string(['error reading "amount" in ', $>!sheet_and_cell_string($>doc(Item, Prop))])).
+
+ read_value_from_doc_string(Item, Prop, Default_currency, Value) :-
+	doc_value(Item, Prop, Amount_string),
+	(	value_from_string(Default_currency, Amount_string, Value)
+	->	true
+	;	(
+			assertion(var(Value)),
+			throw_string(['error reading "amount" in ', $>!sheet_and_cell_string($>doc(Item, Prop))])
+		)
+	).
+

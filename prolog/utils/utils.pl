@@ -1,6 +1,7 @@
 :- b_setval(context, []).
 
 
+:- use_module(library(record)).
 :- use_module(library(semweb/rdf11),except(['{}'/1])).
 :- use_module(library(semweb/turtle)).
 :- use_module(library(http/json)).
@@ -9,6 +10,7 @@
 :- use_module(library(xpath)).
 :- use_module(library(yall)).
 :- use_module(library(debug)).
+:- use_module(library(clpq)).
 
 :- use_module(library(fnotation)).
 :- fnotation_ops($>,<$).
@@ -32,10 +34,13 @@
 :- [json].
 :- [magic_formula].
 :- [numbers].
+:- [pacioli].
 :- [request_files].
 :- [shell].
 :- [string_manipulation].
 :- [structured_xml].
 :- [structures].
+:- [term_dict].
 :- [term_output].
+:- [vector_string].
 :- [xml].
