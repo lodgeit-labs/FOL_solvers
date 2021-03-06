@@ -161,6 +161,11 @@ day_diff(Date1, Date2, Days) :-
 	absolute_day(Date2, Days2),
 	Days is Days2 - Days1.
 
+absolute_days_day_diff(Date1, Date2, Days) :-
+	absolute_day(Date1, Days1),
+	absolute_day(Date2, Days2),
+	Days is Days2 - Days1.
+
 % -------------------------------------------------------------------
 % parses date in "DD-MM-YYYY" format
 % -------------------------------------------------------------------
