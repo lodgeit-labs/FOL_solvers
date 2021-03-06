@@ -31,6 +31,7 @@ trc(Module, A, (A :- Proof)) :-
 	trc(Module, C, Proof).
 
 trc(Module, Q, (Q :- Proof)):-
+	writeq(Module-Q),nl,
 	(	atom(Q)
 	->	Name = Q
 	;	compound_name_arity(Q, Name, _)),
@@ -40,11 +41,12 @@ trc(Module, Q, (Q :- Proof)):-
 	->	Body = builtin(Q)
 	;	trc_clause(Module,Q,Body)),
 
+	writeq([Body]),nl,
+
 	(
 		(
 			Body = builtin(X),
 			%writeq(call(Module:X)),nl,
-			writeq(Module:X),nl,
 			(	sub_atom(Name, 0, _, _, $)
 			->	call_system_something_with_module(Module, Q)
 			;	call(Module:X)),
@@ -53,14 +55,13 @@ trc(Module, Q, (Q :- Proof)):-
 		;
 		(
 			Body = loaded(X,Module2),
-			writeq(Module2:X),nl,
+			%writeq(Module2:X),nl,
 			trc(Module2, X, Proof)
 		)
 	).
 
 call_system_something_with_module(Module, Q) :-
-	gtrace,
-	(	Q =.. [SysFn]
+	(	Q =.. [_]
 	->	Q2 = Q
 	;	(
 			Q =.. [SysFn|R],
