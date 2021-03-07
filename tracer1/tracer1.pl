@@ -1,9 +1,22 @@
 /* i guess i should make this two-level:
 first level pattern-matches on the code, can use cuts, and dispatches to the second level*/
-trc(_,true,true).
-trc(Module, (A,B),and(ProofA,ProofB)):-
-	trc(Module, A,ProofA),trc(Module, B,ProofB).
+
+term(true,
+	["true"]).
+term(conj,
+	[
+
+
+trc(Parent,_,true,true) :-
+	gennode(Parent,leaf).
+
+trc(Parent,Module, (A,B),and(ProofA,ProofB)):-
+	gennode(Parent,conj,Node),
+	trc(Node,Module, A,ProofA),trc(Node,Module, B,ProofB).
+
 trc(Module, (A->B;C),ifthenelse(ProofA,ProofB,ProofC)):-
+	gennode(Parent,ifthenelse,Node),
+	genprop(Node, args, [A,B,C]),
 	trc(Module, A,ProofA)
 	->
 	trc(Module, B,ProofB)
@@ -17,6 +30,9 @@ trc(Module, (A->B),ifthen(ProofA,ProofB)):-
 	trc(Module, A,ProofA)
 	->
 	trc(Module, B,ProofB).
+trc(Module, ('\\+'(A)),not(A)):-
+	writeln(not(A)),
+	\+trc(Module, A, _).
 
 trc(Module, A, (A :- Proof)) :-
 	catch(A =.. [call,Arg|Args],_,fail),
@@ -31,17 +47,18 @@ trc(Module, A, (A :- Proof)) :-
 	trc(Module, C, Proof).
 
 trc(Module, Q, (Q :- Proof)):-
-	writeq(Module-Q),nl,
+
+	%writeq(Module-Q),nl,
 	(	atom(Q)
 	->	Name = Q
 	;	compound_name_arity(Q, Name, _)),
-	Name \= ',',Name \= ';',Name \= '->',Name \= 'call',
+	Name \= ',',Name \= ';',Name \= '->',Name \= 'call',Name \= '\\+',
 
 	(	sub_atom(Name, 0, _, _, $)
 	->	Body = builtin(Q)
 	;	trc_clause(Module,Q,Body)),
 
-	writeq([Body]),nl,
+	%writeq([Body]),nl,
 
 	(
 		(
@@ -49,7 +66,13 @@ trc(Module, Q, (Q :- Proof)):-
 			%writeq(call(Module:X)),nl,
 			(	sub_atom(Name, 0, _, _, $)
 			->	call_system_something_with_module(Module, Q)
-			;	call(Module:X)),
+			;	(
+					/* this here is the only place where multiple yields can happen implicitly. */
+					call(Module:X),
+					gennode(Parent, exit, TraceNode),
+					genprop(TraceNode, goal, X)
+				)
+			),
 			Proof=builtin
 		)
 		;
@@ -60,6 +83,13 @@ trc(Module, Q, (Q :- Proof)):-
 		)
 	).
 
+
+/*
+now Q is something like '$sig_atomic'(setup_trap_assertions(_32202))
+what i'm trying to do is change that into '$sig_atomic'(module:setup_trap_assertions(_32202))
+but it's useless
+*/
+
 call_system_something_with_module(Module, Q) :-
 	(	Q =.. [_]
 	->	Q2 = Q
@@ -67,11 +97,17 @@ call_system_something_with_module(Module, Q) :-
 			Q =.. [SysFn|R],
 			(	R = [Fn]
 			->	true
-			;	throw_string('uhh')),
+			;	throw_string('uhh too high arity rn')),
 			Q2 =.. [SysFn,(Module:Fn)]
 		)
 	),
 	call(Q2).
+
+/*
+what you gotta do when looking up clauses is, i start with 'user' module, and you can't just naively call clause(Query, Body), you have to call clause(Module:Query, Body).
+If it finds a builtin, it throws an error lol
+if it finds a user clause, it succeeds
+*/
 
 
 trc_clause(Module,Q,Body) :-
@@ -96,16 +132,18 @@ trc_clause(Module,Q,Body) :-
 
 
 
-
-
 trc(X) :-
-	trc(user, X, GP),
+	gennode(none, root, Parent),
+	trc(Parent, user, X, GP),
 	print_term(GP, [write_options([
 				numbervars(true),
 				quoted(true),
 				portray(true)])]),
 	nl.
 	%writeq(GP).
+
+
+gennode :-
 
 
 
@@ -147,3 +185,4 @@ ERROR:   However, there are definitions for:
 ERROR:         call_cleanup/2
 ERROR:         call_cleanup/3
 */
+
