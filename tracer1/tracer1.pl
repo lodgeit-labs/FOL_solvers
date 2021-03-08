@@ -1,41 +1,76 @@
-/* i guess i should make this two-level:
-first level pattern-matches on the code, can use cuts, and dispatches to the second level*/
-
+/*
 term(true,
 	["true"]).
-term(conj,
-	[
+term('builtins#conj',
+	[A,",",B]).
+*/
+
+node(Parent, Type, ArgCount, Args, Node) :-
+	length(Args, ArgCount),
+	maplist(genuri(arg), Args),
+	gen(node{
+		parent: Parent,
+		functor: Type,
+		args: Args
+	}).
 
 
 trc(Parent,_,true,true) :-
-	gennode(Parent,leaf).
+	!,
+	node(Parent, 'builtins#true', 0, _, _).
 
 trc(Parent,Module, (A,B),and(ProofA,ProofB)):-
-	gennode(Parent,conj,Node),
-	trc(Node,Module, A,ProofA),trc(Node,Module, B,ProofB).
+	!,
+	node(Parent, 'builtins#conjunction', 2, [Slot0,Slot1], _),
+	trc(Slot0 ,Module, A, ProofA),trc(Slot1, Module, B, ProofB).
 
 trc(Module, (A->B;C),ifthenelse(ProofA,ProofB,ProofC)):-
-	gennode(Parent,ifthenelse,Node),
-	genprop(Node, args, [A,B,C]),
-	trc(Module, A,ProofA)
-	->
-	trc(Module, B,ProofB)
-	;
-	trc(Module, C,ProofC).
+	!,
+	node(Parent, 'builtins#ifthenelse', 3, [Slot0,Slot1,Slot2], _),
+	(
+		trc(Slot0,Module, A,ProofA)
+		->
+		trc(Slot1,Module, B,ProofB)
+		;
+		trc(Slot2,Module, C,ProofC)
+	).
+
 trc(Module, (A;B),or(Proof)):-
 	A \= (_->_),
-	(trc(Module, A,Proof);
-	trc(Module, B,Proof)).
+	!,
+	node(Parent, 'builtins#disjunction', 2, [Slot0,Slot1], _),
+	(
+		trc(Slot0,Module, A,Proof)
+	;
+		trc(Slot1,Module, B,Proof)
+	).
+
 trc(Module, (A->B),ifthen(ProofA,ProofB)):-
-	trc(Module, A,ProofA)
+	!,
+	node(Parent, 'builtins#ifthen', 2, [Slot0,Slot1], _),
+	(
+		trc(Slot0,Module, A,ProofA)
 	->
-	trc(Module, B,ProofB).
+		trc(Slot1,Module, B,ProofB)
+	).
+
 trc(Module, ('\\+'(A)),not(A)):-
-	writeln(not(A)),
-	\+trc(Module, A, _).
+	!,
+	writeq('\\+'(A)),nl,
+	node(Parent, 'builtins#not', 1, [Slot0], _),
+	\+trc(Slot0,Module, (A), _).
+
+trc(Module, (not(A)),not(A)):-
+	!,
+	writeq('not'(A)),nl,
+	node(Parent, 'builtins#not', 1, [Slot0], _),
+	\+trc(Slot0,Module, A, _).
 
 trc(Module, A, (A :- Proof)) :-
-	catch(A =.. [call,Arg|Args],_,fail),
+	functor(A, call, _),
+	!,
+
+	A =.. [call,Arg|Args],
 	(	atom(Arg)
 	->	C =.. [Arg|Args]
 	;	(
@@ -44,42 +79,31 @@ trc(Module, A, (A :- Proof)) :-
 			C =.. [Fn|New_args]
 		)
 	),
-	trc(Module, C, Proof).
+	node(Parent, 'builtins#call', 1, [Slot0], _),
+	trc(Slot0,Module, C, Proof).
 
 trc(Module, Q, (Q :- Proof)):-
-
-	%writeq(Module-Q),nl,
-	(	atom(Q)
-	->	Name = Q
-	;	compound_name_arity(Q, Name, _)),
-	Name \= ',',Name \= ';',Name \= '->',Name \= 'call',Name \= '\\+',
-
+	functor(Q, Name, _),
 	(	sub_atom(Name, 0, _, _, $)
 	->	Body = builtin(Q)
 	;	trc_clause(Module,Q,Body)),
-
-	%writeq([Body]),nl,
-
-	(
+	(	Body = loaded(X,Module2)
+	->	(
+			node(Parent, 'builtins#call', 1, [Slot0], _),
+			trc(Module2, X, Proof)
+		)
+		;
 		(
 			Body = builtin(X),
-			%writeq(call(Module:X)),nl,
 			(	sub_atom(Name, 0, _, _, $)
 			->	call_system_something_with_module(Module, Q)
 			;	(
-					/* this here is the only place where multiple yields can happen implicitly. */
 					call(Module:X),
 					gennode(Parent, exit, TraceNode),
 					genprop(TraceNode, goal, X)
 				)
 			),
 			Proof=builtin
-		)
-		;
-		(
-			Body = loaded(X,Module2),
-			%writeq(Module2:X),nl,
-			trc(Module2, X, Proof)
 		)
 	).
 
