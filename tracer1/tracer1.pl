@@ -5,28 +5,67 @@ term('builtins#conj',
 	[A,",",B]).
 */
 
-node(Parent, Type, ArgCount, Args, Node) :-
-	length(Args, ArgCount),
+genuri(Base, Uri) :-
+	gensym(Base, Uri).
+
+
+trc(X) :-
+	open('trace1.js', write, Trace_file),
+	write(Trace_file, 'import {f} from "./trace_import.js";\n'),
+	b_setval(trace_file, Trace_file),
+	node(X, "<dummy>", 'control:tracer_invocation', [Slot0], _),
+	trc(Slot0, user, X, GP),
+	print_term(GP, [write_options([
+				numbervars(true),
+				quoted(true),
+				portray(true)])]),
+	nl,
+	close(Trace_file).
+
+
+node(Query, Parent, Type, Args, Node) :-
+	/* name the node */
+	genuri(node, Node),
+	/* name the slots */
 	maplist(genuri(arg), Args),
+	/*maplist(gen_slot, Args),*/
+	/* write it out */
+	term_string(Query,Query_str),
 	gen(node{
+		'@id': Node,
 		parent: Parent,
-		functor: Type,
-		args: Args
+		type: Type,
+		args: Args,
+		str: Query_str
 	}).
+/*
+gen_slot(Arg) :-
+	gen(node{
+		'@id': Arg,
+		type: 'delogic:slot'
+	}).
+*/
+gen(Dict) :-
+	b_getval(trace_file, Trace_file),
+	write(Trace_file, 'f('),
+	json_write(Trace_file, Dict, [serialize_unknown(true)/*, tag(type)*/]),
+	write(Trace_file, ');\n'),
+	flush_output(Trace_file).
 
 
 trc(Parent,_,true,true) :-
 	!,
-	node(Parent, 'builtins#true', 0, _, _).
+	node(true,Parent, 'proof:true', 0, _, _).
 
 trc(Parent,Module, (A,B),and(ProofA,ProofB)):-
 	!,
-	node(Parent, 'builtins#conjunction', 2, [Slot0,Slot1], _),
-	trc(Slot0 ,Module, A, ProofA),trc(Slot1, Module, B, ProofB).
+	node((A,B), Parent, 'proof:conjunction', [Slot0,Slot1], _),
+	trc(Slot0 ,Module, A, ProofA),
+	trc(Slot1, Module, B, ProofB).
 
-trc(Module, (A->B;C),ifthenelse(ProofA,ProofB,ProofC)):-
+trc(Parent,Module, (A->B;C),ifthenelse(ProofA,ProofB,ProofC)):-
 	!,
-	node(Parent, 'builtins#ifthenelse', 3, [Slot0,Slot1,Slot2], _),
+	node((A->B;C), Parent, 'proof:ifthenelse', [Slot0,Slot1,Slot2], _),
 	(
 		trc(Slot0,Module, A,ProofA)
 		->
@@ -35,38 +74,38 @@ trc(Module, (A->B;C),ifthenelse(ProofA,ProofB,ProofC)):-
 		trc(Slot2,Module, C,ProofC)
 	).
 
-trc(Module, (A;B),or(Proof)):-
+trc(Parent,Module, (A;B),or(Proof)):-
 	A \= (_->_),
 	!,
-	node(Parent, 'builtins#disjunction', 2, [Slot0,Slot1], _),
+	node((A;B), Parent, 'proof:disjunction', [Slot0,Slot1], _),
 	(
 		trc(Slot0,Module, A,Proof)
 	;
 		trc(Slot1,Module, B,Proof)
 	).
 
-trc(Module, (A->B),ifthen(ProofA,ProofB)):-
+trc(Parent,Module, (A->B),ifthen(ProofA,ProofB)):-
 	!,
-	node(Parent, 'builtins#ifthen', 2, [Slot0,Slot1], _),
+	node((A->B), Parent, 'proof:ifthen', [Slot0,Slot1], _),
 	(
 		trc(Slot0,Module, A,ProofA)
 	->
 		trc(Slot1,Module, B,ProofB)
 	).
 
-trc(Module, ('\\+'(A)),not(A)):-
+trc(Parent,Module, ('\\+'(A)),not(A)):-
 	!,
 	writeq('\\+'(A)),nl,
-	node(Parent, 'builtins#not', 1, [Slot0], _),
+	node('\\+'(A),Parent, 'proof:not', [Slot0], _),
 	\+trc(Slot0,Module, (A), _).
 
-trc(Module, (not(A)),not(A)):-
+trc(Parent,Module, (not(A)),not(A)):-
 	!,
 	writeq('not'(A)),nl,
-	node(Parent, 'builtins#not', 1, [Slot0], _),
+	node(not(A), Parent, 'proof:not', [Slot0], _),
 	\+trc(Slot0,Module, A, _).
 
-trc(Module, A, (A :- Proof)) :-
+trc(Parent,Module, A, (A :- Proof)) :-
 	functor(A, call, _),
 	!,
 
@@ -79,30 +118,40 @@ trc(Module, A, (A :- Proof)) :-
 			C =.. [Fn|New_args]
 		)
 	),
-	node(Parent, 'builtins#call', 1, [Slot0], _),
+	node(A, Parent, 'proof:call', [Slot0], _),
 	trc(Slot0,Module, C, Proof).
 
-trc(Module, Q, (Q :- Proof)):-
+trc(Parent,Module, catch(X,Y,Z), catch(Px,Y,Pz)) :-
+	!,
+	node(catch(X,Y,Z), Parent, 'proof:catch', [Sx,Sy,Sz], _),
+	catch(
+		trc(Sx, Module, X, Px),
+		Y,
+		(
+			term_string(Sy, Sy_str),
+			gen(arg{'@id': Sy, str: Sy_str}),
+			trc(Sz, Module, Z, Pz)
+		)
+	).
+
+trc(Parent,Module, Q, (Q :- Proof)):-
 	functor(Q, Name, _),
 	(	sub_atom(Name, 0, _, _, $)
 	->	Body = builtin(Q)
 	;	trc_clause(Module,Q,Body)),
 	(	Body = loaded(X,Module2)
 	->	(
-			node(Parent, 'builtins#call', 1, [Slot0], _),
-			trc(Module2, X, Proof)
+			node(Q, Parent, 'proof:loaded', [Slot0], _),
+			trc(Slot0, Module2, X, Proof)
 		)
 		;
 		(
-			Body = builtin(X),
+			Body = builtin(_),
 			(	sub_atom(Name, 0, _, _, $)
-			->	call_system_something_with_module(Module, Q)
-			;	(
-					call(Module:X),
-					gennode(Parent, exit, TraceNode),
-					genprop(TraceNode, goal, X)
-				)
-			),
+			->	system_something_with_module(Module, Q, Q2)
+			;	Q2 = Q),
+			node(Q2, Parent, 'proof#builtin', [], _),
+			call(Q2),
 			Proof=builtin
 		)
 	).
@@ -114,9 +163,9 @@ what i'm trying to do is change that into '$sig_atomic'(module:setup_trap_assert
 but it's useless
 */
 
-call_system_something_with_module(Module, Q) :-
+system_something_with_module(Module, Q, Q2) :-
 	(	Q =.. [_]
-	->	Q2 = Q
+	->	Q2 = Module:Q
 	;	(
 			Q =.. [SysFn|R],
 			(	R = [Fn]
@@ -124,8 +173,7 @@ call_system_something_with_module(Module, Q) :-
 			;	throw_string('uhh too high arity rn')),
 			Q2 =.. [SysFn,(Module:Fn)]
 		)
-	),
-	call(Q2).
+	).
 
 /*
 what you gotta do when looking up clauses is, i start with 'user' module, and you can't just naively call clause(Query, Body), you have to call clause(Module:Query, Body).
@@ -153,60 +201,4 @@ trc_clause(Module,Q,Body) :-
 			)
 		)
 	;	true).
-
-
-
-trc(X) :-
-	gennode(none, root, Parent),
-	trc(Parent, user, X, GP),
-	print_term(GP, [write_options([
-				numbervars(true),
-				quoted(true),
-				portray(true)])]),
-	nl.
-	%writeq(GP).
-
-
-gennode :-
-
-
-
-/*
-swipl -s trace_tests.pl -g 'use_module(library(plunit)),trc(run_tests)'
-
-Warning: /home/koom/lodgeit2/master2/sources/depr/src/event_calculus.pl:163:
-Warning:    Singleton variables: [P]
-user-run_tests
-[loaded((cleanup,setup_call_cleanup(setup_trap_assertions(_32202),run_current_units,report_and_cleanup(_32202))),plunit)]
-plunit-cleanup
-[loaded((thread_self(_32310),retractall(passed(_32314,_32316,_32318,_32320,_32322)),retractall(failed(_32330,_32332,_32334,_32336)),retractall(failed_assertion(_32344,_32346,_32348,_32350,_32352,_32354,_32356)),retractall(blocked(_32364,_32366,_32368,_32370)),retractall(sto(_32378,_32380,_32382,_32384)),retractall(fixme(_32392,_32394,_32396,_32398,_32400)),retractall(running(_32408,_32410,_32412,_32414,_32310))),plunit)]
-plunit-thread_self(_32310)
-[builtin(thread_self(_32310))]
-plunit-retractall(passed(_32314,_32316,_32318,_32320,_32322))
-[builtin(retractall(passed(_32314,_32316,_32318,_32320,_32322)))]
-plunit-retractall(failed(_32330,_32332,_32334,_32336))
-[builtin(retractall(failed(_32330,_32332,_32334,_32336)))]
-plunit-retractall(failed_assertion(_32344,_32346,_32348,_32350,_32352,_32354,_32356))
-[builtin(retractall(failed_assertion(_32344,_32346,_32348,_32350,_32352,_32354,_32356)))]
-plunit-retractall(blocked(_32364,_32366,_32368,_32370))
-[builtin(retractall(blocked(_32364,_32366,_32368,_32370)))]
-plunit-retractall(sto(_32378,_32380,_32382,_32384))
-[builtin(retractall(sto(_32378,_32380,_32382,_32384)))]
-plunit-retractall(fixme(_32392,_32394,_32396,_32398,_32400))
-[builtin(retractall(fixme(_32392,_32394,_32396,_32398,_32400)))]
-plunit-retractall(running(_32408,_32410,_32412,_32414,main))
-[builtin(retractall(running(_32408,_32410,_32412,_32414,main)))]
-plunit-setup_call_cleanup(setup_trap_assertions(_32202),run_current_units,report_and_cleanup(_32202))
-[loaded(setup_call_catcher_cleanup(setup_trap_assertions(_32202),run_current_units,_35784,report_and_cleanup(_32202)),plunit)]
-plunit-setup_call_catcher_cleanup(setup_trap_assertions(_32202),run_current_units,_35784,report_and_cleanup(_32202))
-[loaded(('$sig_atomic'(setup_trap_assertions(_32202)),'$call_cleanup'),plunit)]
-plunit-'$sig_atomic'(setup_trap_assertions(_32202))
-[builtin('$sig_atomic'(setup_trap_assertions(_32202)))]
-plunit-'$call_cleanup'
-[builtin('$call_cleanup')]
-ERROR: -g use_module(library(plunit)),trc(run_tests): call_system_something_with_module/2: Unknown procedure: '$call_cleanup'/0
-ERROR:   However, there are definitions for:
-ERROR:         call_cleanup/2
-ERROR:         call_cleanup/3
-*/
 
