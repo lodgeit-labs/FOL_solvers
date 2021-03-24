@@ -1,1 +1,4 @@
 *.kate-swp
+.idea/
+prolog/utils/.idea/
+tracer1/.idea/

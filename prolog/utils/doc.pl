@@ -90,14 +90,17 @@ maybe this program will even run faster without this?*/
 
 'check that there is only one exception hook and it\'s ours' :-
 	findall(
-		_,
+		Body,
 		(
-			!clause(prolog_exception_hook(A,B,C,D),Body1),
-			assertion(Body1 = user:my_prolog_exception_hook(A,B,C,D))
+			clause(prolog_exception_hook(A,B,C,D),Body)
 		),
-	_).
+		Xs),
+	(	Xs = [(user:doc_saving_prolog_exception_hook(A,B,C,D))]
+	->	true
+	;	throw(internal_error(prolog_exception_hook(Xs)))).
 
 doc_init :-
+	init_prolog_exception_hook,
 	'check that there is only one exception hook and it\'s ours',
 	(	nb_current(doc_trail, _)
 	->	true
@@ -1014,17 +1017,18 @@ Anyway, we could store both doc and context in State.
 	(	clause(prolog_exception_hook(A,B,C,D),Body)
 	->	(
 			assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
+			%gtrace,
 			retractall(prolog_exception_hook(A,B,C,D))
 		)
 	;	true).
 
 init_prolog_exception_hook :-
 	'save old prolog exception hook',
-	assert(prolog_exception_hook(E,F, Frame, CatcherFrame) :- my_prolog_exception_hook(E,F, Frame, CatcherFrame)).
+	assert(prolog_exception_hook(E,F, Frame, CatcherFrame) :- doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame)).
 
-:- initialization(init_prolog_exception_hook).
+%:- initialization(init_prolog_exception_hook).
 
-my_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
+doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 	%print_message(information, "prolog_stack__prolog_exception_hook"),
 
 	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
