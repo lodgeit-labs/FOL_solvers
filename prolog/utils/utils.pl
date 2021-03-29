@@ -10,7 +10,10 @@
 :- use_module(library(xpath)).
 :- use_module(library(yall)).
 :- use_module(library(debug)).
-:- use_module(library(clpq)).
+%:- use_module(library(clpq)).
+% https://github.com/SWI-Prolog/swipl-devel/issues/715#issuecomment-731019516
+:- use_module(library(clpq), [{}/1]).
+:- use_module(library(clpq), []).
 
 :- use_module(library(fnotation)).
 :- fnotation_ops($>,<$).

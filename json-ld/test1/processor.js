@@ -5,7 +5,14 @@ var path = require('path');
 var n3 = require('n3');
 var jl = require('jsonld');
 
-/*import * as interop from 'ld-lib-interop';!*/
+/*
+
+todo: extract this stuff into aa shared lib
+
+import * as interop from 'ld-lib-interop';!
+
+*/
+
 function n3lib_quad_to_jld(x)
 {
 	return {

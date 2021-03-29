@@ -108,11 +108,11 @@ doc_init :-
 	doc_clear.
 
 doc_init_trace_0 :-
-	Fn = 'doc_trace_0',
+	Fn = 'doc_trace_0.txt',
 	Fnn = loc(file_name, Fn),
 	(	absolute_tmp_path(Fnn, loc(absolute_path, Trail_File_Path))
 	->	true
-	;	Trail_File_Path = 'doc_trace_0'),
+	;	Trail_File_Path = Fn),
 	open(Trail_File_Path, write, Trail_Stream, [buffer(line)]),
 	b_setval(doc_trail, Trail_Stream).
 
