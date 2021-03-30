@@ -47,12 +47,12 @@ terms_with_floats_close_enough(X,Y) :-
 
 
 
-round_term(X, unbound) :-
-	var(X).
-
 round_term(X, Y) :-
 	float_comparison_significant_digits(D),
 	round_term(D, X, Y).
+
+round_term(_, X, unbound) :-
+	var(X).
 
 /*round_term(Digits, X, Y) :-
 	maplist(round_term(Digits), X, Y),!.*/
