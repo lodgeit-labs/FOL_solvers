@@ -1096,6 +1096,10 @@ rpv(S,P,V) :-
 		)
 	).
 
+opv(S,P,V) :-
+		doc(S,P,V0)
+	->	!doc(V0, rdf:value, V).
+
 
 
 
