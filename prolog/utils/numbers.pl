@@ -51,7 +51,7 @@ round_term(X, Y) :-
 	float_comparison_significant_digits(D),
 	round_term(D, X, Y).
 
-round_term(_, X, unbound) :-
+round_term(_, X, '[all]') :-
 	var(X).
 
 /*round_term(Digits, X, Y) :-

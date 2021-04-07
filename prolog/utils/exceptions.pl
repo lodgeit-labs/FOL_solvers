@@ -39,7 +39,7 @@ prepare_throw(List_Or_Atomic, String) :-
 
  throw_format(Format, Args) :-
  	length(Args,_),
- 	assertion(atom(Format)),
+ 	assertion((atom(Format);string(Format))),
  	format(string(S), Format, Args),
 	throw_string(S).
 

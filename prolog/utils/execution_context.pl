@@ -53,7 +53,8 @@ get_context_trace(X) :-
 	b_setval(context, New_ctx_list).
 
  push_format(Format_string, Args) :-
- 	push_context($>format(string(<$), Format_string, Args)).
+ 	maplist(round_term, Args, Args2),
+ 	push_context($>format(string(<$), Format_string, Args2)).
 
  pop_format :-
 	pop_context.
