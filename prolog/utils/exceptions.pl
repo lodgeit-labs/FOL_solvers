@@ -52,12 +52,15 @@ prepare_throw(List_Or_Atomic, String) :-
 
  gtrace_if_have_display :-
 	(	have_display
-	->	(	(	\+current_prolog_flag(gtrace, false)
-			-> 	format(user_error, '\\+current_prolog_flag(gtrace, false)\n', [])
-			; 	format(user_error, 'current_prolog_flag(gtrace, false)\n', [])
-		)
+	->	(
+			(	\+current_prolog_flag(gtrace, false)
+				/*-> 	format(user_error, '\\+current_prolog_flag(gtrace, false)\n', [])
+				; 	format(user_error, 'current_prolog_flag(gtrace, false)\n', [])*/
+			)
 		->	(
+				format(user_error, '**********', []),
 				backtrace(200),
+				format(user_error, '**********', []),
 				trace
 			)
 		;	true)
