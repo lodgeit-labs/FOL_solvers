@@ -166,7 +166,7 @@ add_xml_report(Key, Title, XML) :-
 	),
 	add_report_file(-10,Key, Title, Url). % (_{name:Name,format:'xml'}
 
-add_report_file(Priority, Key, Title, loc(absolute_url, Url)) :-
+ add_report_file(Priority, Key, Title, loc(absolute_url, Url)) :-
 	result(R),
 	doc_new_uri(report_file, Uri),
 	doc_add(R, l:has_report, Uri, files),

@@ -521,24 +521,26 @@ doc_to_rdf_all_graphs :-
 		),_
 	).
 
-save_doc_turtle :-
-	Fn = 'doc.n3',
-	add_report_file(-15,Fn, Fn, Url),
+save_doc_(Format, Id) :-
+	atomic_list_concat(['doc_', Id, '.', Format],Fn),
 	report_file_path(loc(file_name, Fn), Url, loc(absolute_path,Path)),
 	Url = loc(absolute_url, Url_Value),
-	rdf_save_turtle(Path, [sorted(true), base(Url_Value), canonize_numbers(true), abbreviate_literals(false), prefixes([rdf,rdfs,xsd,l,livestock])]).
-
-save_doc_trig :-
-	Fn = 'doc.trig',
 	add_report_file(-15,Fn, Fn, Url),
-	report_file_path(loc(file_name, Fn), Url, loc(absolute_path,Path)),
-	Url = loc(absolute_url, Url_Value),
-	rdf_save_trig(Path, [sorted(true), base(Url_Value), canonize_numbers(true), abbreviate_literals(false), prefixes([rdf,rdfs,xsd,l,livestock])]).
+	Options = [
+		sorted(true),
+		base(Url_Value),
+		canonize_numbers(true),
+		abbreviate_literals(false),
+		prefixes([rdf,rdfs,xsd,l,livestock])
+	],
+	(	Format = trig
+	->	rdf_save_trig(Path, Options)
+	;	rdf_save_turtle(Path, Options)).
 
-save_doc :-
+save_doc(Id) :-
 	doc_to_rdf_all_graphs,
-	save_doc_turtle,
-	save_doc_trig,
+	save_doc_(turtle, Id),
+	save_doc_(trig, Id),
 	rdf_retractall(_,_,_,/*fixme*/_Rdf_Graph).
 
 make_rdf_report :-
@@ -847,7 +849,8 @@ xml_to_doc(Root, element(Name, _Atts, Children)) :-
 
 
 doc_dump :-
-	once(save_doc).
+	gensym('_dump', Id),
+	once(save_doc(Id)).
 
 dg :-
 	doc_dump,gtrace.
@@ -1013,7 +1016,7 @@ Anyway, we could store both doc and context in State.
 :- dynamic(prolog_stack__prolog_exception_hook/4).
 :- dynamic(prolog_exception_hook/4).
 
-'save old prolog exception hook' :-
+ 'save old prolog exception hook' :-
 	(	clause(prolog_exception_hook(A,B,C,D),Body)
 	->	(
 			assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
@@ -1022,7 +1025,7 @@ Anyway, we could store both doc and context in State.
 		)
 	;	true).
 
-init_prolog_exception_hook :-
+ init_prolog_exception_hook :-
 	'save old prolog exception hook',
 	assert(prolog_exception_hook(E,F, Frame, CatcherFrame) :- doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame)).
 
@@ -1058,15 +1061,16 @@ doc_data(G,Ng) :-
 		false
 	).
 
-'store doc data for reporting after exception' :-
+ 'store doc data for reporting after exception' :-
 	(	doc_data(G,Ng)
 	->	(
 			retractall(user:exception_doc_dump(_,_)),
-			assert(user:exception_doc_dump(G,Ng))
+			assert(user:exception_doc_dump(G,Ng)),
+			doc_dump
 		)
 	;	true).
 
-'store ctx data for reporting after exception' :-
+ 'store ctx data for reporting after exception' :-
 	get_context(Ctx_list),
 	%print_message(information, 'storing context:'(Ctx_list)),
 	retractall(user:exception_ctx_dump(_)),
