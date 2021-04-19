@@ -107,6 +107,7 @@ doc_init :-
 	;	doc_init_trace_0),
 	doc_clear.
 
+/* why 0? Probably, the idea was that there'd also be other, higher level formats? */
 doc_init_trace_0 :-
 	Fn = 'doc_trace_0.txt',
 	Fnn = loc(file_name, Fn),
