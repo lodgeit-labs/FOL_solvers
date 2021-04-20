@@ -41,6 +41,25 @@ get_context_trace(X) :-
 		X = []
 	).
 
+context_trace_init_trail_0 :-
+	Fn = 'context_trace_trail.txt',
+	Fnn = loc(file_name, Fn),
+	(	absolute_tmp_path(Fnn, loc(absolute_path, Trail_File_Path))
+	->	true
+	;	Trail_File_Path = Fn),
+	open(Trail_File_Path, write, Trail_Stream, [buffer(line)]),
+	b_setval(context_trace_trail, Trail_Stream).
+
+context_trace_trail(Term) :-
+	b_getval(context_trace_trail, Stream),
+	(	Stream \= []
+	->	(
+			writeq(Stream, Term),
+			writeln(Stream, '\n'),
+			flush_output(Stream)
+		)
+	;	true).
+
  push_context(C) :-
 	get_context(Ctx_list),
 	get_context_depth(Depth),
@@ -50,7 +69,19 @@ get_context_trace(X) :-
 	append([(Depth,C)], Trace, New_trace),
 	b_setval(context_trace, New_trace),
 	b_setval(context_depth, New_depth),
-	b_setval(context, New_ctx_list).
+	b_setval(context, New_ctx_list),
+	(
+		(
+			context_string(Str),
+			context_trace_trail(Str)
+		)
+		;
+		(
+			context_trace_trail(pop(C)),
+			fail
+		)
+	).
+
 
  push_format(Format_string, Args) :-
  	maplist(round_term, Args, Args2),

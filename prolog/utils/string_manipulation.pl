@@ -88,3 +88,5 @@
 	phrase(Grammar, Codes),
 	string_codes(Text, Codes).
 
+ fs(Format, Args, Result) :-
+ 	format(string(Result), Format, Args).

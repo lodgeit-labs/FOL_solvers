@@ -194,7 +194,7 @@ doc_add(S,P,O,G) :-
 assumption: only O's are allowed to be non-atoms
 */
 
-addd(S2,P2,O2,G2) :-
+ addd(S2,P2,O2,G2) :-
 %	(\+ground(addd(S2,P2,O2,G2)) -> g trace ; true),
 	atom(S2),atom(P2),atom(G2),
 
@@ -245,7 +245,7 @@ addd(S2,P2,O2,G2) :-
     rol_add(O2, Os).
 
 
-addd(S2,P2,O2,G2) :-
+ addd(S2,P2,O2,G2) :-
 	X = spog(S2,P2,O2,G2),
 	\+((atom(S2),atom(P2),atom(G2))),
 	%format(user_error, 'ng:~q~n', [X]),
@@ -546,11 +546,11 @@ save_doc(Id) :-
 
 make_rdf_report :-
 	Title = 'response.n3',
-	doc_to_rdf(Rdf_Graph),
-	report_file_path(loc(file_name, Title), Url, loc(absolute_path,Path)),
-	add_report_file(-11,Title, Title, Url),
+	!doc_to_rdf(Rdf_Graph),
+	!report_file_path(loc(file_name, Title), Url, loc(absolute_path,Path)),
+	!add_report_file(-11,Title, Title, Url),
 	Url = loc(absolute_url, Url_Value),
-	rdf_save_turtle(Path, [graph(Rdf_Graph), sorted(true), base(Url_Value), canonize_numbers(true), abbreviate_literals(false), prefixes([rdf,rdfs,xsd,l,livestock])]).
+	!rdf_save_turtle(Path, [graph(Rdf_Graph), sorted(true), base(Url_Value), canonize_numbers(true), abbreviate_literals(false), prefixes([rdf,rdfs,xsd,l,livestock])]).
 
 
 doc_from_rdf(Rdf_Graph, Replaced_prefix, Replacement_prefix) :-
@@ -850,7 +850,7 @@ xml_to_doc(Root, element(Name, _Atts, Children)) :-
 
 
 doc_dump :-
-	gensym('_dump', Id),
+	gensym(dump, Id),
 	once(save_doc(Id)).
 
 dg :-
@@ -866,6 +866,9 @@ we could control this with a thread select'ing some unix socket
 /*doc_dumping_enabled :-
 	current_prolog_flag(doc_dumping_enabled, true).
 */
+
+
+
 
 
 /*

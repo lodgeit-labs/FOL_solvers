@@ -52,19 +52,55 @@ replace_request_with_response(Atom, Response) :-
 		String \= Response
 	).
 
-write_tmp_file(Name, Text) :-
+/*write_tmp_file(Name, Text) :-
 	absolute_tmp_path(Name, Path),
 	write_file(Path, Text).
 
 write_tmp_json_file(Name, Json) :-
 	dict_json_text(Json, Text),
 	write_tmp_file(Name, Text).
+*/
 
-unique_report_fn(Fn0, Fn) :-
-	string_concat('report_fn_', Fn0, Gensym_prefix),
-	gensym(Gensym_prefix, Uniq),
-	string_concat(Gensym_prefix, Uid, Uniq),
-	atomics_to_string([Uid,'_',Fn0], Fn).
+ b_current(K,V) :-
+	/* this really reads a backtracking value, but there's no b_current in stdlib */
+	nb_current(K,V).
+
+ b_current_num_with_default(K,Default,V) :-
+	(	b_current_num(K,V)
+	->	true
+	;	Default = V).
+
+/* another swipl crapulooza workaround */
+ b_current_num(K, V) :-
+	(
+		(
+			b_current(K, V),
+			V\=[]
+		)
+	->	true
+	;	false).
+
+ nondet_report_fn_key(Fn, Key) :-
+	atomic_list_concat(['report_fn_', Fn], Key).
+
+ next_nondet_report_fn(Base, Fn) :-
+	next_nondet_report_fn_id(Base, Next_id),
+	atomics_to_string([Next_id,'_',Base], Fn).
+
+ next_nondet_report_fn_id(Base, Next_id) :-
+	nondet_report_fn_key(Base, Key),
+	(	b_current_num(Key, Id)
+	->	Next_id is Id + 1
+	;	Next_id is 0).
+
+ bump_nondet_report_fn_id(Base) :-
+	next_nondet_report_fn_id(Base, Next_id),
+	nondet_report_fn_key(Base, Key),
+	nb_setval(Key, Next_id).
+
+ unique_report_fn(Base, Fn) :-
+	next_nondet_report_fn(Base, Fn),
+	bump_nondet_report_fn_id(Base).
 
  report_file_path(Fn0, Url, Path) :-
 	report_file_path(Fn0, Url, Path, _).
@@ -79,6 +115,8 @@ unique_report_fn(Fn0, Fn) :-
 ) :-
 	unique_report_fn(Fn0, Fn),
 	report_file_path__singleton(loc(file_name, Fn), Url, Path).
+
+% report_file_path__singleton(Fn, Url, Path, Final_fn) :-
 
 report_file_path__singleton(
 	/* input */
