@@ -21,7 +21,9 @@ json_post(Url, Payload, Response) :-
 		(
 			(	E = error(socket_error(eai_again,Msg),_)
 			->	(
-					debug(shell, '~q', Msg),
+					%debug(shell, '~q', Msg),
+					format(user_error, '~q', Msg),
+					sleep(1),
 					json_post(Url, Payload, Response)
 				)
 			;	throw(
