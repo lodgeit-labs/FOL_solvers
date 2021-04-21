@@ -11,9 +11,27 @@ services_server(S) :-
 json_post(Url, Payload, Response) :-
 	%format(user_error, '~q~n', [http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)])]),
 	catch(
-		http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)]),
+		http_post(
+			Url,
+			json(Payload),
+			Response,
+			[content_type('application/json'), json_object(dict)]
+		),
 		E,
-		throw(during(E,http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)])))
+		(
+			(	E = error(socket_error(eai_again,Msg),_)
+			->	(
+					debug(shell, '~q', Msg),
+					json_post(Url, Payload, Response)
+				)
+			;	throw(
+					during(
+						E,
+						http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)])
+					)
+				)
+			)
+		)
 	).
 
 services_server_shell_cmd(Cmd) :-

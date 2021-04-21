@@ -85,7 +85,8 @@ write_tmp_json_file(Name, Json) :-
 
  next_nondet_report_fn(Base, Fn) :-
 	next_nondet_report_fn_id(Base, Next_id),
-	atomics_to_string([Next_id,'_',Base], Fn).
+	format(string(Fn), '~|~`0t~w~6|_~w', [Next_id, Base]).
+	%atomics_to_string([Next_id,'_',Base], Fn).
 
  next_nondet_report_fn_id(Base, Next_id) :-
 	nondet_report_fn_key(Base, Key),
