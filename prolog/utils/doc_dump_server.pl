@@ -19,16 +19,18 @@ root(_) :-
 	reply_json(_{'msg':'doc dump requested from main thread. If main thread is stopped in trace, make one step to allow it to run.'}).
 
 :- initialization(
-	format(user_error, 'starting doc-dump server..', []),
-	thread_create(
-		http_server(
-			http_dispatch,
-			[
-				interactive(true),
-				port(1234),
-				ip(localhost)
-			]
-		),
-		_
+	(
+		format(user_error, 'starting doc-dump server..', []),
+		thread_create(
+			http_server(
+				http_dispatch,
+				[
+					interactive(true),
+					port(1234),
+					ip(localhost)
+				]
+			),
+			_
+		)
 	)
 ).
