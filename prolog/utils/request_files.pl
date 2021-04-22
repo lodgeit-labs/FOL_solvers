@@ -70,6 +70,11 @@ write_tmp_json_file(Name, Json) :-
 	->	true
 	;	Default = V).
 
+ grab_current_num(K, V) :-
+ 	b_current_num_with_default(K,0,V),
+ 	Next is V + 1,
+ 	b_setval(K, Next).
+
 /* another swipl crapulooza workaround */
  b_current_num(K, V) :-
 	(
@@ -99,7 +104,7 @@ write_tmp_json_file(Name, Json) :-
 	nondet_report_fn_key(Base, Key),
 	nb_setval(Key, Next_id).
 
- unique_report_fn(Base, Fn) :-
+ grab_nondet_report_fn(Base, Fn) :-
 	next_nondet_report_fn(Base, Fn),
 	bump_nondet_report_fn_id(Base).
 
@@ -114,7 +119,7 @@ write_tmp_json_file(Name, Json) :-
 	Path,
 	Fn
 ) :-
-	unique_report_fn(Fn0, Fn),
+	grab_nondet_report_fn(Fn0, Fn),
 	report_file_path__singleton(loc(file_name, Fn), Url, Path).
 
 % report_file_path__singleton(Fn, Url, Path, Final_fn) :-

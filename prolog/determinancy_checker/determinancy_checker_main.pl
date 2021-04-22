@@ -1,6 +1,10 @@
 :- module(_, [
 	op(812,fx,!),
 	op(812,fx,?),
+	op(812,fx,*),
+
+	/* is nondet. This is just a no-op annotation */
+	'*'/1,
 
 	/* must have one solution */
 	'!'/1,
@@ -14,6 +18,23 @@
 	/* must have one or more solutions(to be done) */
 	/*'+'/1*/
 ]).
+
+:- meta_predicate '*'(0).
+:- meta_predicate '*'(1, ?).
+:- meta_predicate '*'(2, ?, ?).
+:- meta_predicate '*'(3, ?, ?, ?).
+:- meta_predicate '*'(4, ?, ?, ?, ?).
+
+'*'(Callable) :-
+	call(Callable).
+'*'(Callable,A1) :-
+	call(Callable,A1).
+'*'(Callable,A1,A2) :-
+	call(Callable,A1,A2).
+'*'(Callable,A1,A2,A3) :-
+	call(Callable,A1,A2,A3).
+'*'(Callable,A1,A2,A3,A4) :-
+	call(Callable,A1,A2,A3,A4).
 
 
 :- meta_predicate '!'(0).
@@ -39,6 +60,8 @@ env_bool_is_true(Env_var_value) :-
 env_bool_true(Key) :-
 	getenv(Key, Val),
 	env_bool_is_true(Val).
+
+
 
 :- if(env_bool_true('DETERMINANCY_CHECKER__USE__ENFORCER')).
 :- [determinancy_enforcer].
