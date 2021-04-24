@@ -9,27 +9,34 @@ services_server(S) :-
 	current_prolog_flag(services_server, S).
 
 json_post(Url, Payload, Response) :-
-	%format(user_error, '~q~n', [http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)])]),
+	json_post(Url, Payload, Response, 5).
+
+json_post(Url, Payload, Response, Max_retries) :-
+	json_post(Url, Payload, Response, Max_retries, Max_retries).
+
+json_post(Url, Payload, Response, Max_retries, Retries) :-
+	Options = [content_type('application/json'), json_object(dict)],
+	%format(user_error, '~q~n', [http_post(Url, json(Payload), Response, Options),
 	catch(
-		http_post(
-			Url,
-			json(Payload),
-			Response,
-			[content_type('application/json'), json_object(dict)]
-		),
+		http_post(Url, json(Payload), Response, Options),
 		E,
 		(
-			(	E = error(socket_error(eai_again,Msg),_)
+			(	(
+					E = error(socket_error(eai_again,Msg),_),
+					Retries > 0
+				)
 			->	(
 					%debug(shell, '~q', Msg),
 					format(user_error, '~q', Msg),
-					sleep(1),
-					json_post(Url, Payload, Response)
+					Sleep is Max_retries - Retries,
+					sleep(Sleep),
+					Next_retries is Retries - 1,
+					json_post(Url, Payload, Response, Max_retries, Next_retries)
 				)
 			;	throw(
 					during(
 						E,
-						http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)])
+						http_post(Url, json(Payload), Response, Options)
 					)
 				)
 			)
@@ -41,10 +48,10 @@ services_server_shell_cmd(Cmd) :-
 	debug(shell, 'POST: ~w', Url),
 	json_post(Url, _{cmd:Cmd,quiet_success:true}, _).
 
-/* shell4: to be used probably everywhere instead of shell2 or swipl shell.
+/*shell4: to be used probably everywhere instead of shell2 or swipl shell.
 swipl shell has a bug making it stuck for long time */
 
-shell4(Cmd_In, Exit_Status) :-
+ shell4(Cmd_In, Exit_Status) :-
 	%format(user_error, 'shell4: ~q ...\n', [Cmd_In]),
 	services_server_shell_cmd(Cmd_In),Exit_Status=0,
 	%format(user_error, 'shell4: done\n', []),

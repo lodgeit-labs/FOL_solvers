@@ -86,4 +86,9 @@ todo:
 
 */
 
+/*
 
+todo harmonize with this a bit?
+https://github.com/mthom/scryer-prolog/blob/master/src/lib/debug.pl
+
+*/

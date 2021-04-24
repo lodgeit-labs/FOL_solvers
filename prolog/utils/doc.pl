@@ -849,7 +849,7 @@ xml_to_doc(Root, element(Name, _Atts, Children)) :-
 
 
 
-doc_dump :-
+ doc_dump :-
 	gensym(dump, Id),
 	once(save_doc(Id)).
 
