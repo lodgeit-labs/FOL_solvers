@@ -22,7 +22,8 @@
 
  throw_value(V) :-
  	(	current_prolog_flag(debug, true)	->	trace	;	true),
- 	get_prolog_backtrace_str(Backtrace_str),
+ 	% get_prolog_backtrace_str(Backtrace_str),
+ 	Backtrace_str = "",
 	throw(with_backtrace_str(error(msg(V),_),Backtrace_str)).
 
 
