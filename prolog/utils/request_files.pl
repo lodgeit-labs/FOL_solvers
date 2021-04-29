@@ -25,6 +25,7 @@ symlink_last_to_current(loc(absolute_path, Path)) :-
 	resolve_specifier(loc(specifier,my_tmp(File_Path_Relative_To_Tmp)), Absolute_File_Name).
 
 make_zip :-
+% todo replace with https://docs.python.org/3/library/shutil.html#archiving-example
 	resolve_specifier(loc(specifier, my_tmp('')), loc(absolute_path, Tmp)),
 	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
 	resolve_specifier(loc(specifier, my_tmp(Tmp_Dir)), loc(absolute_path, Tmp_Dir_Path)),

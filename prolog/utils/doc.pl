@@ -80,6 +80,7 @@ maybe this program will even run faster without this?*/
 :- rdf_meta docm(r,r,r,r).
 :- rdf_meta doc_new_(r,-).
 :- rdf_meta result_property(r,r).
+:- rdf_meta rp(r,r).
 :- rdf_meta result_add_property(r,r).
 :- rdf_meta result_add_property(r,r,r).
 :- rdf_meta result_assert_property(r,r,r).
@@ -88,7 +89,7 @@ maybe this program will even run faster without this?*/
 :- rdf_meta doc_add_value(r,r,r).
 :- rdf_meta doc_add_value(r,r,r,r).
 
-'check that there is only one exception hook and it\'s ours' :-
+ 'check that there is only one exception hook and it\'s ours' :-
 	findall(
 		Body,
 		(
@@ -99,7 +100,7 @@ maybe this program will even run faster without this?*/
 	->	true
 	;	throw(internal_error(prolog_exception_hook(Xs)))).
 
-doc_init :-
+ doc_init :-
 	init_prolog_exception_hook,
 	'check that there is only one exception hook and it\'s ours',
 	(	nb_current(doc_trail, _)
@@ -107,8 +108,14 @@ doc_init :-
 	;	doc_init_trace_0),
 	doc_clear.
 
+/*
+good thing is i think even with retracts (the backtracking kind), we won't have to worry about prolog reusing variable numbers. anyway, variables are todo
+*/
+
+:- if(env_bool_true('ROBUST_DOC_ENABLE_TRAIL')).
+
 /* why 0? Probably, the idea was that there'd also be other, higher level formats? */
-doc_init_trace_0 :-
+ doc_init_trace_0 :-
 	Fn = 'doc_trace_0.txt',
 	Fnn = loc(file_name, Fn),
 	(	absolute_tmp_path(Fnn, loc(absolute_path, Trail_File_Path))
@@ -117,21 +124,26 @@ doc_init_trace_0 :-
 	open(Trail_File_Path, write, Trail_Stream, [buffer(line)]),
 	b_setval(doc_trail, Trail_Stream).
 
-/*
-good thing is i think even with retracts (the backtracking kind), we won't have to worry about prolog reusing variable numbers. anyway, variables are todo
-*/
-
-doc_trace0(Term) :-
+ doc_trace0(Term) :-
 	b_getval(doc_trail, Stream),
-	(	Stream \= []
+	(	true %Stream \= []
 	->	(
 			writeq(Stream, Term),
 			writeln(Stream, ',')
 		)
 	;	true).
 
+:- else.
 
-dump :-
+ doc_init_trace_0 :- true.
+ doc_trace0(_) :- true.
+
+:- endif.
+
+
+
+
+ dump :-
 	findall(_,
 		(
 			docm(S,P,O),
@@ -165,28 +177,32 @@ doc_add(S,P,O) :-
 	doc_add(S,P,O,G).
 
 
-atom_or_idk(X,X2) :-
+ atom_or_idk(X,X2) :-
 	(	atom(X)
 	->	X2 = X
 	;	X2 = idk).
 
-get_or_default(T, X, XXX) :-
+ get_or_default(T, X, XXX) :-
 	(	XXX = T.get(X)
 	->	true
 	;	XXX = _{}).
 
-doc_add(S,P,O,G) :-
+ doc_add(S,P,O,G) :-
 	rdf_global_id(S, S2),
 	rdf_global_id(P, P2),
 	rdf_global_id(O, O2),
 	rdf_global_id(G, G2),
 	doc_trace0(doc_add(S2,P2,O2,G2)),
-	debug(doc, 'add:~q~n', [(S2,P2,O2,G2)]),
+	%debug(doc, 'add:~q~n', [(S2,P2,O2,G2)]),
 	addd(S2,P2,O2,G2).
 
-doc_add(S,P,O,G) :-
+:- if(env_bool_true('ROBUST_DOC_ENABLE_TRAIL')).
+
+ doc_add(S,P,O,G) :-
 	doc_trace0(clean_pop(doc_add(S,P,O,G))),
 	fail.
+
+:- endif.
 
 /*todo b_getval(the_theory_nongrounds,TTT),*/
 
@@ -308,7 +324,7 @@ doc(S,P,O,G) :-
 	rdf_global_id(O, O2),
 	rdf_global_id(G, G2),
 	b_getval(the_theory,X),
-	debug(doc, 'doc?:~q~n', [(S2,P2,O2,G2)]),
+	%debug(doc, 'doc?:~q~n', [(S2,P2,O2,G2)]),
 	dddd(spog(S2,P2,O2,G2), X).
 
 /*
@@ -324,7 +340,7 @@ docm(S,P,O,G) :-
 	rdf_global_id(O, O2),
 	rdf_global_id(G, G2),
 	b_getval(the_theory,X),
-	debug(doc, 'docm:~q~n', [(S2,P2,O2,G2)]),
+	%debug(doc, 'docm:~q~n', [(S2,P2,O2,G2)]),
 	dddd(spog(S2,P2,O2,G2), X).
 /*
 member
@@ -358,13 +374,18 @@ doc_new_uri(Postfix, Uri) :-
 /*
  ensure Spog is added as a last element of T, while memberchk would otherwise possibly just unify an existing member with it
 */
-rol_add(Spog,T) :-
-	(
-		current_prolog_flag(doc_checks, true),
-		rol_member(Spog,T),
-		throw(added_quad_matches_existing_quad)
-	)
-	;	memberchk(Spog,T).
+
+:- if(env_bool_true('ROBUST_ROL_ENABLE_CHECKS')).
+
+ rol_add(Spog,T) :-
+	rol_member(Spog,T),
+	throw(added_quad_matches_existing_quad).
+
+:- endif.
+
+ rol_add(Spog,T) :-
+	memberchk(Spog,T).
+
 
 rol_assert(Spog,T) :-
 	rol_member(Spog,T)
@@ -392,25 +413,32 @@ match((S1,P1,O1,G1),(S2,P2,O2,G2))
 	;	rdf_equal(?Resource1, ?Resource2)
 	*/
 
-rol_single_match(T,SpogA) :-
-	(	current_prolog_flag(doc_checks, true)
-	->	copy_term(SpogA,SpogA_Copy)
-	;	true),
+:- if(env_bool_true('ROBUST_ROL_ENABLE_CHECKS')).
+
+ rol_single_match(T,SpogA) :-
+	copy_term(SpogA,SpogA_Copy)
 	rol_member(SpogA,T),
-	(	current_prolog_flag(doc_checks, true)
-	->
-		(
-			/* only allow one match */
-			findall(x,rol_member(SpogA_Copy,T),Matches),
-			length(Matches, Length),
-			(	Length > 1
-			->	(
-					format(string(Msg), 'multiple_matches, use docm: ~q', [SpogA_Copy]),
-					throw_string(Msg)
-				)
-			;	true)
-		)
-	;	true).
+	(
+		/* only allow one match */
+		findall(x,rol_member(SpogA_Copy,T),Matches),
+		length(Matches, Length),
+		(	Length > 1
+		->	(
+				format(string(Msg), 'multiple_matches, use docm: ~q', [SpogA_Copy]),
+				throw_string(Msg)
+			)
+		;	true)
+	).
+
+:- else.
+
+ rol_single_match(T,SpogA) :-
+	rol_member(SpogA,T).
+
+:- endif.
+
+
+
 
 
 
@@ -422,26 +450,26 @@ rol_single_match(T,SpogA) :-
 ░▀░░░▀░▀░▀▀▀░▀░▀░▀░░░░▀░░▀▀▀░░░▀░▀░▀▀░░▀░░
 */
 
-node_rdf_vs_doc(
+ node_rdf_vs_doc(
 	date_time(Y,M,D,Z0,Z1,Z2) ^^ 'http://www.w3.org/2001/XMLSchema#dateTime',
 	date(Y,M,D)) :-
 		is_zero_number(Z0),
 		is_zero_number(Z1),
 		is_zero_number(Z2),!.
 
-node_rdf_vs_doc(
+ node_rdf_vs_doc(
 	date_time(Y,L,D,H,M,S) ^^ 'http://www.w3.org/2001/XMLSchema#dateTime',
 	date(Y,L,D,H,M,S, 0,'UTC',-)) :- !.
 
-node_rdf_vs_doc(
+ node_rdf_vs_doc(
 	String ^^ 'http://www.w3.org/2001/XMLSchema#string',
 	String):- string(String), !.
 
-node_rdf_vs_doc(
+ node_rdf_vs_doc(
 	Int ^^ 'http://www.w3.org/2001/XMLSchema#integer',
 	Int) :- integer(Int),!.
 
-node_rdf_vs_doc(
+ node_rdf_vs_doc(
 	X ^^ 'http://www.w3.org/2001/XMLSchema#boolean',
 X) :-
 	(X == true
@@ -449,7 +477,7 @@ X) :-
 	X == false),
 	!.
 
-node_rdf_vs_doc(
+ node_rdf_vs_doc(
 	Float ^^ 'http://www.w3.org/2001/XMLSchema#decimal',
 	Rat) :-
 		/*freeze(Float, float(Float)),
@@ -463,15 +491,15 @@ node_rdf_vs_doc(
 		->	Float is float(Rat)
 		;	Rat is rationalize(Float)),!.
 
-node_rdf_vs_doc(Atom, Atom) :- atom(Atom),!.
+ node_rdf_vs_doc(Atom, Atom) :- atom(Atom),!.
 
-node_rdf_vs_doc(String, Term) :-
+ node_rdf_vs_doc(String, Term) :-
 	var(String),
 	String = String2^^'http://www.w3.org/2001/XMLSchema#string',
 	/*compound(Term), */term_string(Term, String2),
 	!.
 
-triple_rdf_vs_doc((S,P,O), (S,P,O2)) :-
+ triple_rdf_vs_doc((S,P,O), (S,P,O2)) :-
 	(var(S);atom(S)),
 	catch(
 		(	node_rdf_vs_doc(O,O2)
@@ -488,7 +516,7 @@ triple_rdf_vs_doc((S,P,O), (S,P,O2)) :-
 
 
 
-doc_to_rdf(Rdf_Graph) :-
+ doc_to_rdf(Rdf_Graph) :-
 	rdf_create_bnode(Rdf_Graph),
 	findall(_,
 		(
@@ -498,7 +526,7 @@ doc_to_rdf(Rdf_Graph) :-
 			!rdf_assert(X2,Y2,Z2,Rdf_Graph)
 		),_).
 
-add_to_rdf((X,Y,Z,G)) :-
+ add_to_rdf((X,Y,Z,G)) :-
 	(
 		triple_rdf_vs_doc((X2,Y2,Z2),(X,Y,Z)),
 		debug(doc, 'to_rdf:~q~n', [(X2,Y2,Z2,G)]),
@@ -514,7 +542,7 @@ add_to_rdf((X,Y,Z,G)) :-
 
 /*:- comment(lib:doc_to_rdf_all_graphs, "if necessary, modify to not wipe out whole rdf database and to check that G doesn't already exist */
 
-doc_to_rdf_all_graphs :-
+ doc_to_rdf_all_graphs :-
 	rdf_retractall(_,_,_,_),
 	findall(_,(
 			docm(X,Y,Z,G),
@@ -522,7 +550,7 @@ doc_to_rdf_all_graphs :-
 		),_
 	).
 
-save_doc_(Format, Id) :-
+ save_doc_(Format, Id) :-
 	atomic_list_concat(['doc_', Id, '.', Format],Fn),
 	report_file_path(loc(file_name, Fn), Url, loc(absolute_path,Path)),
 	Url = loc(absolute_url, Url_Value),
@@ -538,13 +566,13 @@ save_doc_(Format, Id) :-
 	->	rdf_save_trig(Path, Options)
 	;	rdf_save_turtle(Path, Options)).
 
-save_doc(Id) :-
+ save_doc(Id) :-
 	doc_to_rdf_all_graphs,
 	save_doc_(turtle, Id),
 	save_doc_(trig, Id),
 	rdf_retractall(_,_,_,/*fixme*/_Rdf_Graph).
 
-make_rdf_report :-
+ make_rdf_report :-
 	Title = 'response.n3',
 	!doc_to_rdf(Rdf_Graph),
 	!report_file_path(loc(file_name, Title), Url, loc(absolute_path,Path)),
@@ -553,7 +581,7 @@ make_rdf_report :-
 	!rdf_save_turtle(Path, [graph(Rdf_Graph), sorted(true), base(Url_Value), canonize_numbers(true), abbreviate_literals(false), prefixes([rdf,rdfs,xsd,l,livestock])]).
 
 
-doc_from_rdf(Rdf_Graph, Replaced_prefix, Replacement_prefix) :-
+ doc_from_rdf(Rdf_Graph, Replaced_prefix, Replacement_prefix) :-
 	findall((X2,Y2,Z2),
 		(
 			rdf(X,Y,Z,Rdf_Graph),
@@ -565,7 +593,7 @@ doc_from_rdf(Rdf_Graph, Replaced_prefix, Replacement_prefix) :-
 	maplist(triple_rdf_vs_doc, Triples, Triples2),
 	maplist(doc_add, Triples2).
 
-replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2) :-
+ replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2) :-
 	(	(
 			atom(Z),
 			atom_prefix(Z, Replaced_prefix)
@@ -573,7 +601,7 @@ replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2) :-
 	->	!replace_atom_prefix(Z, Replaced_prefix, Replacement_prefix, Z2)
 	;	Z = Z2).
 
-replace_atom_prefix(X, Replaced_prefix, Replacement_prefix, X2) :-
+ replace_atom_prefix(X, Replaced_prefix, Replacement_prefix, X2) :-
 	atom_length(Replaced_prefix, L0),
 	atom_length(X, L1),
 	L2 is L1 - L0,
@@ -608,6 +636,9 @@ replace_atom_prefix(X, Replaced_prefix, Replacement_prefix, X2) :-
  report_details_property_value(P, V) :-
 	!request_data_property(ic_ui:report_details, Details),
 	doc_value(Details, P, V).
+
+ rp(P, O) :-
+ 	result_property(P, O).
 
  result_property(P, O) :-
 	result(R),

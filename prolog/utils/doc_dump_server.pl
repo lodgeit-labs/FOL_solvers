@@ -18,19 +18,24 @@ root(_) :-
 	thread_signal(main, doc_dump),
 	reply_json(_{'msg':'doc dump requested from main thread. If main thread is stopped in trace, make one step to allow it to run.'}).
 
-:- initialization(
-	(
-		format(user_error, 'starting doc-dump server..', []),
-		thread_create(
-			http_server(
-				http_dispatch,
-				[
-					interactive(true),
-					port(1234),
-					ip(localhost)
-				]
-			),
-			_
+:- dynamic(doc_dump_server_is_inited/0).
+
+ init_doc_dump_server :-
+ 	(	doc_dump_server_is_inited
+ 	->	true
+ 	;	(
+			assert(doc_dump_server_is_inited),
+			format(user_error, 'starting doc-dump server..', []),
+			thread_create(
+				http_server(
+					http_dispatch,
+					[
+						interactive(true),
+						port(1234),
+						ip(localhost)
+					]
+				),
+				_
+			)
 		)
-	)
-).
+	).
