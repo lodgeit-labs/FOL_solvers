@@ -20,6 +20,10 @@
 :- fnotation_ops($>,<$).
 :- op(900,fx,<$).
 
+
+:- use_module(envvars).
+
+
 :- use_module('../determinancy_checker/determinancy_checker_main.pl').
 :- assert(user:determinancy_checker_thrower(throw_string)).
 

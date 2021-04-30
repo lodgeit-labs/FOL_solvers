@@ -17,7 +17,7 @@ running this takes a while because it first does just a load to find compile err
 shell2(Cmd) :-
 	shell2(Cmd, _).
 
-:- debug(dev_runner).
+%:- debug(dev_runner).
 
 shell2(Cmd_In, Exit_Status) :-
 	flatten([Cmd_In], Cmd_Flat),
@@ -201,7 +201,7 @@ run_with_compilation(Optimization, Script, Viewer) :-
 			;	Redirection = ''),
 
 			%shell2(['/usr/bin/time -f "user time :%U secs, max ram:%M KB" ./a.out', Redirection], Execution_exit_status),
-			shell2(['/usr/bin/time -v ./a.out', Redirection], Execution_exit_status),
+			shell2(['/usr/bin/time ./a.out', Redirection], Execution_exit_status),
 
 			(	Execution_exit_status = 0
 			->	true

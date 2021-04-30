@@ -19,6 +19,10 @@
 	/*'+'/1*/
 ]).
 
+:- use_module('../../prolog/utils/envvars', [env_bool_true/1]).
+
+
+
 :- meta_predicate '*'(0).
 :- meta_predicate '*'(1, ?).
 :- meta_predicate '*'(2, ?, ?).
@@ -52,15 +56,6 @@ determinancy_checker_throw_error(E) :-
 
 determinancy_checker_throw_error(E) :-
 	throw(E).
-
-env_bool_is_true(Env_var_value) :-
-	downcase_atom(Env_var_value, V),
-	member(V, [1, '1', 'true', 'yes', 'on']),!.
-
-env_bool_true(Key) :-
-	getenv(Key, Val),
-	env_bool_is_true(Val).
-
 
 
 :- if(env_bool_true('DETERMINANCY_CHECKER__USE__ENFORCER')).

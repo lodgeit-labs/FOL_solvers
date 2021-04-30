@@ -416,7 +416,7 @@ match((S1,P1,O1,G1),(S2,P2,O2,G2))
 :- if(env_bool_true('ROBUST_ROL_ENABLE_CHECKS')).
 
  rol_single_match(T,SpogA) :-
-	copy_term(SpogA,SpogA_Copy)
+	copy_term(SpogA,SpogA_Copy),
 	rol_member(SpogA,T),
 	(
 		/* only allow one match */
