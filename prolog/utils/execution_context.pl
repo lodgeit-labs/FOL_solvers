@@ -98,6 +98,10 @@ context_trace_trail(Term) :-
 	!append(New_ctx_list,[_],Ctx_list),
 	b_setval(context, New_ctx_list).
 
+ ct(Context) :-
+	push_context(Context),
+	pop_context.
+
 %:- meta_predicate 'c'(?, 0).
  ct(Context, Callable) :-
 	push_context(Context),

@@ -158,15 +158,22 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 ╹ ╹┗━┛╺┻┛╹╹   ╹ ╹╹ ╹┗━┛
 */
 
-doc_clear :-
+ doc_clear :-
 	doc_trace0(doc_clear),
 	b_setval(the_theory,_{}),
 	b_setval(the_theory_nonground,[]),
 	doc_set_default_graph(default).
 
-doc_set_default_graph(G) :-
+
+ doc_set_default_graph(G) :-
 	doc_trace0(doc_set_default_graph(G)),
 	b_setval(default_graph, G).
+
+ doc_add(S, [P, O|Rest]) :-
+	doc_add(S,P,O),
+	doc_add(S,Rest).
+
+ doc_add(_, []).
 
 doc_add((S,P,O)) :-
 	doc_add(S,P,O).
@@ -515,6 +522,7 @@ X) :-
 /* todo vars */
 
 
+%:- debug(doc).
 
  doc_to_rdf(Rdf_Graph) :-
 	rdf_create_bnode(Rdf_Graph),
@@ -572,7 +580,7 @@ X) :-
 	save_doc_(trig, Id),
 	rdf_retractall(_,_,_,/*fixme*/_Rdf_Graph).
 
- make_rdf_report :-
+ make_rdf_response_report :-
 	Title = 'response.n3',
 	!doc_to_rdf(Rdf_Graph),
 	!report_file_path(loc(file_name, Title), Url, loc(absolute_path,Path)),
@@ -681,10 +689,16 @@ result_assert_property(P, O) :-
 
  add_alert(Type, Msg, Uri) :-
 	result(R),
+	get_ctx_dump_string(Ctx_str),
 	doc_new_uri(alert, Uri),
 	doc_add(R, l:alert, Uri),
-	doc_add(Uri, l:type, Type),
-	doc_add(Uri, l:message, Msg).
+
+	doc_add(Uri, [
+		l:type, 	Type,
+	 	l:message, 	Msg,
+	 	l:ctx_str, 	Ctx_str
+	]).
+
 
  assert_alert(Type, Msg) :-
 	/*todo*/
