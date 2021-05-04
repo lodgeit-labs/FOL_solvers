@@ -104,6 +104,7 @@ find_thing_in_tree([_|Entries], Matcher, Children_Yielder, Thing) :-
 	find_thing_in_tree(Entries, Matcher, Children_Yielder, Thing).
 
 find_thing_in_tree(Root, Matcher, Children_Yielder, Thing) :-
+	\+is_list(Root),
 	call(Children_Yielder, Root, Child),
 	find_thing_in_tree(Child, Matcher, Children_Yielder, Thing).
 

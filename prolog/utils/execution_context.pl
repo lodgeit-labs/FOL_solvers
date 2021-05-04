@@ -41,6 +41,8 @@ get_context_trace(X) :-
 		X = []
 	).
 
+:- if(env_bool_true('CONTEXT_TRACE_TRAIL')).
+
 context_trace_init_trail_0 :-
 	Fn = 'context_trace_trail.txt',
 	Fnn = loc(file_name, Fn),
@@ -50,7 +52,7 @@ context_trace_init_trail_0 :-
 	open(Trail_File_Path, write, Trail_Stream, [buffer(line)]),
 	b_setval(context_trace_trail, Trail_Stream).
 
-context_trace_trail(Term) :-
+ context_trace_trail(Term) :-
 	b_getval(context_trace_trail, Stream),
 	(	Stream \= []
 	->	(
@@ -59,6 +61,14 @@ context_trace_trail(Term) :-
 			flush_output(Stream)
 		)
 	;	true).
+
+:- else.
+
+ context_trace_init_trail_0.
+ context_trace_trail(_).
+
+:- endif.
+
 
  push_context(C) :-
 	get_context(Ctx_list),
