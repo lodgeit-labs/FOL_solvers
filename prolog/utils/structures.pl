@@ -94,6 +94,7 @@ sort_into_assoc(_, [], D, D).
 :- meta_predicate find_thing_in_tree(?, 2, 3, ?).
 
 find_thing_in_tree(Root, Matcher, _, Root) :-
+	\+is_list(Root),
 	call(Matcher, Root).
 
 find_thing_in_tree([Entry|_], Matcher, Children_Yielder, Thing) :-

@@ -88,6 +88,7 @@ maybe this program will even run faster without this?*/
 :- rdf_meta doc_value(r,r,r).
 :- rdf_meta doc_add_value(r,r,r).
 :- rdf_meta doc_add_value(r,r,r,r).
+:- rdf_meta t(r,r).
 
  'check that there is only one exception hook and it\'s ours' :-
 	findall(
@@ -160,7 +161,7 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 
  doc_clear :-
 	doc_trace0(doc_clear),
-	b_setval(the_theory,_{}),
+	b_setval(the_theory,subjs{}),
 	b_setval(the_theory_nonground,[]),
 	doc_set_default_graph(default).
 
@@ -218,7 +219,6 @@ assumption: only O's are allowed to be non-atoms
 */
 
  addd(S2,P2,O2,G2) :-
-%	(\+ground(addd(S2,P2,O2,G2)) -> g trace ; true),
 	atom(S2),atom(P2),atom(G2),
 
 	% get the_theory global
@@ -230,7 +230,7 @@ assumption: only O's are allowed to be non-atoms
 	%	the it's a dict from preds to graphs
 	->	Ss2 = Ss
 	;	(
-			Ps = _{},
+			Ps = preds{},
 			Ss2 = Ss.put(S2, Ps),
 			b_setval(the_theory, Ss2)
 		)
@@ -239,13 +239,15 @@ assumption: only O's are allowed to be non-atoms
 	(	Gs = Ps.get(P2)
 	->	Ps2 = Ps
 	;	(
-			Gs = _{},
+			Gs = graphs{},
 			Ps2 = Ps.put(P2, Gs),
 			b_set_dict(S2, Ss2, Ps2)
 		)
 	),
 
 /*
+todo this is an laternative ending, check if it's faster.
+
 	(	Os = Gs.get(G2)
 	->	(
 			append(Os, [O2], Os2),
@@ -271,6 +273,7 @@ assumption: only O's are allowed to be non-atoms
  addd(S2,P2,O2,G2) :-
 	X = spog(S2,P2,O2,G2),
 	\+((atom(S2),atom(P2),atom(G2))),
+	% adding non-ground triples is nonoptimal, because they aren't indexed.
 	%format(user_error, 'ng:~q~n', [X]),
 	b_getval(the_theory_nonground, Ng),
 	append(Ng, [X], Ng2),
@@ -326,6 +329,7 @@ doc(S,P,O) :-
 must have at most one match
 */
 doc(S,P,O,G) :-
+	!(atom(S);var(S)),
 	rdf_global_id(S, S2),
 	rdf_global_id(P, P2),
 	rdf_global_id(O, O2),
@@ -337,10 +341,11 @@ doc(S,P,O,G) :-
 /*
 can have multiple matches
 */
+docm((S,P,O)) :-
+	docm(S,P,O).
 docm(S,P,O) :-
 	b_getval(default_graph, G),
 	docm(S,P,O,G).
-
 docm(S,P,O,G) :-
 	rdf_global_id(S, S2),
 	rdf_global_id(P, P2),
@@ -528,16 +533,19 @@ X) :-
 	rdf_create_bnode(Rdf_Graph),
 	findall(_,
 		(
-			docm(X,Y,Z),
-			debug(doc, 'to_rdf:~q~n', [(X,Y,Z)]),
-			triple_rdf_vs_doc((X2,Y2,Z2),(X,Y,Z)),
+			%docm(X,Y,Z),
+			docm(T),
+			round_term(T,T2),
+			%debug(doc, 'to_rdf:~q~n', [T2]),
+			triple_rdf_vs_doc((X2,Y2,Z2),T2),
 			!rdf_assert(X2,Y2,Z2,Rdf_Graph)
 		),_).
 
  add_to_rdf((X,Y,Z,G)) :-
 	(
-		triple_rdf_vs_doc((X2,Y2,Z2),(X,Y,Z)),
-		debug(doc, 'to_rdf:~q~n', [(X2,Y2,Z2,G)]),
+		round_term((X,Y,Z),T),
+		triple_rdf_vs_doc((X2,Y2,Z2),T),
+		%debug(doc, 'to_rdf:~q~n', [(X2,Y2,Z2,G)]),
 		catch(
 			rdf_assert(X2,Y2,Z2,G),
 			E,
@@ -689,7 +697,7 @@ result_assert_property(P, O) :-
 
  add_alert(Type, Msg, Uri) :-
 	result(R),
-	get_ctx_dump_string(Ctx_str),
+	context_string(Ctx_str),
 	doc_new_uri(alert, Uri),
 	doc_add(R, l:alert, Uri),
 
@@ -808,6 +816,8 @@ gu(Prefixed, Full) :-
 
 
 
+ t(X,Y) :-
+	!doc(X, rdf:type, Y).
 
 
 
@@ -953,36 +963,6 @@ diff from rol_ version. This was maybe even faster, and prolly uses a lot less m
 
 
 
-/*
-
-version trying to use swipl rdf db, 4x slower than dicts (and with non-backtracking semantics)
-
-can_go_into_rdf_db(spog(S2,P2,O2,G2)) :-
-	atom(S2),atom(P2),atom(G2),atomic(O2).
-
-addd(S2,P2,O2,G2) :-
-	can_go_into_rdf_db(spog(S2,P2,O2,G2)),
-	rdf_assert(S2,P2,O2,G2).
-
-addd(S2,P2,O2,G2) :-
-	X = spog(S2,P2,O2,G2),
-	\+can_go_into_rdf_db(X),
-	rol_add(X, $>b_getval(the_theory_nonground)).
-
-dddd(Spog, _X) :-
-	Spog = spog(S2,P2,O2,G2),
-	(atom(S2);var(S2)),
-	(atom(P2);var(P2)),
-	(atom(G2);var(G2)),
-	(atomic(O2);var(O2)),
-	rdf(S2,P2,O2,G2).
-*/
-
-
-
-
-
-
 
 /*
 
@@ -1001,9 +981,6 @@ objects:
 
 
 prolog could need access to the request data
-
-
-
 
 
 
@@ -1033,6 +1010,7 @@ take, as an example account role. (RoleParent/RoleChild), posibly nested. For al
 /*
 about namespaces:
 	i think it'll be ideal if a contracted form is the default and used everywhere, ie, nodes are normalized into the contracted form when put into the store or queried.
+	- this is what i'm trying out in QuadLad now
 */
 
 

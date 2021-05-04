@@ -203,7 +203,7 @@ for what it's worth. Should be superseded by a nice svelte Rdf viewer UI
 
  context_string(C,Str) :-
 	(	C = []
-	->	Str = ''
+	->	Str = ""
 	;	(
 			context_string1(1, C, Item_strings),
 			atomics_to_string(['during: \n' | Item_strings], Str)
