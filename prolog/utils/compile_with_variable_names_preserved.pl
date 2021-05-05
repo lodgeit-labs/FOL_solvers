@@ -1,6 +1,6 @@
 /*executed at compile time, passess X through, and binds Names to info suitable for term_string*/
 
-user:goal_expansion(
+ user:goal_expansion(
 	compile_with_variable_names_preserved(X, variable_names(Names))
 , X) :-
 	term_variables(X, Vars),
@@ -35,6 +35,6 @@ x([S2,' ', S3,' ', S4]) :-
 */
 
 
-my_variable_naming(Var, (Name = Var)) :-
+ my_variable_naming(Var, (Name = Var)) :-
 	var_property(Var, name(Name)).
 

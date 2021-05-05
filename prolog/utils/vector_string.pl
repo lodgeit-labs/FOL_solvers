@@ -1,8 +1,8 @@
 
 :- use_module(library(dcg/basics)).
 
-money_string(value(Unit, Amount)) --> blanks, number(Amount), blanks,  string(Unit0), blanks, {atom_codes(Unit, Unit0)}.
-money_string(value(Unit, Amount)) --> blanks, string(Unit0), blanks, number(Amount), blanks, {atom_codes(Unit, Unit0)}.
+ money_string(value(Unit, Amount)) --> blanks, number(Amount), blanks,  string(Unit0), blanks, {atom_codes(Unit, Unit0)}.
+ money_string(value(Unit, Amount)) --> blanks, string(Unit0), blanks, number(Amount), blanks, {atom_codes(Unit, Unit0)}.
 
 
 %:- string_codes("5457.878700 AUD", C), phrase(money_string(X), C), writeq(X).
@@ -24,7 +24,7 @@ money_string(value(Unit, Amount)) --> blanks, string(Unit0), blanks, number(Amou
 		;	string_value(S, V))
 	).
 
-my_number_string(N, S) :-
+ my_number_string(N, S) :-
 	catch(
 		number_string(N, S),
 		error(type_error(list,Got),Ctx),

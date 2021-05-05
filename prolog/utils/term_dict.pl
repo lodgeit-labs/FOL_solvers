@@ -1,11 +1,11 @@
-term_dict(
+ term_dict(
 	Value,
 	value{unit:U, amount:A}
 ) :-
 	Value=value(_,_),
 	round_term(Value,value(U, A)).
 
-term_dict(
+ term_dict(
 	Coord,
 	coord{unit:U2, debit:D2, credit:C2}
 ) :-
@@ -16,7 +16,7 @@ term_dict(
 
 
 /* finish me, if needed
-term_dict(
+ term_dict(
 	entry(Account, Balance, Child_sheet_entries, Transactions_count,_),
 	entry{account:Account2, balance:Balance2, child_sheet_entries:Child_sheet_entries2, transactions_count:Transactions_count2}
 ) :-
@@ -26,7 +26,7 @@ term_dict(
 	round_term(Transactions_count,Transactions_count2).
 */
 
-term_dict(
+ term_dict(
 	exchange_rate(Day, Src, Dst, Rate),
 	exchange_rate{date:Day, src:Src2, dst:Dst2, rate:Rate2}
 ) :-
@@ -34,7 +34,7 @@ term_dict(
 	round_term(Dst,Dst2),
 	round_term(Rate,Rate2).
 
-term_dict(
+ term_dict(
 	date(Y,M,D),
 	Str
 	%date{day:D, month:M, year:Y}

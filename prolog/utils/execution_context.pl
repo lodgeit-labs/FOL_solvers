@@ -20,21 +20,21 @@ c(blabla, callable): calls push_context(blabla), then calls callable
 */
 
 
-get_context(Ctx_list) :-
+ get_context(Ctx_list) :-
 	catch(
 		b_getval(context, Ctx_list),
 		_,
 		Ctx_list = []
 	).
 
-get_context_depth(D) :-
+ get_context_depth(D) :-
 	catch(
 		b_getval(context_depth, D),
 		_,
 		D = 0
 	).
 
-get_context_trace(X) :-
+ get_context_trace(X) :-
 	catch(
 		b_getval(context_trace, X),
 		_,
@@ -43,7 +43,7 @@ get_context_trace(X) :-
 
 :- if(env_bool_true('CONTEXT_TRACE_TRAIL')).
 
-context_trace_init_trail_0 :-
+ context_trace_init_trail_0 :-
 	Fn = 'context_trace_trail.txt',
 	Fnn = loc(file_name, Fn),
 	(	absolute_tmp_path(Fnn, loc(absolute_path, Trail_File_Path))

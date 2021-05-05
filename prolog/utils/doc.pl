@@ -56,7 +56,7 @@
 'http://www.w3.org/2000/01/rdf-schema#').
 
 
-rdf_equal2(X,Y) :-
+ rdf_equal2(X,Y) :-
 	!rdf_global_id(X, X2),
 	!rdf_global_id(Y, Y2),
 	X2 = Y2.
@@ -176,11 +176,11 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 
  doc_add(_, []).
 
-doc_add((S,P,O)) :-
+ doc_add((S,P,O)) :-
 	doc_add(S,P,O).
 
 
-doc_add(S,P,O) :-
+ doc_add(S,P,O) :-
 	b_getval(default_graph, G),
 	doc_add(S,P,O,G).
 
@@ -288,7 +288,7 @@ dddd(Spog, X) :-
 	(atom(G2);var(G2)),
 	member(O2, X.get(S2).get(P2).get(G2)).
 */
-dddd(Spog, X) :-
+ dddd(Spog, X) :-
 	Spog = spog(S2,P2,O2,G2),
 	(atom(S2);var(S2)),
 	(atom(P2);var(P2)),
@@ -296,16 +296,16 @@ dddd(Spog, X) :-
 	/* looks like a bug here not finding a triple is S2 is unbound? At any case, is any of S2, P2 or O2 is unbound, the yields are in random order, so we have to find another way than dicts. (and than lists, which were slow, or was that just the rol- stuff?. */
 	rol_member(O2, X.get(S2).get(P2).get(G2)).
 
-dddd(Spog, _X) :-
+ dddd(Spog, _X) :-
 	member(Spog, $>b_getval(the_theory_nonground)).
 
-doc_assert(S,P,O,G) :-
+ doc_assert(S,P,O,G) :-
 	doc_add(S,P,O,G).
 /*	doc_trace0(doc_assert(S,P,O,G)),
 	b_getval(the_theory,X),
 	rol_assert(spog(S,P,O,G),X).*/
 
-doc_assert(S,P,O,G) :-
+ doc_assert(S,P,O,G) :-
 	doc_trace0(clean_pop(doc_assert(S,P,O,G))),
 	fail.
 
@@ -321,14 +321,14 @@ doc_assert(S,P,O,G) :-
 /*
 must have at most one match
 */
-doc(S,P,O) :-
+ doc(S,P,O) :-
 	b_getval(default_graph, G),
 	doc(S,P,O,G).
 
 /*
 must have at most one match
 */
-doc(S,P,O,G) :-
+ doc(S,P,O,G) :-
 	!(atom(S);var(S)),
 	rdf_global_id(S, S2),
 	rdf_global_id(P, P2),
@@ -341,12 +341,12 @@ doc(S,P,O,G) :-
 /*
 can have multiple matches
 */
-docm((S,P,O)) :-
+ docm((S,P,O)) :-
 	docm(S,P,O).
-docm(S,P,O) :-
+ docm(S,P,O) :-
 	b_getval(default_graph, G),
 	docm(S,P,O,G).
-docm(S,P,O,G) :-
+ docm(S,P,O,G) :-
 	rdf_global_id(S, S2),
 	rdf_global_id(P, P2),
 	rdf_global_id(O, O2),
@@ -359,15 +359,15 @@ member
 */
 
 /*
-has(S,P,O) :-
+ has(S,P,O) :-
 	(	doc(S,P,O2)
 	->	O = O2
 	;	doc_add(S,P,O)).
 */
-doc_new_uri(Uri) :-
+ doc_new_uri(Uri) :-
 	doc_new_uri('', Uri).
 
-doc_new_uri(Postfix, Uri) :-
+ doc_new_uri(Postfix, Uri) :-
 	result(R),
 	doc(R, l:has_result_data_uri_base, Result_data_uri_base),
 	/* fixme, use something deterministic */
@@ -399,19 +399,19 @@ doc_new_uri(Postfix, Uri) :-
 	memberchk(Spog,T).
 
 
-rol_assert(Spog,T) :-
+ rol_assert(Spog,T) :-
 	rol_member(Spog,T)
 	->	true
 	;	memberchk(Spog,T).
 
 /*?*/
-rol_add_quiet(Spog,T) :-
+ rol_add_quiet(Spog,T) :-
 		rol_member(Spog,T)
 	->	true
 	; 	memberchk(Spog,T).
 
 /* nondet */
-rol_member(SpogA,T) :-
+ rol_member(SpogA,T) :-
 	/* avoid unifying SpogA with the open tail of T */
 	member(SpogB, T),
 	(	nonvar(SpogB)
@@ -419,7 +419,7 @@ rol_member(SpogA,T) :-
 	;	(!,fail)).
 
 	/*match(SpogA, SpogB)).
-match((S1,P1,O1,G1),(S2,P2,O2,G2))
+ match((S1,P1,O1,G1),(S2,P2,O2,G2))
 	(	S1 = S2
 	->	true
 	;	rdf_equal(?Resource1, ?Resource2)
@@ -668,7 +668,7 @@ X) :-
 	result(R),
 	doc_add(R, P, O, G).
 
-result_assert_property(P, O) :-
+ result_assert_property(P, O) :-
 	b_getval(default_graph, G),
 	result_assert_property(P, O, G).
 
@@ -750,29 +750,29 @@ result_assert_property(P, O) :-
  doc_add_list([], rdf:nil).
 
 
-doc_value(S, P, V) :-
+ doc_value(S, P, V) :-
 	b_getval(default_graph, G),
 	doc_value(S, P, V, G).
 
-doc_value(S, P, V, G) :-
-	doc(S, P, O, G),
-	doc(O, rdf:value, V).
+ doc_value(S, P, V, G) :-
+ 	doc(S, P, O, G),
+ 	doc(O, rdf:value, V).
 
-value(O,V) :-
-	doc(O, rdf:value, V).
+ value(O,V) :-
+ 	doc(O, rdf:value, V).
 
-values(Os,Vs) :-
-	maplist(value, Os, Vs).
+ values(Os,Vs) :-
+ 	maplist(value, Os, Vs).
 
 
-doc_add_value(S, P, V) :-
-	b_getval(default_graph, G),
-	doc_add_value(S, P, V, G).
+ doc_add_value(S, P, V) :-
+ 	b_getval(default_graph, G),
+ 	doc_add_value(S, P, V, G).
 
-doc_add_value(S, P, V, G) :-
-	doc_new_uri(value, Uri),
-	doc_add(S, P, Uri, G),
-	doc_add(Uri, rdf:value, V).
+ doc_add_value(S, P, V, G) :-
+ 	doc_new_uri(value, Uri),
+ 	doc_add(S, P, Uri, G),
+ 	doc_add(Uri, rdf:value, V).
 
 
 
@@ -808,7 +808,7 @@ pondering a syntax for triples..
 
 
 
-gu(Prefixed, Full) :-
+ gu(Prefixed, Full) :-
 	rdf_global_id(Prefixed, Full).
 
 
@@ -838,26 +838,26 @@ gu(Prefixed, Full) :-
 represent xml in doc.
 */
 
-request_xml_to_doc(Dom) :-
+ request_xml_to_doc(Dom) :-
 	xml_to_doc(request_xml, [
 		balanceSheetRequest,
 		unitValues
 	], pid:request_xml, Dom).
 
-xml_to_doc(Prefix, Uris, Root, Dom) :-
+ xml_to_doc(Prefix, Uris, Root, Dom) :-
 	b_setval(xml_to_doc_uris, Uris),
 	b_setval(xml_to_doc_uris_prefix, Prefix),
 	b_setval(xml_to_doc_uris_used, _),
 	xml_to_doc(Root, Dom).
 
-xml_to_doc(Root, Dom) :-
+ xml_to_doc(Root, Dom) :-
 	maplist(xml_to_doc(Root), Dom).
 
-xml_to_doc(Root, X) :-
+ xml_to_doc(Root, X) :-
 	atomic(X),
 	doc_add(Root, rdf:value, X).
 
-xml_to_doc(Root, element(Name, _Atts, Children)) :-
+ xml_to_doc(Root, element(Name, _Atts, Children)) :-
 	b_getval(xml_to_doc_uris, Uris),
 	b_getval(xml_to_doc_uris_used, Used),
 	b_getval(xml_to_doc_uris_prefix, Prefix),
@@ -891,7 +891,7 @@ xml_to_doc(Root, element(Name, _Atts, Children)) :-
 
 */
 
-'watch doc-dumper command pipe' :-
+ 'watch doc-dumper command pipe' :-
     open(fo, read, Fo),
     read_term(Fo, X,[]),
     open(X,append,Out_Stream),
@@ -908,7 +908,7 @@ xml_to_doc(Root, element(Name, _Atts, Children)) :-
 	gensym(dump, Id),
 	once(save_doc(Id)).
 
-dg :-
+ dg :-
 	doc_dump,gtrace.
 
 
@@ -1058,7 +1058,7 @@ Anyway, we could store both doc and context in State.
 
 %:- initialization(init_prolog_exception_hook).
 
-doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
+ doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 	%print_message(information, "prolog_stack__prolog_exception_hook"),
 
 	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
@@ -1078,7 +1078,7 @@ doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 /*
 */
 
-doc_data(G,Ng) :-
+ doc_data(G,Ng) :-
 	catch(
 		(
 			b_getval(the_theory, G),
@@ -1111,7 +1111,7 @@ doc_data(G,Ng) :-
 Required Property Value
 */
 
-rpv(S,P,V) :-
+ rpv(S,P,V) :-
 	(	doc(S,P,V0)
 	->	!doc(V0, rdf:value, V)
 	;	(
@@ -1127,7 +1127,7 @@ rpv(S,P,V) :-
 		)
 	).
 
-opv(S,P,V) :-
+ opv(S,P,V) :-
 		doc(S,P,V0)
 	->	!doc(V0, rdf:value, V).
 

@@ -26,7 +26,7 @@ run(RPath1, RPath2) :-
 	).
 
 */
-compare_atoms(A,B,Error,Path, Item) :-
+ compare_atoms(A,B,Error,Path, Item) :-
 	(
 		atom_number(A,A_Num),
 		atom_number(B,B_Num),
@@ -46,11 +46,11 @@ compare_atoms(A,B,Error,Path, Item) :-
 		)
 	).
 
-compare_xml_attrs([],[]) :-
+ compare_xml_attrs([],[]) :-
 	writeln("compare_xml_attrs"),
 	writeln("no attributes").
 
-compare_xml_attrs([Attr1 | Attrs1], [Attr2 | Attrs2]) :-
+ compare_xml_attrs([Attr1 | Attrs1], [Attr2 | Attrs2]) :-
 	writeln("compare_xml_attrs"),
 	writeln("Attr1:"),
 	writeln(Attr1),
@@ -60,7 +60,7 @@ compare_xml_attrs([Attr1 | Attrs1], [Attr2 | Attrs2]) :-
 	writeln(""),
 	compare_xml_attrs(Attrs1,Attrs2).
 
-compare_xml_dom([], [], _Error, _Path, _Num) :-!.
+ compare_xml_dom([], [], _Error, _Path, _Num) :-!.
 
 % can move some of this stuff into pattern matching in the head w/ multiple rules
 % but i'll save that for later
@@ -70,7 +70,7 @@ compare_xml_dom([], [], _Error, _Path, _Num) :-!.
 compare_xml_dom([_ | _], [], 'element count differs, _, _).
 compare_xml_dom([], [_|_], 'element count differs, _, _).
 */
-compare_xml_dom(Elements1, Elements2, Error, Path, Num) :-
+ compare_xml_dom(Elements1, Elements2, Error, Path, Num) :-
 	(
 		(
 			length(Elements1, Len),
@@ -131,9 +131,9 @@ compare_xml_dom(Elements1, Elements2, Error, Path, Num) :-
 		)
 	).
 
-compare_xml_dom(A, B, Error) :-
+ compare_xml_dom(A, B, Error) :-
 	compare_xml_dom(A, B, Error, "", 0).
 
-compare_xml_dom(A, B) :-
+ compare_xml_dom(A, B) :-
 	compare_xml_dom(A, B, Error),
 	var(Error).

@@ -1,18 +1,18 @@
 :- thread_local user:my_request_tmp_dir/1.
 :- thread_local asserted_server_public_url/1.
 
-set_unique_tmp_directory_name(Name) :-
+ set_unique_tmp_directory_name(Name) :-
 	retractall(my_request_tmp_dir(_)),
 	asserta(my_request_tmp_dir(Name)).
 
-create_tmp_directory(Dir_Name) :-
+ create_tmp_directory(Dir_Name) :-
 	Dir_Name = loc(tmp_directory_name, Dir_Name_Value),
 	resolve_specifier(loc(specifier, my_tmp(Dir_Name_Value)), Path),
 	%Path = loc(absolute_path, Path_Value),
 	ensure_directory_exists(Path),
 	symlink_last_to_current(Path).
 
-symlink_last_to_current(loc(absolute_path, Path)) :-
+ symlink_last_to_current(loc(absolute_path, Path)) :-
 	resolve_specifier(loc(specifier, my_tmp('last')), loc(_, Last)),
 	shell4(['rm', '-f', Last], _),
 	shell4(['ln', '-s', Path, Last], _).
@@ -24,7 +24,7 @@ symlink_last_to_current(loc(absolute_path, Path)) :-
 	my_tmp_file_path(loc(file_name, File_Name), loc(path_relative_to_tmp, File_Path_Relative_To_Tmp)),
 	resolve_specifier(loc(specifier,my_tmp(File_Path_Relative_To_Tmp)), Absolute_File_Name).
 
-make_zip :-
+ make_zip :-
 % todo replace with https://docs.python.org/3/library/shutil.html#archiving-example
 	resolve_specifier(loc(specifier, my_tmp('')), loc(absolute_path, Tmp)),
 	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
@@ -34,15 +34,15 @@ make_zip :-
 	archive_create(Zip_Fn, [Tmp_Dir_With_Slash], [format(zip), directory(Tmp)]),
 	shell4(['mv', Zip_Fn, Tmp_Dir_With_Slash], _).
 
-copy_request_files_to_tmp(Paths, Names) :-
+ copy_request_files_to_tmp(Paths, Names) :-
 	maplist(copy_request_file_to_tmp, Paths, Names).
 
-copy_request_file_to_tmp(Path, Name) :-
+ copy_request_file_to_tmp(Path, Name) :-
 	exclude_file_location_from_filename(Path, Name),
 	absolute_tmp_path(Name, Tmp_Request_File_Path),
 	copy_file_loc(Path, Tmp_Request_File_Path).
 
-replace_request_with_response(Atom, Response) :-
+ replace_request_with_response(Atom, Response) :-
 	atom_string(Atom, String),
 	(
 		(
@@ -125,7 +125,7 @@ write_tmp_json_file(Name, Json) :-
 
 % report_file_path__singleton(Fn, Url, Path, Final_fn) :-
 
-report_file_path__singleton(
+ report_file_path__singleton(
 	/* input */
 	loc(file_name, Fn),
 	/* output */
@@ -140,13 +140,13 @@ report_file_path__singleton(
 	absolute_tmp_path(loc(file_name, Fn), Path).
 
 
-server_public_url(Url) :-
+ server_public_url(Url) :-
 	asserted_server_public_url(Url).
 
-set_server_public_url(Url) :-
+ set_server_public_url(Url) :-
 	asserted_server_public_url(Url), !.
 
-set_server_public_url(Url) :-
+ set_server_public_url(Url) :-
 	(	asserted_server_public_url(Old)
 	->	format(user_error, 'old Server_Public_Url: ~qw\n', [Old])
 	;	true),
@@ -154,11 +154,11 @@ set_server_public_url(Url) :-
 	retractall(asserted_server_public_url(_)),
 	assert(asserted_server_public_url(Url)).
 
-my_tmp_file_path(loc(file_name,File_Name), loc(path_relative_to_tmp, File_Path_Relative_To_Tmp)) :-
+ my_tmp_file_path(loc(file_name,File_Name), loc(path_relative_to_tmp, File_Path_Relative_To_Tmp)) :-
 	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
 	atomic_list_concat([Tmp_Dir, '/', File_Name], File_Path_Relative_To_Tmp).
 
-tmp_file_url(File_Name, Url) :-
+ tmp_file_url(File_Name, Url) :-
 	server_public_url(Server),
 	my_tmp_file_path(File_Name, loc(path_relative_to_tmp, File_Path_Relative_To_Tmp)),
 	atomic_list_concat([Server, '/tmp/', File_Path_Relative_To_Tmp], Url).
@@ -208,7 +208,7 @@ tmp_file_url(File_Name, Url) :-
 	doc_add(Uri, l:title, $>atom_string(Title), files),
 	doc_add(Uri, l:url, Url, files).
 
-get_report_file(Priority, Title, Key, Url) :-
+ get_report_file(Priority, Title, Key, Url) :-
 	result(R),
 	docm(R, l:has_report, Uri, files),
 	(	doc(Uri, l:priority, Priority, files)
@@ -218,11 +218,11 @@ get_report_file(Priority, Title, Key, Url) :-
 	doc(Uri, l:title, Title, files),
 	doc(Uri, l:url, Url, files).
 
-add_result_file_by_filename(Name) :-
+ add_result_file_by_filename(Name) :-
 	report_file_path(Name, Url, _),
 	add_report_file(-1,'result', 'result', Url).
 
-add_result_file_by_path(Path) :-
+ add_result_file_by_path(Path) :-
 	tmp_file_path_to_url(Path, Url),
 	add_report_file(-1,'result', 'result', Url).
 

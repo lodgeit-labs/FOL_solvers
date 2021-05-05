@@ -14,7 +14,7 @@
 
 :- http_handler(root(.), root, []).
 
-root(_) :-
+ root(_) :-
 	thread_signal(main, doc_dump),
 	reply_json(_{'msg':'doc dump requested from main thread. If main thread is stopped in trace, make one step to allow it to run.'}).
 

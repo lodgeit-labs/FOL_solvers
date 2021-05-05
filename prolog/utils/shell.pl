@@ -5,16 +5,16 @@
 :- use_module(library(http/http_open)).
 
 
-services_server(S) :-
+ services_server(S) :-
 	current_prolog_flag(services_server, S).
 
-json_post(Url, Payload, Response) :-
+ json_post(Url, Payload, Response) :-
 	json_post(Url, Payload, Response, 5).
 
-json_post(Url, Payload, Response, Max_retries) :-
+ json_post(Url, Payload, Response, Max_retries) :-
 	json_post(Url, Payload, Response, Max_retries, Max_retries).
 
-json_post(Url, Payload, Response, Max_retries, Retries) :-
+ json_post(Url, Payload, Response, Max_retries, Retries) :-
 	Options = [content_type('application/json'), json_object(dict)],
 	%format(user_error, '~q~n', [http_post(Url, json(Payload), Response, Options),
 	catch(
@@ -43,7 +43,7 @@ json_post(Url, Payload, Response, Max_retries, Retries) :-
 		)
 	).
 
-services_server_shell_cmd(Cmd) :-
+ services_server_shell_cmd(Cmd) :-
 	format(string(Url), '~w/shell/rpc/', [$>services_server(<$)]),
 	debug(shell, 'POST: ~w', Url),
 	json_post(Url, _{cmd:Cmd,quiet_success:true}, _).
@@ -57,13 +57,13 @@ swipl shell has a bug making it stuck for long time */
 	%format(user_error, 'shell4: done\n', []),
 	true.
 
-shell2(Cmd) :-
+ shell2(Cmd) :-
 	shell2(Cmd, _).
 
-shell2(Cmd_In, Exit_Status) :-
+ shell2(Cmd_In, Exit_Status) :-
 	shell3(Cmd_In, [exit_status(Exit_Status)]).
 
-shell3(Cmd_In, Options) :-
+ shell3(Cmd_In, Options) :-
 	flatten([Cmd_In], Cmd_Flat),
 	atomic_list_concat(Cmd_Flat, " ", Cmd),
 
@@ -83,7 +83,7 @@ shell3(Cmd_In, Options) :-
 	;	true).
 
 /* for gnome-terminal and ..? */
-print_clickable_link(Url, Title) :-
+ print_clickable_link(Url, Title) :-
 	/* todo replace this with write */
 	atomics_to_string([">&2 printf '\e]8;;", Url,"\e\\   ", Title, "   \e]8;;\e\\\n'"],  S),
 	shell2(S,_).

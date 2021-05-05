@@ -5,7 +5,7 @@ where the first generates an actual source file.
 At any case there are some tradeoffs to consider, and i think this is more of a fun hack that can get
 some simple calculators into production quickly, not a perfect solution.
 */
-user:goal_expansion(
+ user:goal_expansion(
 	magic_formula(X), Code
 ) :-
 	term_variables(X, Vars),
@@ -19,9 +19,9 @@ user:goal_expansion(
 	writeln(BBB),
 	writeln('------')*/.
 
-expand_formulas_to_code([], (true)).
+ expand_formulas_to_code([], (true)).
 
-expand_formulas_to_code([H|T], Expansion) :-
+ expand_formulas_to_code([H|T], Expansion) :-
 	H = (New_Formula, S1, Description, _A),
 	New_Formula = (V is Rhs),
 	Expansion = ((
@@ -39,16 +39,16 @@ expand_formulas_to_code([H|T], Expansion) :-
 		), Tail),
 	expand_formulas_to_code(T, Tail).
 
-expand_formula(Namings, (A=B), _Es_In, ((A is B), S1, Description, A)):-
+ expand_formula(Namings, (A=B), _Es_In, ((A is B), S1, Description, A)):-
 	term_string(A, S1, [Namings]),
 	term_string(B, S2, [Namings]),
 	atomic_list_concat([S1, ' = ', S2], Description).
 
-expand_formulas(Namings, (F, Fs), Es_In, Es_Out) :-
+ expand_formulas(Namings, (F, Fs), Es_In, Es_Out) :-
 	expand_formula(Namings, F, Es_In, E),
 	append(Es_In, [E], Es2),
 	expand_formulas(Namings, Fs, Es2, Es_Out),!.
 
-expand_formulas(Namings, F,  Es_In, Es_Out) :-
+ expand_formulas(Namings, F,  Es_In, Es_Out) :-
 	expand_formula(Namings, F, Es_In, E),
 	append(Es_In, [E], Es_Out).
