@@ -47,15 +47,11 @@
 :- meta_predicate '!'(3, ?, ?, ?).
 
 
-:- dynamic determinancy_checker_thrower/1.
+:- multifile determinancy_checker_throw_error/1.
+%:- dynamic determinancy_checker_throw_error/1.
 
-
-determinancy_checker_throw_error(E) :-
-	user:determinancy_checker_thrower(T),!,
-	call(T,E).
-
-determinancy_checker_throw_error(E) :-
-	throw(E).
+ determinancy_checker_throw_error(E) :-
+	gtrace,throw(E).
 
 
 :- if(env_bool_true('DETERMINANCY_CHECKER__USE__ENFORCER')).

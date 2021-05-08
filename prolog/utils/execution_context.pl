@@ -28,11 +28,7 @@ c(blabla, callable): calls push_context(blabla), then calls callable
 	).
 
  get_context_depth(D) :-
-	catch(
-		b_getval(context_depth, D),
-		_,
-		D = 0
-	).
+	b_current_num_with_default(context_depth, 0, D).
 
  get_context_trace(X) :-
 	catch(

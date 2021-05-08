@@ -19,16 +19,26 @@
 	det_nbinc(Call_id, (X, Y, Z, ZZ)).
 
 det_with(Call_id, Call) :-
-	gensym(determinancy_checker__deterministic_call__progress, Call_id),
-	(	nb_setval(Call_id, 0)
-	;	(
+%
+	%gensym(determinancy_checker__deterministic_call__progress, Call_id),
+%
+	flag(determinancy_checker__deterministic_call__progress, Call_id_num, Call_id_num+1),
+    atom_concat(dtc, Call_id_num, Call_id),
+%
+	(
+		nb_setval(Call_id, 0)
+	;
+		(
 			nb_getval(Call_id, 1)
-		->	(
+		->
+			(
 				nb_delete(Call_id),
 				fail
 			)
-		;	determinancy_checker_throw_error(error(deterministic_call_failed(Call),_))
-	)).
+		;
+			determinancy_checker_throw_error(error(deterministic_call_failed(Call),_))
+		)
+	).
 
 det_nbinc(Call_id, Call) :-
 	nb_getval(Call_id, Sols),

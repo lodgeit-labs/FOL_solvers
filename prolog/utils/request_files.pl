@@ -62,29 +62,6 @@ write_tmp_json_file(Name, Json) :-
 	write_tmp_file(Name, Text).
 */
 
- b_current(K,V) :-
-	/* this really reads a backtracking value, but there's no b_current in stdlib */
-	nb_current(K,V).
-
- b_current_num_with_default(K,Default,V) :-
-	(	b_current_num(K,V)
-	->	true
-	;	Default = V).
-
- grab_current_num(K, V) :-
- 	b_current_num_with_default(K,0,V),
- 	Next is V + 1,
- 	b_setval(K, Next).
-
-/* another swipl crapulooza workaround */
- b_current_num(K, V) :-
-	(
-		(
-			b_current(K, V),
-			V\=[]
-		)
-	->	true
-	;	false).
 
  nondet_report_fn_key(Fn, Key) :-
 	atomic_list_concat(['report_fn_', Fn], Key).

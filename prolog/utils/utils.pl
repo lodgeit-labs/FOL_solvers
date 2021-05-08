@@ -1,3 +1,4 @@
+
 :- b_setval(context, []).
 
 
@@ -11,10 +12,12 @@
 :- use_module(library(yall)).
 :- use_module(library(debug)).
 
+
 % https://github.com/SWI-Prolog/swipl-devel/issues/715#issuecomment-731019516
 %:- use_module(library(clpq), [{}/1]).
 %:- use_module(library(clpq), []).
 :- use_module(library(clpq)).
+
 
 :- use_module(library(fnotation)).
 :- fnotation_ops($>,<$).
@@ -24,11 +27,15 @@
 :- use_module(envvars).
 
 
+:- multifile determinancy_checker_throw_error/1.
+ determinancy_checker_throw_error(X) :- throw_string(X),!.
 :- use_module('../determinancy_checker/determinancy_checker_main.pl').
-:- assert(user:determinancy_checker_thrower(throw_string)).
+%:- asserta((determinancy_checker_throw_error(X) :- throw_string(X),!)).
+
 
 :- multifile user:goal_expansion/2.
 :- dynamic user:goal_expansion/2.
+
 
 :- [compare_xml].
 :- [compile_with_variable_names_preserved].
@@ -38,6 +45,7 @@
 :- [exceptions].
 :- [execution_context].
 :- [files].
+:- [globals].
 :- [higher_order].
 :- [json].
 :- [magic_formula].
