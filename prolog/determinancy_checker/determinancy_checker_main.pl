@@ -57,7 +57,13 @@
 :- if(env_bool_true('DETERMINANCY_CHECKER__USE__ENFORCER')).
 :- [determinancy_enforcer].
 :- else.
+
+:- if(env_bool_true('DETERMINANCY_CHECKER__USE__UNDO')).
+:- [determinancy_checker_det_v3_undo].
+:- else.
 :- [determinancy_checker_det_v2].
+:- endif.
+
 :- [determinancy_checker_semidet_v1].
 :- endif.
 
