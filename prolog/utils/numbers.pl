@@ -52,17 +52,8 @@
 	round_term(D, X, Y).
 
  round_term(_, X, '[all]') :-
-	var(X).
-
-/*round_term(Digits, X, Y) :-
-	maplist(round_term(Digits), X, Y),!.*/
-
-/*round_term(Digits, value(U,V), value(U2,V2)) :- !,
-	round_term(Digits, U, U2),
-	round_term(Digits, V,V2).
-
-round_term(Digits, coord(U,V), coord(U2,V2)) :- !,
-	round_term(Digits, value(U,V), value(U2,V2)).*/
+	var(X),
+	!.
 
  round_term(Digits, X, Y) :-
 	(number(X);rational(X)),
