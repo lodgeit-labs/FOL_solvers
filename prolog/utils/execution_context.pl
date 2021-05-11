@@ -1,5 +1,6 @@
 /*
-execution contexts: something like stack traces, but done manually:
+
+execution contexts: something like stack traces, but higher level and done manually:
 you call:
 push_context('investment calculator request')
 push_context('extract accounts')
@@ -9,14 +10,10 @@ and then, when there's an exception, we can print a nice "processing stack":
 when processing:
 1) investment calculator request
 2) extract accounts
-3) xxx
-4) yyy
+3) ...
+4) ...
 exception: blablabla
 
-
-plus, there's a higher level api:
-c(callable): calls push_context(callable), then calls callable
-c(blabla, callable): calls push_context(blabla), then calls callable
 */
 
 
@@ -36,6 +33,9 @@ c(blabla, callable): calls push_context(blabla), then calls callable
 		_,
 		X = []
 	).
+
+
+
 
 :- if(env_bool_true('CONTEXT_TRACE_TRAIL')).
 
@@ -58,7 +58,7 @@ c(blabla, callable): calls push_context(blabla), then calls callable
 		)
 	;	true).
 
-context_trace_trail__push_context(C) :-
+ context_trace_trail__push_context(C) :-
 	(
 		(
 			context_string(Str),
@@ -80,6 +80,16 @@ context_trace_trail__push_context(C) :-
 
 :- endif.
 
+
+
+:- if(env_bool_false('ENABLE_CONTEXT_TRACE')).
+
+ push_context(_).
+ push_format(_,_).
+ pop_context.
+ pop_format.
+
+:- else.
 
  push_context(C) :-
 	get_context(Ctx_list),
@@ -108,6 +118,8 @@ context_trace_trail__push_context(C) :-
 	b_setval(context_depth, New_depth),
 	!append(New_ctx_list,[_],Ctx_list),
 	b_setval(context, New_ctx_list).
+
+:- endif.
 
  ct(Context) :-
 	push_context(Context),

@@ -43,10 +43,14 @@
 		)
 	).
 
+
+
  services_server_shell_cmd(Cmd) :-
 	format(string(Url), '~w/shell/rpc/', [$>services_server(<$)]),
 	debug(shell, 'POST: ~w', Url),
 	json_post(Url, _{cmd:Cmd,quiet_success:true}, _).
+
+
 
 /*shell4: to be used probably everywhere instead of shell2 or swipl shell.
 swipl shell has a bug making it stuck for long time */
@@ -56,6 +60,8 @@ swipl shell has a bug making it stuck for long time */
 	services_server_shell_cmd(Cmd_In),Exit_Status=0,
 	%format(user_error, 'shell4: done\n', []),
 	true.
+
+
 
  shell2(Cmd) :-
 	shell2(Cmd, _).
@@ -81,6 +87,8 @@ swipl shell has a bug making it stuck for long time */
 	(	memberchk(command(C), Options)
 	->	C = Cmd
 	;	true).
+
+
 
 /* for gnome-terminal and ..? */
  print_clickable_link(Url, Title) :-

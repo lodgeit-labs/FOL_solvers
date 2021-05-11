@@ -893,7 +893,7 @@ represent xml in doc.
 */
 
  'watch doc-dumper command pipe' :-
-    /* todo make sure the fifo exists */
+    shell4('mkfifo fo',_),
     open(fo, read, Fo),
     read_term(Fo, X,[]),
     open(X,append,Out_Stream),
@@ -902,7 +902,7 @@ represent xml in doc.
     thread_signal(main, doc_dump),
     'watch doc-dumper command pipe'.
 
-:- thread_create('watch doc-dumper command pipe', _).
+:- initialization(thread_create('watch doc-dumper command pipe', _)).
 
 
 
