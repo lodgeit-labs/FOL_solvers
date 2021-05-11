@@ -58,7 +58,7 @@ c(blabla, callable): calls push_context(blabla), then calls callable
 		)
 	;	true).
 
-context_trace_trail__push_context(Str) :-
+context_trace_trail__push_context(C) :-
 	(
 		(
 			context_string(Str),
@@ -91,7 +91,7 @@ context_trace_trail__push_context(Str) :-
 	b_setval(context_trace, New_trace),
 	b_setval(context_depth, New_depth),
 	b_setval(context, New_ctx_list),
-	context_trace_trail__push_context(Str).
+	context_trace_trail__push_context(C).
 
 
  push_format(Format_string, Args) :-

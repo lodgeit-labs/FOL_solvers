@@ -893,6 +893,7 @@ represent xml in doc.
 */
 
  'watch doc-dumper command pipe' :-
+    /* todo make sure the fifo exists */
     open(fo, read, Fo),
     read_term(Fo, X,[]),
     open(X,append,Out_Stream),

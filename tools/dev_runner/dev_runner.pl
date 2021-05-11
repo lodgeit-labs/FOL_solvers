@@ -200,7 +200,7 @@ run_with_compilation(Optimization, Script, Viewer) :-
 			->	Redirection = [' 2>&1  1> arrr.xml']
 			;	Redirection = ''),
 
-			%shell2(['/usr/bin/time -f "user time :%U secs, max ram:%M KB" ./a.out', Redirection], Execution_exit_status),
+			%shell2(['/usr/bin/time --f "user time :%U secs, max ram:%M KB" ./a.out', Redirection], Execution_exit_status),
 			shell2(['/usr/bin/time ./a.out', Redirection], Execution_exit_status),
 
 			(	Execution_exit_status = 0
