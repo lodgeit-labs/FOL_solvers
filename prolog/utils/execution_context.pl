@@ -58,8 +58,23 @@ c(blabla, callable): calls push_context(blabla), then calls callable
 		)
 	;	true).
 
+context_trace_trail__push_context(Str) :-
+	(
+		(
+			context_string(Str),
+			context_trace_trail(Str)
+		)
+		;
+		(
+			context_trace_trail(pop(C)),
+			fail
+		)
+	).
+
+
 :- else.
 
+ context_trace_trail__push_context(_).
  context_trace_init_trail_0.
  context_trace_trail(_).
 
@@ -76,17 +91,7 @@ c(blabla, callable): calls push_context(blabla), then calls callable
 	b_setval(context_trace, New_trace),
 	b_setval(context_depth, New_depth),
 	b_setval(context, New_ctx_list),
-	(
-		(
-			context_string(Str),
-			context_trace_trail(Str)
-		)
-		;
-		(
-			context_trace_trail(pop(C)),
-			fail
-		)
-	).
+	context_trace_trail__push_context(Str).
 
 
  push_format(Format_string, Args) :-
