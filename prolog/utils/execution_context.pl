@@ -55,7 +55,7 @@ exception: blablabla
 			get_time(TimeStamp),
 			format(Stream, '~5f ', [TimeStamp]),
 			writeq(Stream, Term),
-			%writeln(Stream, '\n'),
+			writeln(Stream, '\n'),
 			flush_output(Stream)
 		)
 	;	true).

@@ -31,6 +31,25 @@
 
 
 
+/* same as sort_into_dict, but predicate is ternary, and third argument is the binned value */
+ sort_into_dict2(Selector_Predicate, Ts, D) :-
+	sort_into_dict2(Selector_Predicate, Ts, _{}, D).
+
+:- meta_predicate sort_into_dict2(3, ?, ?, ?).
+
+ sort_into_dict2(Selector_Predicate, [T|Ts], D, D_Out) :-
+	call(Selector_Predicate, T, A, V),
+	(	L = D.get(A)
+	->	true
+	;	L = []),
+	append(L, [V], L2),
+	D2 = D.put(A, L2),
+	sort_into_dict2(Selector_Predicate, Ts, D2, D_Out).
+
+ sort_into_dict2(_, [], D, D).
+
+
+
 /*
 sort_into_dict_on_success/3(
 	P,			% pred(Item,Key)
@@ -156,3 +175,8 @@ sort_into_dict_on_success/4(
  assert_ground(X) :-
 	assertion(ground(X)).
 
+
+
+
+ sort_pairs_into_dict(Pairs, Dict) :-
+	!sort_into_dict2([(A, B), A, B]>>true, Pairs, Dict).
