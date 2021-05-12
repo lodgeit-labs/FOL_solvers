@@ -201,7 +201,7 @@ run_with_compilation(Optimization, Script, Viewer) :-
 			;	Redirection = ''),
 
 			%shell2(['/usr/bin/time --f "user time :%U secs, max ram:%M KB" ./a.out', Redirection], Execution_exit_status),
-			shell2(['/usr/bin/time ./a.out', Redirection], Execution_exit_status),
+			shell2(['/usr/bin/time -v ./a.out', Redirection], Execution_exit_status),
 
 			(	Execution_exit_status = 0
 			->	true
@@ -244,7 +244,7 @@ run_without_compilation(Debug, Optimization, Script, Viewer) :-
 			->	Err_Grep = [' 3>&1 1>&2 2>&3 | grep -v -x -F -f ', Whitelist_File, ' ) 3>&1 1>&2 2>&3']
 			;	Err_Grep = ')'),
 
-			shell2(["(swipl", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
+			shell2(["(/usr/bin/time -v swipl", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
 
 			(	Exit_status = 0
 			->	true

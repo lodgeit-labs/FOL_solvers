@@ -7,7 +7,7 @@
  	dict_from_vars(Dict, Vars_List), Code
  ) :-
  	maplist(var_to_kv_pair, Vars_List, Pairs),
- 	Code = dict_create(Dict, _, Pairs).
+ 	Code = dict_create(Dict, sd, Pairs).
 
  user:goal_expansion(
  	dict_from_vars(Dict, Name, Vars_List), Code
