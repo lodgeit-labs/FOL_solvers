@@ -279,3 +279,6 @@ vec_sum_by_pred(
  value_credit_vec(Value, [Coord]) :-
 	coord_normal_side_value(Coord, kb:credit, Value).
 
+
+ vec_is_almost_zero(Vec) :-
+	maplist(coord_is_almost_zero, Vec).

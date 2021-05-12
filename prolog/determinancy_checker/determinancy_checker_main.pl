@@ -19,7 +19,7 @@
 	/*'+'/1*/
 ]).
 
-:- use_module('../../prolog/utils/envvars', [env_bool_true/1]).
+:- use_module('../../prolog/utils/envvars', [env_bool/2]).
 
 
 
@@ -54,11 +54,11 @@
 	gtrace,throw(E).
 
 
-:- if(env_bool_true('DETERMINANCY_CHECKER__USE__ENFORCER')).
+:- if(env_bool('DETERMINANCY_CHECKER__USE__ENFORCER', true)).
 :- [determinancy_enforcer].
 :- else.
 
-:- if(env_bool_true('DETERMINANCY_CHECKER__USE__UNDO')).
+:- if(env_bool('DETERMINANCY_CHECKER__USE__UNDO', true)).
 :- [determinancy_checker_det_v3_undo].
 :- else.
 :- [determinancy_checker_det_v2].

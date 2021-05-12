@@ -37,7 +37,7 @@ exception: blablabla
 
 
 
-:- if(env_bool_true('CONTEXT_TRACE_TRAIL')).
+:- if(env_bool('ENABLE_CONTEXT_TRACE_TRAIL',true)).
 
  context_trace_init_trail_0 :-
 	Fn = 'context_trace_trail.txt',
@@ -52,8 +52,10 @@ exception: blablabla
 	b_getval(context_trace_trail, Stream),
 	(	Stream \= []
 	->	(
+			get_time(TimeStamp),
+			format(Stream, '~5f ', [TimeStamp]),
 			writeq(Stream, Term),
-			writeln(Stream, '\n'),
+			%writeln(Stream, '\n'),
 			flush_output(Stream)
 		)
 	;	true).
@@ -66,15 +68,20 @@ exception: blablabla
 		)
 		;
 		(
-			context_trace_trail(pop(C)),
+			context_trace_trail(unwind(C)),
 			fail
 		)
 	).
+
+ context_trace_trail__pop_context :-
+ 	context_trace_trail(pop).
+
 
 
 :- else.
 
  context_trace_trail__push_context(_).
+ context_trace_trail__pop_context.
  context_trace_init_trail_0.
  context_trace_trail(_).
 
@@ -82,7 +89,7 @@ exception: blablabla
 
 
 
-:- if(env_bool_false('ENABLE_CONTEXT_TRACE')).
+:- if(env_bool('ENABLE_CONTEXT_TRACE', false)).
 
  push_context(_).
  push_format(_,_).
@@ -117,7 +124,8 @@ exception: blablabla
 	New_depth is Depth - 1,
 	b_setval(context_depth, New_depth),
 	!append(New_ctx_list,[_],Ctx_list),
-	b_setval(context, New_ctx_list).
+	b_setval(context, New_ctx_list),
+	context_trace_trail__pop_context.
 
 :- endif.
 

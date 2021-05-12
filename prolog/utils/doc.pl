@@ -113,7 +113,7 @@ maybe this program will even run faster without this?*/
 good thing is i think even with retracts (the backtracking kind), we won't have to worry about prolog reusing variable numbers. anyway, variables are todo
 */
 
-:- if(env_bool_true('ROBUST_DOC_ENABLE_TRAIL')).
+:- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
 
 /* why 0? Probably, the idea was that there'd also be other, higher level formats? */
  doc_init_trace_0 :-
@@ -205,7 +205,7 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 	%debug(doc, 'add:~q~n', [(S2,P2,O2,G2)]),
 	addd(S2,P2,O2,G2).
 
-:- if(env_bool_true('ROBUST_DOC_ENABLE_TRAIL')).
+:- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
 
  doc_add(S,P,O,G) :-
 	doc_trace0(clean_pop(doc_add(S,P,O,G))),
@@ -388,7 +388,7 @@ member
  ensure Spog is added as a last element of T, while memberchk would otherwise possibly just unify an existing member with it
 */
 
-:- if(env_bool_true('ROBUST_ROL_ENABLE_CHECKS')).
+:- if(env_bool('ROBUST_ROL_ENABLE_CHECKS', true)).
 
  rol_add(Spog,T) :-
 	rol_member(Spog,T),
@@ -426,7 +426,7 @@ member
 	;	rdf_equal(?Resource1, ?Resource2)
 	*/
 
-:- if(env_bool_true('ROBUST_ROL_ENABLE_CHECKS')).
+:- if(env_bool('ROBUST_ROL_ENABLE_CHECKS', true)).
 
  rol_single_match(T,SpogA) :-
 	copy_term(SpogA,SpogA_Copy),

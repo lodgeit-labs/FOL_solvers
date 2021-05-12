@@ -1,3 +1,8 @@
+
+/*
+https://swi-prolog.discourse.group/t/new-undo-1/3932/3
+*/
+
 '!'(X) :-
 	det_with(Call_id, X),
 	call(X),
