@@ -61,6 +61,9 @@
 	!rdf_global_id(Y, Y2),
 	X2 = Y2.
 
+ e(X,Y) :-
+	rdf_equal2(X,Y).
+
 
 /*
 	a quad-store implemented with an open list stored in a global thread-local variable

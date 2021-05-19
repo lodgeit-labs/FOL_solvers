@@ -77,3 +77,11 @@
  get_prolog_backtrace_str(Backtrace_str) :-
 	get_prolog_backtrace(200, Backtrace, [goal_depth(7)]),
 	stt(Backtrace, Backtrace_str).
+
+
+
+:- meta_predicate 'assertion2'(0).
+ assertion2(Callable) :-
+ 	(	call(Callable)
+ 	->	true
+ 	;	throw_format('assertion failed: ~q', [Callable])).
