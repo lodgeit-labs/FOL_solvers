@@ -1,3 +1,6 @@
+:- use_module(library(http/json)).
+
+
 /*
 term(true,
 	["true"]).
@@ -9,13 +12,16 @@ genuri(Base, Uri) :-
 	gensym(Base, Uri).
 
 
-trc(X) :-
+trc(Query) :-
 	open('trace1.js', write, Trace_file),
 	write(Trace_file, 'import {f} from "./trace_import.js";\n'),
 	b_setval(trace_file, Trace_file),
-	node(X, "<dummy>", 'control:tracer_invocation', [Slot0], _),
-	trc(Slot0, user, X, GP),
-	print_term(GP, [write_options([
+	/* this is confusing, this shouldn't be a delogic_node */
+	node(Query, "<dummy>", 'control:tracer_invocation', [Slot0], _),
+
+	trc(Slot0, user, Query, Proof),
+
+	print_term(Proof, [write_options([
 				numbervars(true),
 				quoted(true),
 				portray(true)])]),
@@ -55,7 +61,7 @@ gen(Dict) :-
 
 trc(Parent,_,true,true) :-
 	!,
-	node(true,Parent, 'proof:true', 0, _, _).
+	node(true,Parent, 'proof:true', _, _).
 
 trc(Parent,Module, (A,B),and(ProofA,ProofB)):-
 	!,
@@ -147,9 +153,9 @@ trc(Parent,Module, Q, (Q :- Proof)):-
 		;
 		(
 			Body = builtin(_),
-			(	sub_atom(Name, 0, _, _, $)
+			(	/*sub_atom(Name, 0, _, _, $)
 			->	system_something_with_module(Module, Q, Q2)
-			;	Q2 = Q),
+			;	*/Q2 = Q),
 			node(Q2, Parent, 'proof#builtin', [], _),
 			call(Q2),
 			Proof=builtin
@@ -170,7 +176,7 @@ system_something_with_module(Module, Q, Q2) :-
 			Q =.. [SysFn|R],
 			(	R = [Fn]
 			->	true
-			;	throw_string('uhh too high arity rn')),
+			;	throw('uhh too high arity rn'(SysFn,R))),
 			Q2 =.. [SysFn,(Module:Fn)]
 		)
 	).
