@@ -28,22 +28,24 @@ trc(Query) :-
 	nl,
 	close(Trace_file).
 
+node(_,_,_,_,_) :- true.
 
-node(Query, Parent, Type, Args, Node) :-
-	/* name the node */
-	genuri(node, Node),
-	/* name the slots */
-	maplist(genuri(arg), Args),
-	/*maplist(gen_slot, Args),*/
-	/* write it out */
-	term_string(Query,Query_str),
-	gen(node{
-		'@id': Node,
-		parent: Parent,
-		type: Type,
-		args: Args,
-		str: Query_str
-	}).
+%node(Query, Parent, Type, Args, Node) :-
+%	/* name the node */
+%	genuri(node, Node),
+%	/* name the slots */
+%	maplist(genuri(arg), Args),
+%	/*maplist(gen_slot, Args),*/
+%	/* write it out */
+%	term_string(Query,Query_str),
+%	gen(node{
+%		'@id': Node,
+%		parent: Parent,
+%		type: Type,
+%		args: Args,
+%		str: Query_str
+%	}).
+
 /*
 gen_slot(Arg) :-
 	gen(node{
@@ -55,8 +57,8 @@ gen(Dict) :-
 	b_getval(trace_file, Trace_file),
 	write(Trace_file, 'f('),
 	json_write(Trace_file, Dict, [serialize_unknown(true)/*, tag(type)*/]),
-	write(Trace_file, ');\n'),
-	flush_output(Trace_file).
+	write(Trace_file, ');\n')/*,
+	flush_output(Trace_file)*/.
 
 
 trc(Parent,_,true,true) :-
