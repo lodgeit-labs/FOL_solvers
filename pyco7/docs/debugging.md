@@ -1,0 +1,1 @@
+Debuggability is the main focus, at this early stage. The assumption is that the solver runs on a machine with plenty of spare RAM to store a visualization of current proof tree, or has spare CPU cycles to periodically rebuild that visualization, or both..
