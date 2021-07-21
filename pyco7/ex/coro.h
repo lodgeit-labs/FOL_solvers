@@ -5,7 +5,9 @@
 class Coro
 {
 public:
-    Coro();
+ Coro();
+int entry = 0;
 };
+
 
 #endif // CORO_H

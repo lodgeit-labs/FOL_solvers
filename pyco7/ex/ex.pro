@@ -16,7 +16,8 @@ SOURCES += \
     mainwindow.cpp \
     rule.cpp \
     term.cpp \
-    thing.cpp
+    thing.cpp \
+    unification.cpp
 
 HEADERS += \
     coro.h \
@@ -25,7 +26,8 @@ HEADERS += \
     mainwindow.h \
     rule.h \
     term.h \
-    thing.h
+    thing.h \
+    unification.h
 
 FORMS += \
     mainwindow.ui

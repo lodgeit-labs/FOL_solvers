@@ -1,4 +1,6 @@
 #include "thing.h"
+#include "coro.h"
+
 
 Thing::Thing()
 {
@@ -54,6 +56,8 @@ def unifier2(arg_x, arg_y, val_x, val_y):
         return fail(nolog or ("different things: %s %s" % (val_x, val_y)), xy)
 */
 
+
+/*
 task<> unify2(Thing x_addr, Thing y_addr) {
     Thing x = *x_addr;
     Thing y = *y_addr;
@@ -84,16 +88,4 @@ task<> unify2(Thing x_addr, Thing y_addr) {
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+*/
