@@ -17,7 +17,8 @@ SOURCES += \
     rule.cpp \
     term.cpp \
     thing.cpp \
-    unification.cpp
+    unification.cpp \
+    bnodeunification.cpp
 
 HEADERS += \
     coro.h \
@@ -27,7 +28,8 @@ HEADERS += \
     rule.h \
     term.h \
     thing.h \
-    unification.h
+    unification.h \
+    bnodeunification.h
 
 FORMS += \
     mainwindow.ui
