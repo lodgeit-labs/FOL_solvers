@@ -18,7 +18,8 @@ SOURCES += \
     term.cpp \
     thing.cpp \
     unification.cpp \
-    bnodeunification.cpp
+    bnodeunification.cpp \
+    const.cpp
 
 HEADERS += \
     coro.h \
@@ -29,7 +30,8 @@ HEADERS += \
     term.h \
     thing.h \
     unification.h \
-    bnodeunification.h
+    bnodeunification.h \
+    const.h
 
 FORMS += \
     mainwindow.ui
