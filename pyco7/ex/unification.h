@@ -1,29 +1,30 @@
 #ifndef UNIFICATION_H
 #define UNIFICATION_H
 
-#include "bnodeunificationo.h"
+#include "bnodeunification.h"
 #include "coro.h"
 #include "thing.h"
 
-class Unification {
+class Unification
+{
 public:
-	Unification();
+Unification();
 };
 
 class Unification2 : public Coro
 
 {
 public:
-	Thing* x_addr;
-	Thing* y_addr;
-	BnodeUnificationo* bnode_unification;
+Thing* x_addr;
+Thing* y_addr;
+BnodeUnification* bnode_unification;
 
-	Unification2(Thing* _x_addr, Thing* _y_addr)
-		: x_addr(_x_addr)
-		, y_addr(_y_addr)
-	{
-	}
-	void step();
+Unification2(Thing* _x_addr, Thing* _y_addr)
+: x_addr(_x_addr)
+, y_addr(_y_addr)
+{
+}
+void step();
 };
 
 #endif // UNIFICATION_H

@@ -1,12 +1,13 @@
-#ifndef BNODEUNIFICATIONO_H
-#define BNODEUNIFICATIONO_H
+#ifndef BNODEUNIFICATION_H
+#define BNODEUNIFICATION_H
 
 #include "coro.h"
 #include "thing.h"
 
-class BnodeUnificationo : public Coro {
+class BnodeUnification : public Coro
+{
 public:
-	BnodeUnificationo(Thing* _x_addr, Thing* _y_addr);
+BnodeUnification(Thing* _x_addr, Thing* _y_addr);
 };
 
-#endif // BNODEUNIFICATIONO_H
+#endif // BNODEUNIFICATION_H
