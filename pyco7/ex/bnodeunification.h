@@ -7,7 +7,8 @@
 class BnodeUnification : public Coro
 {
 public:
-BnodeUnification(Thing* _x_addr, Thing* _y_addr);
+	BnodeUnification(Thing *_x_addr, Thing *_y_addr);
+	void *step();
 };
 
 #endif // BNODEUNIFICATION_H

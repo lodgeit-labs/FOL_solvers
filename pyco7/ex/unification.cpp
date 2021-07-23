@@ -1,73 +1,85 @@
 #include "unification.h"
+#include <QString>
+#include <QtGlobal>
 
 Unification::Unification() {}
+
+#define yield(label, _reason)           \
+	{                                   \
+		entry_str = QString("" #label); \
+		reason = QString(_reason);      \
+		entry = &&label;                \
+		return entry;                   \
+	}
+
+#define quit(_reason)                \
+	{                                \
+		entry_str = QString("quit"); \
+		reason = QString(_reason);   \
+		entry = nullptr;             \
+		return entry;                \
+	}
 
 void *Unification2::step()
 {
 	if (entry)
 		goto *entry;
-	if (x == y || *x == *y)
+	if (x == y || x->eq(*y))
 	{
-		// reason = same things
-		return &&end;
+		yield(end, "same things")
 	}
-	if (x->type == UNBOUND_UNIVERSAL)
+	if (x->type == UNIVERSAL)
 	{
+		Q_ASSERT(x->binding == nullptr);
 		x->bind(y);
-		// reason = x bound to y
-		return &&unbind_x;
+		// reason =
+		yield(unbind_x, "x bound to y")
 	}
-	if (y->type == UNBOUND_UNIVERSAL)
+	if (y->type == UNIVERSAL)
 	{
+		Q_ASSERT(y->binding == nullptr);
 		y->bind(x);
-		// reason = y bound to x
-		return &&unbind_y;
+		yield(unbind_y, "y bound to x")
 	}
 	if (y->type == y->type)
 	{
 		if (x->type == CONST)
 		{
-			if (x->value == y->value)
+			if (x->c == y->c)
 			{
-				// reason = "same consts";
-				return &&end;
+				yield(end, "same consts");
 			}
 			else
 			{
-				// reason  =("different consts: %s %s" % (val_x.value, val_y.value)),
-				// xy)
-				return 0;
+				quit(QString("different consts: %1 vs %2").arg(x->c).arg(y->c))
 			}
 		}
-		if (x->type == BNODE)
+		if (x->type == EXISTENTIAL)
 		{
-			bnode_unification = new BnodeUnification(x_addr, y_addr);
+			bnode_unification = new BnodeUnification(x, y);
 			goto l_bnode_unification;
-			// reason = bnodes didn not unify
-			return 0;
 		}
 	}
-	// reason = fail( ("different things: %s %s" % (val_x, val_y)), xy)
+	quit(QString("different things: %1 vs %2").arg(x->str(), y->str()));
 end:
-	return 0;
+	quit("done");
 l_bnode_unification:;
 	{
 		if (bnode_unification->step())
 		{
-			// reason = bnodes unified
-			return &&l_bnode_unification;
+			yield(l_bnode_unification, "bnodes unified");
 		}
 		delete bnode_unification;
-		return 0;
+		quit("no more ways to unify bnodes");
 	}
 unbind_x:;
 	{
-		x.unbind();
-		return 0;
+		x->unbind();
+		quit("done");
 	}
 unbind_y:;
 	{
-		y.unbind();
-		return 0;
+		y->unbind();
+		quit("done");
 	}
 }

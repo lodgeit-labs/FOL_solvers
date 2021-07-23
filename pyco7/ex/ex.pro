@@ -19,7 +19,8 @@ SOURCES += \
     thing.cpp \
     unification.cpp \
     bnodeunification.cpp \
-    const.cpp
+    const.cpp \
+    constmanager.cpp
 
 HEADERS += \
     coro.h \
@@ -31,7 +32,8 @@ HEADERS += \
     thing.h \
     unification.h \
     bnodeunification.h \
-    const.h
+    const.h \
+    constmanager.h
 
 FORMS += \
     mainwindow.ui

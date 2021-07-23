@@ -1,34 +1,42 @@
 #ifndef THING_H
 #define THING_H
 
+#include "const.h"
+#include <QString>
 
-
-enum ThingType {BOUND_EXISTENTIAL, UNBOUND_EXISTENTIAL, BOUND_UNIVERSAL, UNBOUND_UNIVERSAL, CONST, OFFSET};
-
-
-Class Thing {
-public:
-   //Structure
-   ThingType type;
-   union {
-       //maybe call this value? how about binding?
-       //both sound appropriate; better than thing anyway
-       Thing *thing;     // for bound var
-       nodeid node;      // for node
-       size_t size;      // for list. not sure
-       offset_t offset;
-   };
-}
-
+enum ThingType
+{
+	EXISTENTIAL,
+	UNIVERSAL,
+	CONST
+};
 
 class Thing
 {
 public:
-    Thing();
-    bool operator == (const Thing& lhs, const Thing& rhs) {
-        return lhs.type == rhs.type &&
-                lhs.thing = rhs.thing;
-    }
+	ThingType type;
+	union
+	{
+		Thing *binding;
+		ConstRef c;
+	};
+	Thing();
+	bool eq(const Thing &rhs)
+	{
+		return type == rhs.type && binding == rhs.binding;
+	}
+	QString str()
+	{
+		return QString("thing");
+	}
+	void bind(Thing *y)
+	{
+		binding = y;
+	}
+	void unbind()
+	{
+		binding = nullptr;
+	}
 };
 
 #endif // THING_H
