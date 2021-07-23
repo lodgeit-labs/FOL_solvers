@@ -20,7 +20,9 @@ SOURCES += \
     unification.cpp \
     bnodeunification.cpp \
     const.cpp \
-    constmanager.cpp
+    constmanager.cpp \
+    bndata.cpp \
+    rules.cpp
 
 HEADERS += \
     coro.h \
@@ -33,7 +35,9 @@ HEADERS += \
     unification.h \
     bnodeunification.h \
     const.h \
-    constmanager.h
+    constmanager.h \
+    bndata.h \
+    rules.h
 
 FORMS += \
     mainwindow.ui
