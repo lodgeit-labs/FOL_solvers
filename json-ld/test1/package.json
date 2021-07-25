@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "commander": "^8.0.0",
     "jsonld": "^5.0.0",
     "n3": "^1.9.0"
   }

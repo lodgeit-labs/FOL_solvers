@@ -50,7 +50,7 @@ function n3lib_term_to_jld(x)
 async function n3_file_jld_quads(fn)
 {
 	const store = new n3.Store();
-	const parser = new n3.Parser({format: 'N3'});
+	const parser = new n3.Parser(/*{format: 'N3'}*/);
 	var n3_text = fs.readFileSync(fn, {encoding: 'utf-8'});
 	const quads = await parser.parse(n3_text)
 	const quads2 = quads.map(n3lib_quad_to_jld);

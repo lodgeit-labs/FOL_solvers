@@ -22,10 +22,6 @@ const ctx = {
 	"rdfs": "http://www.w3.org/2000/01/rdf-schema#",
 	"excel": "https://rdf.lodgeit.net.au/v1/excel#",
 
-
-
-
-
 /*	"depr": "https://rdf.lodgeit.net.au/v1/calcs/depr#",
 	"depr_ui": "https://rdf.lodgeit.net.au/v1/calcs/depr/ui#",
 	"smsf": "https://rdf.lodgeit.net.au/v1/calcs/smsf#",
@@ -143,6 +139,7 @@ function ids_to_keys(doc)
 		"note": `(You may want to console.log this text for comfortable reading.)
 		
 This is an object generated programmatically by https://github.com/LodgeiT/labs-accounts-assessor/blob/jld/misc/json-ld/test1/main.js. Therefore, it does not have an @id.
+
 The top-level keys are "sheet_sets", "example_sheet_sets" and "sheet_type". Each contains an object, whose keys are the "@id" of the nested objects.
 a json-ld context was chosen such that the @id string is always the full iri of the resource.
 In excel, sheet type is in cell A2. The string is the full iri, as used to identify the sheet type in RDF.
@@ -175,7 +172,7 @@ you have to look up "https://rdf.lodgeit.net.au/v1/calcs/hp#hp_contract_payment_
 		//"@context":ctx,
 		sheet_sets: await idd(
 			{
-				"@type": "excel:sheet_set", // todo: make sure that all objects you want to grab actually have this type asserted. 
+				"@type": "excel:sheet_set", // todo: make sure that all objects you want to grab actually have this type asserted.
 				"excel:sheets":
 					{
 						"@list": [
@@ -188,7 +185,7 @@ you have to look up "https://rdf.lodgeit.net.au/v1/calcs/hp#hp_contract_payment_
 			),
 		example_sheet_sets: await idd(
 			{
-				"@type": "excel:example_sheet_set",// todo: make sure that all objects you want to grab actually have this type asserted. 
+				"@type": "excel:example_sheet_set",// todo: make sure that all objects you want to grab actually have this type asserted.
 				"excel:example_has_sheets":
 					{
 						"@list": [
@@ -201,7 +198,7 @@ you have to look up "https://rdf.lodgeit.net.au/v1/calcs/hp#hp_contract_payment_
 			),
 		sheet_types: await idd(
 			{
-				"@type": "excel:sheet_type"// todo: make sure that all objects you want to grab actually have this type asserted. 
+				"@type": "excel:sheet_type"// todo: make sure that all objects you want to grab actually have this type asserted.
 			}
 			),
 		ranges: await idd(
