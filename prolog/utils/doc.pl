@@ -184,7 +184,7 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 
 
  doc_add(S,P,O) :-
-  	assertion(ground((S,P,O))),
+  	%assertion(ground((S,P,O))),
 	b_getval(default_graph, G),
 	doc_add(S,P,O,G).
 
