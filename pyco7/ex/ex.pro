@@ -22,7 +22,9 @@ SOURCES += \
     const.cpp \
     constmanager.cpp \
     bndata.cpp \
-    rules.cpp
+    rules.cpp \
+    localstemplate.cpp \
+    ruleinstance.cpp
 
 HEADERS += \
     coro.h \
@@ -37,7 +39,9 @@ HEADERS += \
     const.h \
     constmanager.h \
     bndata.h \
-    rules.h
+    rules.h \
+    localstemplate.h \
+    ruleinstance.h
 
 FORMS += \
     mainwindow.ui

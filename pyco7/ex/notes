@@ -1,0 +1,18 @@
+
+
+
+RuleInstance(Coro)
+	locals
+	
+typedef Thing* Locals;
+
+Locals new_locals(LocalsTemplate template)
+{
+	
+
+}
+
+void free_locals(Locals locals, LocalsTemplate template)
+{
+	
+}
