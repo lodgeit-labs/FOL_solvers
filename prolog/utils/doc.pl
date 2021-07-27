@@ -1173,3 +1173,16 @@ Required Property Value
 		)
 	).
 
+ get_sheet_data(Type, Data) :-
+	*doc($>request_data, excel:has_sheet, S),
+	?doc(S, excel:sheet_instance_has_sheet_type, T),
+	!doc(S, excel:sheet_instance_has_sheet_data, Data).
+
+ get_sheets_data(Type, Datas) :-
+ 	findall(Data, get_sheet_data(Type, Data), Datas).
+
+ get_singleton_sheet_data(Type, Data) :-
+ 	get_sheets_data(Type, Datas),
+ 	(	Datas = [Data]
+ 	->	true
+ 	;	throw_format('not expected: multiple sheets of type ~q', [Type]).
