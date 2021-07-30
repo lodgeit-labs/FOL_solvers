@@ -1152,7 +1152,7 @@ Required Property Value
 	!sheet_and_cell_string(Value, Str).
 
  sheet_and_cell_string(Value, Str) :-
-	!doc(Value, excel:sheet_name, Sheet_name),
+	!doc(Value, excel:has_sheet_name, Sheet_name),
 	!doc(Value, excel:col, Col),
 	!doc(Value, excel:row, Row),
 	!atomics_to_string(['sheet "', Sheet_name, '", cell ', Col, ':', Row], Str).
@@ -1173,6 +1173,19 @@ Required Property Value
 		)
 	).
 
+ get_sheet(Type, Sheet) :-
+	*doc($>request_data, excel:has_sheet, Sheet),
+	?doc(Sheet, excel:sheet_instance_has_sheet_type, Type).
+
+ get_sheets(Type, Sheets) :-
+ 	findall(Sheet, get_sheet(Type, Sheet), Sheets).
+
+ get_singleton_sheet(Type, Sheet) :-
+ 	get_sheets(Type, Sheets),
+ 	(	Sheets = [Sheet]
+ 	->	true
+ 	;	throw_format('not expected: multiple sheets of type ~q', [Type]).
+
  get_sheet_data(Type, Data) :-
 	*doc($>request_data, excel:has_sheet, S),
 	?doc(S, excel:sheet_instance_has_sheet_type, T),
@@ -1186,3 +1199,11 @@ Required Property Value
  	(	Datas = [Data]
  	->	true
  	;	throw_format('not expected: multiple sheets of type ~q', [Type]).
+
+ get_optional_singleton_sheet_data(Type, Data) :-
+ 	get_sheets_data(Type, Datas),
+ 	length(Datas, L),
+ 	(	L #< 2
+ 	->	true
+ 	;	throw_format('not expected: multiple sheets of type ~q', [Type])),
+ 	Datas = [Data].
