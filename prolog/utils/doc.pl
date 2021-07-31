@@ -156,6 +156,9 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 	_).
 
 
+ doc_default_graph(G) :-
+	doc_default_graph(G).
+
 /*
 ┏┳┓┏━┓╺┳┓╻┏━╸╻ ╻╻┏┓╻┏━╸
 ┃┃┃┃ ┃ ┃┃┃┣╸ ┗┳┛┃┃┗┫┃╺┓
@@ -185,7 +188,7 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 
  doc_add(S,P,O) :-
   	%assertion(ground((S,P,O))),
-	b_getval(default_graph, G),
+	doc_default_graph(G),
 	doc_add(S,P,O,G).
 
 
@@ -326,7 +329,7 @@ dddd(Spog, X) :-
 must have at most one match
 */
  doc(S,P,O) :-
-	b_getval(default_graph, G),
+	doc_default_graph(G),
 	doc(S,P,O,G).
 
 /*
@@ -348,7 +351,7 @@ can have multiple matches
  docm((S,P,O)) :-
 	docm(S,P,O).
  docm(S,P,O) :-
-	b_getval(default_graph, G),
+	doc_default_graph(G),
 	docm(S,P,O,G).
  docm(S,P,O,G) :-
 	rdf_global_id(S, S2),
@@ -562,36 +565,40 @@ X) :-
 
 /*:- comment(lib:doc_to_rdf_all_graphs, "if necessary, modify to not wipe out whole rdf database and to check that G doesn't already exist */
 
+
  doc_to_rdf_all_graphs :-
-	rdf_retractall(_,_,_,_),
+	doc_to_rdf_graph(_).
+
+ doc_to_rdf_graph(G) :-
+ 	rdf_retractall(_,_,_,_),
 	findall(_,(
 			docm(X,Y,Z,G),
 			add_to_rdf((X,Y,Z,G))
 		),_
 	).
 
- save_doc_(Format, Id) :-
+
+ save_doc_(Format, Id, Report_key) :-
 	atomic_list_concat(['doc_', Id, '.', Format],Fn),
 	report_file_path(loc(file_name, Fn), Url, loc(absolute_path,Path)),
 	Url = loc(absolute_url, Url_Value),
-	add_report_file(-15,Fn, Fn, Url),
+	(	var(Report_key)
+	->	Report_key = Fn
+	;	true),
+	add_report_file(-15, Report_key, Fn, Url),
 	Options = [
 		sorted(true),
 		base(Url_Value),
 		canonize_numbers(true),
 		abbreviate_literals(false),
-		prefixes([rdf,rdfs,xsd,l,livestock])
+		prefixes([rdf,rdfs,xsd,l,livestock,excel])
 	],
 	(	Format = trig
 	->	rdf_save_trig(Path, Options)
 	;	rdf_save_turtle(Path, Options)).
-
- save_doc(Id) :-
-	doc_to_rdf_all_graphs,
-	save_doc_(turtle, Id),
-	save_doc_(trig, Id),
-	rdf_retractall(_,_,_,/*fixme*/_Rdf_Graph).
-
+% ^
+%todo refactor
+% v
  make_rdf_response_report :-
 	Title = 'response.n3',
 	!doc_to_rdf(Rdf_Graph),
@@ -599,6 +606,23 @@ X) :-
 	!add_report_file(-11,Title, Title, Url),
 	Url = loc(absolute_url, Url_Value),
 	!rdf_save_turtle(Path, [graph(Rdf_Graph), sorted(true), base(Url_Value), canonize_numbers(true), abbreviate_literals(false), prefixes([rdf,rdfs,xsd,l,livestock])]).
+
+
+ save_doc(Id) :-
+	doc_to_rdf_all_graphs,
+	save_doc_(turtle, Id, _),
+	save_doc_(trig, Id, _),
+	rdf_retractall(_,_,_,_).
+
+
+ save_doc_graph(Graph, Report_key) :-
+	doc_to_rdf_graph(Graph),
+	save_doc(turtle, result_sheets, result_sheets)
+
+
+ add_result_sheets_report(Graph) :-
+	save_doc_graph(Graph, result_sheets).
+
 
 
  doc_from_rdf(Rdf_Graph, Replaced_prefix, Replacement_prefix) :-
@@ -665,7 +689,7 @@ X) :-
 	doc(R, P, O).
 
  result_add_property(P, O) :-
-	b_getval(default_graph, G),
+	doc_default_graph(G),
 	result_add_property(P, O, G).
 
  result_add_property(P, O, G) :-
@@ -673,7 +697,7 @@ X) :-
 	doc_add(R, P, O, G).
 
  result_assert_property(P, O) :-
-	b_getval(default_graph, G),
+	doc_default_graph(G),
 	result_assert_property(P, O, G).
 
  result_assert_property(P, O, G) :-
@@ -755,7 +779,7 @@ X) :-
 
 
  doc_value(S, P, V) :-
-	b_getval(default_graph, G),
+	doc_default_graph(G),
 	doc_value(S, P, V, G).
 
  doc_value(S, P, V, G) :-
@@ -770,7 +794,7 @@ X) :-
 
 
  doc_add_value(S, P, V) :-
- 	b_getval(default_graph, G),
+ 	doc_default_graph(G),
  	doc_add_value(S, P, V, G).
 
  doc_add_value(S, P, V, G) :-
@@ -1207,3 +1231,5 @@ Required Property Value
  	->	true
  	;	throw_format('not expected: multiple sheets of type ~q', [Type])),
  	Datas = [Data].
+
+
