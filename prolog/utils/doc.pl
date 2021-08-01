@@ -157,7 +157,7 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 
 
  doc_default_graph(G) :-
-	doc_default_graph(G).
+	b_getval(default_graph, G).
 
 /*
 ┏┳┓┏━┓╺┳┓╻┏━╸╻ ╻╻┏┓╻┏━╸
@@ -617,7 +617,7 @@ X) :-
 
  save_doc_graph(Graph, Report_key) :-
 	doc_to_rdf_graph(Graph),
-	save_doc(turtle, result_sheets, result_sheets)
+	save_doc_(turtle, Report_key, Report_key).
 
 
  add_result_sheets_report(Graph) :-
@@ -1197,8 +1197,12 @@ Required Property Value
 		)
 	).
 
+
+
+
  get_sheet(Type, Sheet) :-
-	*doc($>request_data, excel:has_sheet, Sheet),
+	!doc($>request_data, excel:has_sheet_instances, Sheets),
+	*doc_list_member(Sheet, Sheets),
 	?doc(Sheet, excel:sheet_instance_has_sheet_type, Type).
 
  get_sheets(Type, Sheets) :-
@@ -1208,12 +1212,14 @@ Required Property Value
  	get_sheets(Type, Sheets),
  	(	Sheets = [Sheet]
  	->	true
- 	;	throw_format('not expected: multiple sheets of type ~q', [Type]).
+ 	;	((	Sheets = []
+ 		->	throw_format('not expected: no sheets of type ~q', [Type])
+ 		;	true),
+	 	throw_format('not expected: multiple sheets of type ~q', [Type]))).
 
  get_sheet_data(Type, Data) :-
-	*doc($>request_data, excel:has_sheet, S),
-	?doc(S, excel:sheet_instance_has_sheet_type, T),
-	!doc(S, excel:sheet_instance_has_sheet_data, Data).
+	*get_sheet(Type, Sheet),
+	!doc(Sheet, excel:sheet_instance_has_sheet_data, Data).
 
  get_sheets_data(Type, Datas) :-
  	findall(Data, get_sheet_data(Type, Data), Datas).
@@ -1222,7 +1228,10 @@ Required Property Value
  	get_sheets_data(Type, Datas),
  	(	Datas = [Data]
  	->	true
- 	;	throw_format('not expected: multiple sheets of type ~q', [Type]).
+ 	;	((	Datas = []
+ 		->	throw_format('not expected: no sheets of type ~q', [Type])
+ 		;	true),
+	 	throw_format('not expected: multiple sheets of type ~q', [Type]))).
 
  get_optional_singleton_sheet_data(Type, Data) :-
  	get_sheets_data(Type, Datas),
@@ -1231,5 +1240,13 @@ Required Property Value
  	->	true
  	;	throw_format('not expected: multiple sheets of type ~q', [Type])),
  	Datas = [Data].
+
+ get_optional_singleton_sheet(Type, Sheet) :-
+ 	get_sheets(Type, Sheets),
+ 	length(Sheets, L),
+ 	(	L #= 1
+ 	->	true
+ 	;	throw_format('expected exactly one sheet of type ~q', [Type])),
+ 	Sheets = [Sheet].
 
 
