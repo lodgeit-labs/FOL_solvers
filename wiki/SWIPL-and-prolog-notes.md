@@ -217,12 +217,5 @@ test(0, forall(x(X)), all((X=X))) :-
 		```
 		hackery2/data/swipl/parse_prolog.pl
 
-
-# SICSTUS
-bundled clpfd is constrained to "[-2^60,2^60-1] on 64-bit platforms". This means we wouldn't be able to emulate rationals.
-^ err not anymore?
-how far along is https://github.com/triska/clpz ?
-https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/FDBG-Introduction.html
-
 # SWIPL RPC
 https://github.com/rla/node-swipl-stdio
