@@ -678,7 +678,7 @@ X) :-
 	doc(Request_Data, P, O).
 
  report_details_property_value(P, V) :-
-	!request_data_property(ic_ui:report_details, Details),
+	!report_details(Details),
 	doc_value(Details, P, V).
 
  rp(P, O) :-
@@ -776,7 +776,6 @@ X) :-
 	doc_add(Uri, rdf:rest, Uri2).
 
  doc_add_list([], rdf:nil).
-
 
  doc_value(S, P, V) :-
 	doc_default_graph(G),
@@ -1244,9 +1243,9 @@ Required Property Value
  get_optional_singleton_sheet(Type, Sheet) :-
  	get_sheets(Type, Sheets),
  	length(Sheets, L),
- 	(	L #= 1
+ 	(	L #< 2
  	->	true
- 	;	throw_format('expected exactly one sheet of type ~q', [Type])),
+ 	;	throw_format('expected only one sheet of type ~q', [Type])),
  	Sheets = [Sheet].
 
 
