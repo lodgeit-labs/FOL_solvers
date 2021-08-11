@@ -684,6 +684,9 @@ X) :-
  rp(P, O) :-
  	result_property(P, O).
 
+ result_data_uri_base(B) :-
+ 	rp(l:has_result_data_uri_base, B).
+
  result_property(P, O) :-
 	result(R),
 	doc(R, P, O).
@@ -1238,7 +1241,7 @@ Required Property Value
  	(	L #< 2
  	->	true
  	;	throw_format('not expected: multiple sheets of type ~q', [Type])),
- 	Datas = [Data].
+ 	?(Datas = [Data]).
 
  get_optional_singleton_sheet(Type, Sheet) :-
  	get_sheets(Type, Sheets),
