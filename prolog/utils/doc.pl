@@ -381,6 +381,8 @@ member
 	gensym('#bnx', Uri0),
 	atomic_list_concat([Result_data_uri_base, Uri0, '_', Postfix], Uri).
 
+ bn(Postfix, Uri) :-
+	doc_new_uri(Postfix, Uri).
 
 /*
 ░░░░░░░░░░░░░█▀▄░█▀█░█░░
