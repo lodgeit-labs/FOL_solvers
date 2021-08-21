@@ -222,7 +222,9 @@ test(0, forall(x(X)), all((X=X))) :-
 		almost works but not quite, chokes on itself
 ##	github.com:JanWielemaker/reindent
 		just tokenizes and then does some smartness to fix indentation, not useful
-	
+##	https://github.com/GavinMendelGleason/transformer	
+		?
+		
 	
 
 # SWIPL RPC
