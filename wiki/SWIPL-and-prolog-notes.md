@@ -203,10 +203,6 @@ test(0, forall(x(X)), all((X=X))) :-
 
 
 # parsing prolog code
-## 	https://github.com/fnogatz/plammar
-		almost works but not quite
-##	github.com:JanWielemaker/reindent
-		just tokenizes and then does some smartness to fix indentation, not useful
 ##	https://github.com:SWI-Prolog/packages-indent
 		seems to be the way to go. queries prolog_read_source_term, then we can pattern-match the clause terms..
 		```
@@ -220,6 +216,13 @@ test(0, forall(x(X)), all((X=X))) :-
 		```
 ##	https://github.com/koo5/hackery2/blob/master/data/swipl/parse_prolog2.pl
 		my attempt ... seems to work well on a limited codebase. uses `read_clause` and implements its own tracking of currently active operators, and uses `push_operators`.
+##	https://www.swi-prolog.org/pldoc/doc/_SWI_/library/prolog_colour.pl?show=src#prolog_colourise_stream/3
+		uses xref stuff
+## 	https://github.com/fnogatz/plammar
+		almost works but not quite, chokes on itself
+##	github.com:JanWielemaker/reindent
+		just tokenizes and then does some smartness to fix indentation, not useful
+	
 	
 
 # SWIPL RPC
