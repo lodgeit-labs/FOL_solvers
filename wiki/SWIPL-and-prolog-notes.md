@@ -66,17 +66,20 @@ it's still a severy DRY violation to try to keep rdet() declarations in sync wit
 https://github.com/jarble/functional-prolog/blob/master/functional_prolog.pl (?)
 https://github.com/mndrix/func/issues/12 (?)
 
-https://github.com/awto/fnotation
+### https://github.com/awto/fnotation
 	confuses gtrace? with so many bugs, it would be better if gtrace showed the generated code, like it happens with my dict macro, but it doesnt
-	puts statements in the wrong place: 
+	put statements in the wrong place: 
 		doesnt play with ( -> ; ), 
 		doesnt play with yall
 		doesnt play with dicts?
 		doesnt play with =
 	it's still the best one i found, but use it with care
 
+* https://github.com/SWI-Prolog/swipl-devel/issues/774
 
-https://www.j-paine.org/dobbs/grips.html (proprietary)
+
+### https://www.j-paine.org/dobbs/grips.html
+	proprietary
 
 ### issues
 https://stackoverflow.com/questions/58758471/swi-prolog-yall-conflict-with-dicts
@@ -200,11 +203,11 @@ test(0, forall(x(X)), all((X=X))) :-
 
 
 # parsing prolog code
-	https://github.com/fnogatz/plammar
+## 	https://github.com/fnogatz/plammar
 		almost works but not quite
-	github.com:JanWielemaker/reindent
+##	github.com:JanWielemaker/reindent
 		just tokenizes and then does some smartness to fix indentation, not useful
-	github.com:SWI-Prolog/packages-indent
+##	https://github.com:SWI-Prolog/packages-indent
 		seems to be the way to go. queries prolog_read_source_term, then we can pattern-match the clause terms..
 		```
 		?- [A|B] =.. X.
@@ -215,7 +218,9 @@ test(0, forall(x(X)), all((X=X))) :-
 		```
 			comments suck in general. It hurts to accept it, but if you think about it, how could a parser ever read you mind to figure out what commment is associated to what part of your code? Comments on their own lines, comments at line ends, comments in arg lists, commented out code, crap crap crap. So, my idea is, comment with structure, right in prolog code. Add :- comment(predicate, blablabla), put nop(blabla) inside rule bodies, wrap calls in with_comment(....), whatever it takes.. 
 		```
-		hackery2/data/swipl/parse_prolog.pl
+##	https://github.com/koo5/hackery2/blob/master/data/swipl/parse_prolog2.pl
+		my attempt ... seems to work well on a limited codebase. uses `read_clause` and implements its own tracking of currently active operators, and uses `push_operators`.
+	
 
 # SWIPL RPC
 https://github.com/rla/node-swipl-stdio

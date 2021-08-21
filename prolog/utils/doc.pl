@@ -1,3 +1,5 @@
+:- use_module(library(clpfd)).
+
 :- rdf_register_prefix(code,
 'https://rdf.lodgeit.net.au/v1/code#').
 :- rdf_register_prefix(kb,

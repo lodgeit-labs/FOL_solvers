@@ -205,6 +205,7 @@
  	->	(
  			(	V = date(1,1,1)
  			->	throw_format('error reading date at ~w, found: ~q', [$>sheet_and_cell_string(O), V])
+ 			%->	throw_format('error reading date at ~w, found: ~q', [sheet_and_cell_string(O), V])
  			;	true)
  		)
  	;	(

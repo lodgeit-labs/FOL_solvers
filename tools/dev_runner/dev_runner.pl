@@ -17,7 +17,7 @@ running this takes a while because it first does just a load to find compile err
 shell2(Cmd) :-
 	shell2(Cmd, _).
 
-%:- debug(dev_runner).
+:- debug(dev_runner).
 
 shell2(Cmd_In, Exit_Status) :-
 	flatten([Cmd_In], Cmd_Flat),

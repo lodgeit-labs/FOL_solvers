@@ -210,3 +210,24 @@ trc_clause(Module,Q,Body) :-
 		)
 	;	true).
 
+
+
+
+
+
+
+
+
+/*
+
+maybe useful:
+
+qualify(Goal, Goal) :-
+    functor(Goal, :, 2),
+    !.
+qualify(Goal, user:Goal).
+
+*/
+
+
+
