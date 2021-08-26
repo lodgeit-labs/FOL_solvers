@@ -1078,10 +1078,19 @@ Anyway, we could store both doc and context in State.
 
 :- dynamic(prolog_stack__prolog_exception_hook/4).
 :- dynamic(prolog_exception_hook/4).
+:- dynamic(doc_saving_prolog_exception_hook_is_inited/0).
 
  'save old prolog exception hook' :-
-	(	clause(prolog_exception_hook(A,B,C,D),Body)
+
+ 	findall(hook((A,B,C,D),Body), clause(prolog_exception_hook(A,B,C,D),Body), Old_hooks),
+	length(Old_hooks, Old_hooks_len),
+	(	Old_hooks_len #> 1
+	->	throw('Old_hooks_len #> 1')
+	;	true),
+
+	(	Old_hooks_len #= 1
 	->	(
+			Old_hooks = [hook((A,B,C,D),Body)],
 			assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
 			%gtrace,
 			retractall(prolog_exception_hook(A,B,C,D))
@@ -1089,6 +1098,10 @@ Anyway, we could store both doc and context in State.
 	;	true).
 
  init_prolog_exception_hook :-
+ 	(	doc_saving_prolog_exception_hook_is_inited
+ 	->	throw(doc_saving_prolog_exception_hook_is_inited)
+ 	;	true),
+ 	assert(doc_saving_prolog_exception_hook_is_inited),
 	'save old prolog exception hook',
 	assert(prolog_exception_hook(E,F, Frame, CatcherFrame) :- doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame)).
 
