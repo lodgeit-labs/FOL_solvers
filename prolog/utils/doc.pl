@@ -161,6 +161,8 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
  doc_default_graph(G) :-
 	b_getval(default_graph, G).
 
+ result_sheets_graph(result_sheets).
+
 /*
 ┏┳┓┏━┓╺┳┓╻┏━╸╻ ╻╻┏┓╻┏━╸
 ┃┃┃┃ ┃ ┃┃┃┣╸ ┗┳┛┃┃┗┫┃╺┓
@@ -383,6 +385,7 @@ member
 	gensym('#bnx', Uri0),
 	atomic_list_concat([Result_data_uri_base, Uri0, '_', Postfix], Uri).
 
+% note: uniqueness is not checked, we rely on namespacing by Postfix
  bn(Postfix, Uri) :-
 	doc_new_uri(Postfix, Uri).
 
@@ -611,7 +614,6 @@ X) :-
 	Url = loc(absolute_url, Url_Value),
 	!rdf_save_turtle(Path, [graph(Rdf_Graph), sorted(true), base(Url_Value), canonize_numbers(true), abbreviate_literals(false), prefixes([rdf,rdfs,xsd,l,livestock])]).
 
-
  save_doc(Id) :-
 	doc_to_rdf_all_graphs,
 	save_doc_(turtle, Id, _),
@@ -776,13 +778,16 @@ X) :-
  doc_list_items(L, Items) :-
 	findall(Item, doc_list_member(Item, L), Items).
 
- doc_add_list([H|T], Uri) :-
-	doc_new_uri(rdf_list, Uri),
-	doc_add(Uri, rdf:first, H),
-	doc_add_list(T, Uri2),
-	doc_add(Uri, rdf:rest, Uri2).
+ doc_add_list(Prolog_list, Uri) :-
+	doc_add_list(Prolog_list, $>doc_default_graph, Uri).
 
- doc_add_list([], rdf:nil).
+ doc_add_list([H|T], G, Uri) :-
+	doc_new_uri(rdf_list, Uri),
+	doc_add(Uri, rdf:first, H, G),
+	doc_add_list(T, G, Uri2),
+	doc_add(Uri, rdf:rest, Uri2, G).
+
+ doc_add_list([], _G, rdf:nil).
 
  doc_value(S, P, V) :-
 	doc_default_graph(G),
@@ -806,7 +811,7 @@ X) :-
  doc_add_value(S, P, V, G) :-
  	doc_new_uri(value, Uri),
  	doc_add(S, P, Uri, G),
- 	doc_add(Uri, rdf:value, V).
+ 	doc_add(Uri, rdf:value, V, G).
 
 
 
