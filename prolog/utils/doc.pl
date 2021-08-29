@@ -379,8 +379,7 @@ member
 	doc_new_uri('', Uri).
 
  doc_new_uri(Postfix, Uri) :-
-	result(R),
-	doc(R, l:has_result_data_uri_base, Result_data_uri_base),
+	result_data_uri_base(Result_data_uri_base),
 	/* fixme, use something deterministic */
 	gensym('#bnx', Uri0),
 	atomic_list_concat([Result_data_uri_base, Uri0, '_', Postfix], Uri).
@@ -598,7 +597,7 @@ X) :-
 		base(Url_Value),
 		canonize_numbers(true),
 		abbreviate_literals(false),
-		prefixes([rdf,rdfs,xsd,l,livestock,excel])
+		prefixes([rdf,rdfs,xsd,l,livestock,excel,r-($>atomic_list_concat([$>result_data_uri_base, '#']))])
 	],
 	(	Format = trig
 	->	rdf_save_trig(Path, Options)
@@ -690,9 +689,6 @@ X) :-
  rp(P, O) :-
  	result_property(P, O).
 
- result_data_uri_base(B) :-
- 	rp(l:has_result_data_uri_base, B).
-
  result_property(P, O) :-
 	result(R),
 	doc(R, P, O).
@@ -713,15 +709,27 @@ X) :-
 	result(R),
 	doc_assert(R, P, O, G).
 
+
+
+
+:- table request/1.
  request(R) :-
 	doc(R, rdf:type, l:'Request').
 
+:- table result/1.
  result(R) :-
-	!doc(R, rdf:type, l:'Result').
+	!doc(R, rdf:type, l:'Result'),
+ 	format(user_error, 'result(R): ~q~n', [R]).
 
+:- table request_data/1.
  request_data(D) :-
 	!request(Request),
 	!doc(Request, l:has_request_data, D).
+
+:- table result_data_uri_base/1.
+ result_data_uri_base(B) :-
+ 	rp(l:has_result_data_uri_base, B).
+
 
 
  result_accounts(As) :-
