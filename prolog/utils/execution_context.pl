@@ -52,8 +52,10 @@ env_bool_has_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
 	b_getval(context_trace_trail, Stream),
 	(	Stream \= []
 	->	(
+			statistics(process_epoch, E),
 			get_time(TimeStamp),
-			format(Stream, '~5f ', [TimeStamp]),
+			Ts is TimeStamp - E,
+			format(Stream, '~5f ', [Ts]),
 			writeq(Stream, Term),
 			writeln(Stream, '\n'),
 			flush_output(Stream)
