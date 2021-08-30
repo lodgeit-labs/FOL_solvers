@@ -1,6 +1,10 @@
 :- module(_, [
 	op(812,fx,!),
 	op(812,fx,?),
+	op(812,fx,*),
+
+	/* is nondet. This is just a no-op annotation */
+	'*'/1,
 
 	/* must have one solution */
 	'!'/1,
@@ -15,6 +19,27 @@
 	/*'+'/1*/
 ]).
 
+:- use_module('../../prolog/utils/envvars', [env_bool/2]).
+
+
+
+:- meta_predicate '*'(0).
+:- meta_predicate '*'(1, ?).
+:- meta_predicate '*'(2, ?, ?).
+:- meta_predicate '*'(3, ?, ?, ?).
+:- meta_predicate '*'(4, ?, ?, ?, ?).
+
+'*'(Callable) :-
+	call(Callable).
+'*'(Callable,A1) :-
+	call(Callable,A1).
+'*'(Callable,A1,A2) :-
+	call(Callable,A1,A2).
+'*'(Callable,A1,A2,A3) :-
+	call(Callable,A1,A2,A3).
+'*'(Callable,A1,A2,A3,A4) :-
+	call(Callable,A1,A2,A3,A4).
+
 
 :- meta_predicate '!'(0).
 :- meta_predicate '!'(1, ?).
@@ -22,29 +47,26 @@
 :- meta_predicate '!'(3, ?, ?, ?).
 
 
-:- dynamic determinancy_checker_thrower/1.
+:- multifile determinancy_checker_throw_error/1.
+%:- dynamic determinancy_checker_throw_error/1.
 
+ determinancy_checker_throw_error(E) :-
+	gtrace,throw(E).
 
-determinancy_checker_throw_error(E) :-
-	user:determinancy_checker_thrower(T),!,
-	call(T,E).
+env_bool_has_default('DETERMINANCY_CHECKER__USE__ENFORCER', false).
+env_bool_has_default('DETERMINANCY_CHECKER__USE__UNDO', false).
 
-determinancy_checker_throw_error(E) :-
-	throw(E).
-
-env_bool_is_true(Env_var_value) :-
-	downcase_atom(Env_var_value, V),
-	member(V, [1, '1', 'true', 'yes', 'on']),!.
-
-env_bool_true(Key) :-
-	getenv(Key, Val),
-	env_bool_is_true(Val).
-
-:- if(env_bool_true('DETERMINANCY_CHECKER__USE__ENFORCER')).
-:- [determinancy_enforcer].
+:- if(env_bool('DETERMINANCY_CHECKER__USE__ENFORCER', true)).
+	:- debug(determinancy_checker, "'DETERMINANCY_CHECKER__USE__ENFORCER', true",[]).
+	:- [determinancy_enforcer].
 :- else.
-:- [determinancy_checker_det_v2].
-:- [determinancy_checker_semidet_v1].
+	:- if(env_bool('DETERMINANCY_CHECKER__USE__UNDO', true)).
+		:- [determinancy_checker_det_v3_undo].
+	:- else.
+		:- [determinancy_checker_det_v2].
+	:- endif.
+
+	:- [determinancy_checker_semidet_v1].
 :- endif.
 
 
@@ -63,4 +85,9 @@ todo:
 
 */
 
+/*
 
+todo harmonize with this a bit?
+https://github.com/mthom/scryer-prolog/blob/master/src/lib/debug.pl
+
+*/

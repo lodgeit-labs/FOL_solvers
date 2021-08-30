@@ -1,2 +1,1 @@
-maybe the last thing to do is to actually pick a system for specifying default values of properties (of template-describing objects, not going onto user data here),
-and running the templates rdf through a reasoner (jena maybe?) to fill them in, so that the implementing code will never have to know what the default value is.
+https://github.com/digitalbazaar/jsonld.js/issues

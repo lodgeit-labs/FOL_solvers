@@ -17,8 +17,8 @@ if you expect at least one solution but possibly more. Would be:
 Seems to be a rare case, not implemented.
 
 #### nondeterministic (nondet)
-if you expect zero or more solutions. This is prolog default, nothing to check.
-`something(args)`
+if you expect zero or more solutions. This is prolog default, nothing to check, but you can express it with:
+`*something(args)`
 
 ### variations
 There are multiple things to choose from here. determinancy_checker_main conditionally includes: 
@@ -31,7 +31,7 @@ There are multiple things to choose from here. determinancy_checker_main conditi
 :- endif.
 ```
 #### determinancy_enforcer
-when memory (and speed) matters. Doesn't tell you if there were multiple solutions where there shouldn't be. Implemented like: 
+when memory (and speed) matters. Doesn't tell you if there were multiple solutions where there shouldn't be, only when there was none when there should have been at least one. Implemented like: 
 `(call(X)->true;throw(deterministic_call_failed(X))).`
 
 #### determinancy_checker
@@ -56,16 +56,20 @@ cases with multiple arguments are todo.
 
 ### alternatives: 
 
-#### downsides of determinancy_checker:
-* swipl doesn't warn you at compile time that a predicate you are calling from somewhere doesn't exist, because !xxx is a call to '!', with xxx just as a parameter. This could maybe be alleviated by adding a dummy goal_expansion phase. 
-* Having to step through the checker code.
-
 #### rdet
 See docs/rdet.txt for some tips. Main difference between rdet and determinancy_checker is that with rdet, you declare determinancy of a predicate, while with this, you declare determinancy of a call. I would like to add a "goal_expansion mode" at some point.
-#### downsides of rdet
-* uses goal expansion, which is imo pretty broken (breaks g trace)
+##### downsides of rdet
+* uses goal expansion, which is imo pretty broken (breaks guitracer)
 * requires keeping `:- rdet my_pred/arity.` in sync with your code
-#### upsides of rdet
-* maybe you have a usecase for declaring determinancy at the level of predicate declarations, rather than for particular invocations. Maybe i'll adapt this into determinancy_checker as optional functionality someday. 
+##### upsides of rdet
+* maybe you have a usecase for declaring determinancy at the level of predicate declarations, rather than for particular invocations. Maybe i'll adapt this into determinancy_checker as optional functionality someday? 
 
-	
+#### this
+##### upsides of determinancy_checker:
+* declare determinancy at call site, rather than as a property of a predicate.
+* no declarations to keep in sync
+
+##### downsides of determinancy_checker:
+* swipl doesn't warn you at compile time that a predicate you are calling from somewhere doesn't exist, because !xxx is a call to '!', with xxx just a parameter. This could maybe be alleviated by adding a dummy goal_expansion phase. 
+* Having to step through the checker code.
+

@@ -1,14 +1,37 @@
-
 /*
 	throw a msg(Message) term, these errors are caught by our http server code and turned into nice error messages
 */
 
-throw_string_with_html(List_Or_Atomic, Html) :-
-	prepare_throw(List_Or_Atomic, String),
-	throw(error(msg(with_html(String, Html)),_)).
 
-prepare_throw(List_Or_Atomic, String) :-
- 	/* and then this could be removd in favor of the repl loop gtrace..*/
+ throw_format(Format, Args) :-
+ 	length(Args,_),
+ 	assertion((atom(Format);string(Format))),
+ 	format(string(S), Format, Args),
+	throw_string(S).
+
+
+ throw_string(List_Or_Atomic) :-
+ 	throw_stringize_and_concat(List_Or_Atomic, String),
+ 	throw_value(String).
+
+
+ throw_string_with_html(List_Or_Atomic, Html) :-
+ 	throw_stringize_and_concat(List_Or_Atomic, String),
+	throw_value(with_html(String, Html)).
+
+
+ throw_value(V) :-
+	(	current_prolog_flag(debug, true)
+	->	(
+			gtrace_if_have_display,
+			get_prolog_backtrace_str(Backtrace_str),
+			throw(with_backtrace_str(error(msg(V),_),Backtrace_str))
+		)
+	;	throw(error(msg(V),_))
+	).
+
+
+ throw_stringize_and_concat(List_Or_Atomic, String) :-
 	(
 		(
 			flatten([List_Or_Atomic], List),
@@ -16,52 +39,38 @@ prepare_throw(List_Or_Atomic, String) :-
 			atomic_list_concat(List2, String)
 		)
 		->	true
-		;	throw(internal_error)
-	),
-	(	current_prolog_flag(debug, true)
-	->	(
-			format(user_error, 'debug is true..\n', []),
-			trace
-			%gtrace_if_have_display
-		)
-	;	true).
+		;	/* careful not to use throw_string here */
+			throw(internal_error)
+	).
 
- throw_string(List_Or_Atomic) :-
- 	%get_context(Ctx_list),
-	%context_string(Ctx_list,Ctx_str),
-
- 	prepare_throw(List_Or_Atomic, String),
- 	%throw(error(msg(String),_)).
-
-	get_prolog_backtrace(200, Backtrace, [goal_depth(7)]),
-	stt(Backtrace, Backtrace_str),
-	throw(with_backtrace_str(error(msg(String),_),Backtrace_str)).
-
- throw_format(Format, Args) :-
- 	length(Args,_),
- 	assertion(atom(Format)),
- 	format(string(S), Format, Args),
-	throw_string(S).
 
  have_display :-
- 	format(user_error, 'have_display?', []),
-	getenv('DISPLAY', Display),
-	atom_length(Display, X),
-	X > 0,
-	format(user_error, 'yes\n', []).
+	(	(
+			getenv('DISPLAY', Display),
+			atom_length(Display, X),
+			X > 0
+		)
+	->	debug(checklist, 'have_display?yes\n', [])
+	;	debug(checklist, 'have_display?yes\n', [])).
+
+
+
+flag_default(gtrace, true).
 
  gtrace_if_have_display :-
 	(	have_display
-	->	(	(	\+current_prolog_flag(gtrace, false)
-			-> 	format(user_error, '\\+current_prolog_flag(gtrace, false)\n', [])
-			; 	format(user_error, 'current_prolog_flag(gtrace, false)\n', [])
-		)
+	->	(
+			(	\+current_prolog_flag(gtrace, false)
+			)
 		->	(
+				format(user_error, '**********', []),
 				backtrace(200),
+				format(user_error, '**********', []),
 				trace
 			)
 		;	true)
 	; true).
+
 
  stringize(X, X) :-
 	atomic(X).
@@ -70,3 +79,14 @@ prepare_throw(List_Or_Atomic, String) :-
 	term_string(X, Y).
 
 
+ get_prolog_backtrace_str(Backtrace_str) :-
+	get_prolog_backtrace(200, Backtrace, [goal_depth(7)]),
+	stt(Backtrace, Backtrace_str).
+
+
+
+:- meta_predicate 'assertion2'(0).
+ assertion2(Callable) :-
+ 	(	call(Callable)
+ 	->	true
+ 	;	throw_format('assertion failed: ~q', [Callable])).

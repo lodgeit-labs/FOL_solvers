@@ -22,10 +22,6 @@ const ctx = {
 	"rdfs": "http://www.w3.org/2000/01/rdf-schema#",
 	"excel": "https://rdf.lodgeit.net.au/v1/excel#",
 
-
-
-
-
 /*	"depr": "https://rdf.lodgeit.net.au/v1/calcs/depr#",
 	"depr_ui": "https://rdf.lodgeit.net.au/v1/calcs/depr/ui#",
 	"smsf": "https://rdf.lodgeit.net.au/v1/calcs/smsf#",
@@ -126,7 +122,7 @@ function ids_to_keys(doc)
 }
 
 (async () => {
-	var doc = await processor.load_n3('RdfTemplates.n3');
+	var doc = await processor.load_n3('../../../../static/RdfTemplates.n3');
 	doc = await jl.compact(doc,ctx);
 	doc['@context'] = ctx
 	//console.log(doc);
@@ -140,8 +136,10 @@ function ids_to_keys(doc)
 	}
 
 	const result = {
-		"help": `note: you may want to console.log this text for comfortable reading.
-This is an anonymous object generated programmatically by https://github.com/LodgeiT/labs-accounts-assessor/blob/jld/misc/json-ld/test1/main.js. Therefore, it does not have an @id.
+		"note": `(You may want to console.log this text for comfortable reading.)
+		
+This is an object generated programmatically by https://github.com/LodgeiT/labs-accounts-assessor/blob/jld/misc/json-ld/test1/main.js. Therefore, it does not have an @id.
+
 The top-level keys are "sheet_sets", "example_sheet_sets" and "sheet_type". Each contains an object, whose keys are the "@id" of the nested objects.
 a json-ld context was chosen such that the @id string is always the full iri of the resource.
 In excel, sheet type is in cell A2. The string is the full iri, as used to identify the sheet type in RDF.
@@ -156,7 +154,7 @@ Arrays that come from rdf lists are always wrapped in an object, whose only key 
 note that "is_type_of" does not exhibit this "@list" wrapping. This is because "is_type_of" value is gnerated by enumerating all iris in a certain relation to something (rdf:type relation to the parent object). These iris are not, in rdf, stored in a list.
 
 notes on semantics of the template descriptions in general:
-where "excel:type" is an "excel:uri", such as here:
+where "excel:type" is "excel:uri", such as here:
 
                     {
                       "excel:property": {
@@ -168,14 +166,13 @@ where "excel:type" is an "excel:uri", such as here:
                       "excel:type": "excel:uri"
                     },
 
-you have to look "https://rdf.lodgeit.net.au/v1/calcs/hp#hp_contract_payment_type" up in "ranges". You will see it "is_type_of" a list of items. These are the items that show up in a dropdown.  Each item can either have "rdfs:label", in which case this is what you display to user, or you generate a label by taking the last part of the uri.
-
+you have to look up "https://rdf.lodgeit.net.au/v1/calcs/hp#hp_contract_payment_type" in "ranges". You will see it "is_type_of" a list of items. These are the items that show up in a dropdown.  Each item can either have "rdfs:label", in which case this is what you display to user, or you generate a label by taking the last part of the uri.
 
 `,
 		//"@context":ctx,
 		sheet_sets: await idd(
 			{
-				"@type": "excel:sheet_set",
+				"@type": "excel:sheet_set", // todo: make sure that all objects you want to grab actually have this type asserted.
 				"excel:sheets":
 					{
 						"@list": [
@@ -188,7 +185,7 @@ you have to look "https://rdf.lodgeit.net.au/v1/calcs/hp#hp_contract_payment_typ
 			),
 		example_sheet_sets: await idd(
 			{
-				"@type": "excel:example_sheet_set",
+				"@type": "excel:example_sheet_set",// todo: make sure that all objects you want to grab actually have this type asserted.
 				"excel:example_has_sheets":
 					{
 						"@list": [
@@ -201,7 +198,7 @@ you have to look "https://rdf.lodgeit.net.au/v1/calcs/hp#hp_contract_payment_typ
 			),
 		sheet_types: await idd(
 			{
-				"@type": "excel:sheet_type"
+				"@type": "excel:sheet_type"// todo: make sure that all objects you want to grab actually have this type asserted.
 			}
 			),
 		ranges: await idd(

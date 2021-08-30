@@ -1,4 +1,4 @@
-string_to_json_dict(String, Json_Dict) :-
+ string_to_json_dict(String, Json_Dict) :-
 	setup_call_cleanup(
 		new_memory_file(X),
 		(
@@ -10,11 +10,11 @@ string_to_json_dict(String, Json_Dict) :-
 			close(R)),
 		free_memory_file(X)).
 
-json:json_write_hook(Term, Stream, _, _) :-
+ json:json_write_hook(Term, Stream, _, _) :-
 	term_dict(Term, Dict),
 	json_write(Stream, Dict, [serialize_unknown(true)]).
 
-dict_json_text(Dict, Text) :-
+ dict_json_text(Dict, Text) :-
 	setup_call_cleanup(
 		new_memory_file(X),
 		(

@@ -200,7 +200,7 @@ run_with_compilation(Optimization, Script, Viewer) :-
 			->	Redirection = [' 2>&1  1> arrr.xml']
 			;	Redirection = ''),
 
-			%shell2(['/usr/bin/time -f "user time :%U secs, max ram:%M KB" ./a.out', Redirection], Execution_exit_status),
+			%shell2(['/usr/bin/time --f "user time :%U secs, max ram:%M KB" ./a.out', Redirection], Execution_exit_status),
 			shell2(['/usr/bin/time -v ./a.out', Redirection], Execution_exit_status),
 
 			(	Execution_exit_status = 0
@@ -244,7 +244,7 @@ run_without_compilation(Debug, Optimization, Script, Viewer) :-
 			->	Err_Grep = [' 3>&1 1>&2 2>&3 | grep -v -x -F -f ', Whitelist_File, ' ) 3>&1 1>&2 2>&3']
 			;	Err_Grep = ')'),
 
-			shell2(["(swipl", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
+			shell2(["(/usr/bin/time -v swipl", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
 
 			(	Exit_status = 0
 			->	true
@@ -274,12 +274,13 @@ optimization_flag2(Debug, Optimization) :-
 run_with_toplevel(Debug, Goal, Script, _Opts) :-
 	optimization_flag2(Debug, Optimization),
 	scriptargs(ScriptArgs),
-	Args0 = [Optimization, '-s', Script, '--', ScriptArgs],
+	Args0 = ['-v', 'swipl', Optimization, '-s', Script, '--', ScriptArgs],
 	flatten(Args0, Args),
 	debug(dev_runner, 'dev_runner: will run with toplevel with args: ~q\n', [Args]),
 	atomics_to_string(['(',Goal,',halt(0));halt(1).\n'], Goal2),
 	debug(dev_runner, 'dev_runner: will pipe goal: ~w\n', [Goal2]),
-	process_create(path(swipl), Args, [process(Pid), stdin(pipe(Stdin))]),
+	%process_create(path(swipl), Args, [process(Pid), stdin(pipe(Stdin))]),
+	process_create(path(time), Args, [process(Pid), stdin(pipe(Stdin))]),
 	%write(Stdin, writeln('script output starts below'),
 	%write(Stdin, "current_prolog_flag(debug,Debug),format(user_error,'debug=~q~n',[Debug]).\n\n"),
 	write(Stdin, Goal2),

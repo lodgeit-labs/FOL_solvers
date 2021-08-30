@@ -5,38 +5,72 @@
 :- use_module(library(http/http_open)).
 
 
-services_server(S) :-
-	current_prolog_flag(services_server, S).
+ services_server(S) :-
+	!current_prolog_flag(services_server, S),
+	debug(d, 'current_prolog_flag(services_server, ~q)', [S]).
 
-json_post(Url, Payload, Response) :-
-	%format(user_error, '~q~n', [http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)])]),
+ json_post(Url, Payload, Response) :-
+	json_post(Url, Payload, Response, 5).
+
+ json_post(Url, Payload, Response, Max_retries) :-
+	json_post(Url, Payload, Response, Max_retries, Max_retries).
+
+ json_post(Url, Payload, Response, Max_retries, Retries) :-
+	Options = [content_type('application/json'), json_object(dict)],
+	%format(user_error, '~q~n', [http_post(Url, json(Payload), Response, Options),
 	catch(
-		http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)]),
+		http_post(Url, json(Payload), Response, Options),
 		E,
-		throw(during(E,http_post(Url, json(Payload), Response, [content_type('application/json'), json_object(dict)])))
+		(
+			(	(
+					E = error(socket_error(eai_again,Msg),_),
+					Retries > 0
+				)
+			->	(
+					%debug(shell, '~q', Msg),
+					format(user_error, '~q', Msg),
+					Sleep is Max_retries - Retries,
+					sleep(Sleep),
+					Next_retries is Retries - 1,
+					json_post(Url, Payload, Response, Max_retries, Next_retries)
+				)
+			;	throw(
+					during(
+						E,
+						http_post(Url, json(Payload), Response, Options)
+					)
+				)
+			)
+		)
 	).
 
-services_server_shell_cmd(Cmd) :-
+
+
+ services_server_shell_cmd(Cmd) :-
 	format(string(Url), '~w/shell/rpc/', [$>services_server(<$)]),
 	debug(shell, 'POST: ~w', Url),
 	json_post(Url, _{cmd:Cmd,quiet_success:true}, _).
 
-/* shell4: to be used probably everywhere instead of shell2 or swipl shell.
+
+
+/*shell4: to be used probably everywhere instead of shell2 or swipl shell.
 swipl shell has a bug making it stuck for long time */
 
-shell4(Cmd_In, Exit_Status) :-
+ shell4(Cmd_In, Exit_Status) :-
 	%format(user_error, 'shell4: ~q ...\n', [Cmd_In]),
 	services_server_shell_cmd(Cmd_In),Exit_Status=0,
 	%format(user_error, 'shell4: done\n', []),
 	true.
 
-shell2(Cmd) :-
+
+
+ shell2(Cmd) :-
 	shell2(Cmd, _).
 
-shell2(Cmd_In, Exit_Status) :-
+ shell2(Cmd_In, Exit_Status) :-
 	shell3(Cmd_In, [exit_status(Exit_Status)]).
 
-shell3(Cmd_In, Options) :-
+ shell3(Cmd_In, Options) :-
 	flatten([Cmd_In], Cmd_Flat),
 	atomic_list_concat(Cmd_Flat, " ", Cmd),
 
@@ -55,8 +89,10 @@ shell3(Cmd_In, Options) :-
 	->	C = Cmd
 	;	true).
 
+
+
 /* for gnome-terminal and ..? */
-print_clickable_link(Url, Title) :-
+ print_clickable_link(Url, Title) :-
 	/* todo replace this with write */
 	atomics_to_string([">&2 printf '\e]8;;", Url,"\e\\   ", Title, "   \e]8;;\e\\\n'"],  S),
 	shell2(S,_).

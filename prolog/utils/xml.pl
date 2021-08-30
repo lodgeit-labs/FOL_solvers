@@ -1,10 +1,10 @@
 
 
 % this gets the children of an element with ElementXPath
-inner_xml(Dom, Element_XPath, Children) :-
+ inner_xml(Dom, Element_XPath, Children) :-
 	xpath(Dom, Element_XPath, element(_,_,Children)).
 
-inner_xml_throw(Dom, Element_XPath, Children) :-
+ inner_xml_throw(Dom, Element_XPath, Children) :-
 	(
 		xpath(Dom, Element_XPath, element(_,_,Children))
 	->
@@ -16,20 +16,20 @@ inner_xml_throw(Dom, Element_XPath, Children) :-
 		)
 	).
 
-trimmed_field(Dom, Element_XPath, Value) :-
+ trimmed_field(Dom, Element_XPath, Value) :-
 	xpath(Dom, Element_XPath, element(_,_,[Child_Atom])),
 	trim_atom(Child_Atom, Value).
 
-trim_atom(Atom, Trimmed_Atom) :-
+ trim_atom(Atom, Trimmed_Atom) :-
 	atom_string(Atom, Atom_String),
 	trim_string(Atom_String, Trimmed_String),
 	%split_string(Atom_String, "", "\s\t\n", [Trimmed_String]),
 	atom_string(Trimmed_Atom, Trimmed_String).
 
-trim_string(String, Trimmed_String) :-
+ trim_string(String, Trimmed_String) :-
 	split_string(String, "", "\s\t\n", [Trimmed_String]).
 
-write_tag(Tag_Name_Input,Tag_Value) :-
+ write_tag(Tag_Name_Input,Tag_Value) :-
 	flatten([Tag_Name_Input], Tag_Name_List),
 	atomic_list_concat(Tag_Name_List, Tag_Name),
 	string_concat("<",Tag_Name,Open_Tag_Tmp),
@@ -40,25 +40,25 @@ write_tag(Tag_Name_Input,Tag_Value) :-
 	write(Tag_Value),
 	writeln(Closing_Tag).
 
-open_tag(Name) :-
+ open_tag(Name) :-
 	flatten(['<', Name, '>'], L),
 	atomic_list_concat(L, S),
 	write(S).
 
-close_tag(Name) :-
+ close_tag(Name) :-
 	flatten(['</', Name, '>\n'], L),
 	atomic_list_concat(L, S),
 	write(S).
 
 
-numeric_field(Dom, Name_String, Value) :-
+ numeric_field(Dom, Name_String, Value) :-
 	trimmed_field(Dom, //Name_String, Value_Atom),
 	atom_number(Value_Atom, Value).
 
 
 /* take a list of field names and variables that the contents extracted from xml are bound to
 a (variable, default value) tuple can also be passed */
-fields(Dom, [Name_String, Value_And_Default|Rest]) :-
+ fields(Dom, [Name_String, Value_And_Default|Rest]) :-
 	nonvar(Value_And_Default),
 	!,
 	(Value, Default_Value) = Value_And_Default,
@@ -108,7 +108,7 @@ fields(Dom, [Name_String, Value_And_Default|Rest]) :-
 	),
 	numeric_fields(Dom, Rest).
 
-numeric_fields(Dom, [Name_String, Value|Rest]) :-
+ numeric_fields(Dom, [Name_String, Value|Rest]) :-
 	(
 		(
 			numeric_field(Dom, Name_String, Value),
@@ -121,32 +121,32 @@ numeric_fields(Dom, [Name_String, Value|Rest]) :-
 	),
 	numeric_fields(Dom, Rest).
 
-numeric_fields(_, []).
+ numeric_fields(_, []).
 
 
 
 
 
-xml_write_file(loc(absolute_path,File_Name), Term, Options) :-
+ xml_write_file(loc(absolute_path,File_Name), Term, Options) :-
 	setup_call_cleanup(
 		open(File_Name, write, Stream),
 		xml_write(Stream, Term, Options),
 		close(Stream)).
 
-xml_from_url(Url, Dom) :-
+ xml_from_url(Url, Dom) :-
 	/*fixme: throw something more descriptive here and produce a human-level error message at output*/
 	setup_call_cleanup(
         http_open(Url, In, []),
 		load_structure(In, Dom, [dialect(xml),space(remove)]),
         close(In)).
 
-xml_from_path(File_Path, Dom) :-
+ xml_from_path(File_Path, Dom) :-
 	%http_safe_file(File_Path, []),
 	nb_setval(xml_from_path__file_path,File_Path),
 	load_xml(File_Path, Dom, [space(remove), call(error, xml_loader_error_callback)]),
 	nb_delete(xml_from_path__file_path).
 
-xml_loader_error_callback(X,Y,Z) :-
+ xml_loader_error_callback(X,Y,Z) :-
 	nb_getval(xml_from_path__file_path,File_Path),
 	throw_string(['XML parsing error: "',File_Path, '": ', X,': ', Y,' (',Z,')']).
 
@@ -157,13 +157,13 @@ xml_loader_error_callback(X,Y,Z) :-
 
 
 
-xsd_validator_url(X) :-
+ xsd_validator_url(X) :-
 	atomic_list_concat([$>(!current_prolog_flag(services_server)), '/xml_xsd_validator'], X).
 
 /*
 Validates an XML instance against an XSD schema by calling an external Python script
 */
-validate_xml(loc(absolute_path,Instance_File), loc(absolute_path,Schema_File), Schema_Errors) :-
+ validate_xml(loc(absolute_path,Instance_File), loc(absolute_path,Schema_File), Schema_Errors) :-
 	!uri_encoded(query_value,Instance_File,Instance_File_Encoded),
 	!uri_encoded(query_value,Schema_File,Schema_File_Encoded),
 	!xsd_validator_url(XSD_Validator_URL),

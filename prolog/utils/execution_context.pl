@@ -1,5 +1,6 @@
 /*
-execution contexts: something like stack traces, but done manually:
+
+execution contexts: something like stack traces, but higher level and done manually:
 you call:
 push_context('investment calculator request')
 push_context('extract accounts')
@@ -9,37 +10,93 @@ and then, when there's an exception, we can print a nice "processing stack":
 when processing:
 1) investment calculator request
 2) extract accounts
-3) xxx
-4) yyy
+3) ...
+4) ...
 exception: blablabla
 
-
-plus, there's a higher level api:
-c(callable): calls push_context(callable), then calls callable
-c(blabla, callable): calls push_context(blabla), then calls callable
 */
 
 
-get_context(Ctx_list) :-
+ get_context(Ctx_list) :-
 	catch(
 		b_getval(context, Ctx_list),
 		_,
 		Ctx_list = []
 	).
 
-get_context_depth(D) :-
-	catch(
-		b_getval(context_depth, D),
-		_,
-		D = 0
-	).
+ get_context_depth(D) :-
+	b_current_num_with_default(context_depth, 0, D).
 
-get_context_trace(X) :-
+ get_context_trace(X) :-
 	catch(
 		b_getval(context_trace, X),
 		_,
 		X = []
 	).
+
+
+env_bool_has_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
+
+:- if(env_bool('ENABLE_CONTEXT_TRACE_TRAIL',true)).
+
+ context_trace_init_trail_0 :-
+	Fn = 'context_trace_trail.txt',
+	Fnn = loc(file_name, Fn),
+	(	absolute_tmp_path(Fnn, loc(absolute_path, Trail_File_Path))
+	->	true
+	;	Trail_File_Path = Fn),
+	open(Trail_File_Path, write, Trail_Stream, [buffer(line)]),
+	b_setval(context_trace_trail, Trail_Stream).
+
+ context_trace_trail(Term) :-
+	b_getval(context_trace_trail, Stream),
+	(	Stream \= []
+	->	(
+			get_time(TimeStamp),
+			format(Stream, '~5f ', [TimeStamp]),
+			writeq(Stream, Term),
+			writeln(Stream, '\n'),
+			flush_output(Stream)
+		)
+	;	true).
+
+ context_trace_trail__push_context(C) :-
+	(
+		(
+			context_string(Str),
+			context_trace_trail(Str)
+		)
+		;
+		(
+			context_trace_trail(unwind(C)),
+			fail
+		)
+	).
+
+ context_trace_trail__pop_context :-
+ 	context_trace_trail(pop).
+
+
+
+:- else.
+
+ context_trace_trail__push_context(_).
+ context_trace_trail__pop_context.
+ context_trace_init_trail_0.
+ context_trace_trail(_).
+
+:- endif.
+
+env_bool_has_default('ENABLE_CONTEXT_TRACE',true).
+
+:- if(env_bool('ENABLE_CONTEXT_TRACE', false)).
+
+ push_context(_).
+ push_format(_,_).
+ pop_context.
+ pop_format.
+
+:- else.
 
  push_context(C) :-
 	get_context(Ctx_list),
@@ -50,10 +107,13 @@ get_context_trace(X) :-
 	append([(Depth,C)], Trace, New_trace),
 	b_setval(context_trace, New_trace),
 	b_setval(context_depth, New_depth),
-	b_setval(context, New_ctx_list).
+	b_setval(context, New_ctx_list),
+	context_trace_trail__push_context(C).
+
 
  push_format(Format_string, Args) :-
- 	push_context($>format(string(<$), Format_string, Args)).
+ 	maplist(round_term, Args, Args2),
+ 	push_context($>format(string(<$), Format_string, Args2)).
 
  pop_format :-
 	pop_context.
@@ -64,7 +124,14 @@ get_context_trace(X) :-
 	New_depth is Depth - 1,
 	b_setval(context_depth, New_depth),
 	!append(New_ctx_list,[_],Ctx_list),
-	b_setval(context, New_ctx_list).
+	b_setval(context, New_ctx_list),
+	context_trace_trail__pop_context.
+
+:- endif.
+
+ ct(Context) :-
+	push_context(Context),
+	pop_context.
 
 %:- meta_predicate 'c'(?, 0).
  ct(Context, Callable) :-
@@ -167,7 +234,7 @@ for what it's worth. Should be superseded by a nice svelte Rdf viewer UI
 
  context_string(C,Str) :-
 	(	C = []
-	->	Str = ''
+	->	Str = ""
 	;	(
 			context_string1(1, C, Item_strings),
 			atomics_to_string(['during: \n' | Item_strings], Str)

@@ -2,7 +2,7 @@
 this is a sucessor to https://github.com/koo5/AutoNomic-pyco
 While pyco only achieved a limited form of order invariance with 'EP_YIELD's only in rules producing existentials, this version 'ep_yield's anywhere, and repeats the whole query for as long as the proof tree is growing. It is perhaps an iterative deepening search.
 
-Another difference in semantics from pyco is currently lack of "second_chance" logic, and missing "prune_duplicate_results" option.
+Another difference in semantics from pyco is currently lack of "second_chance" logic (allowing extra depth of search when recursing on lists), and missing "prune_duplicate_results" option.
 
 This version is implemented in (swi)prolog, so we can experiment with integrating CLP, and we can call native clauses.
 
