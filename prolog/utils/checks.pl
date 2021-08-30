@@ -7,6 +7,13 @@ misc_check(Goal) :-
 	call(Goal).
 
 
+:- meta_predicate 'nicety'(0).
+nicety(Goal) :-
+	//call(Goal),
+	true.
+
+
+
 :- debug(checklist).
 
 

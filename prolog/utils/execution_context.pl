@@ -55,9 +55,9 @@ env_bool_has_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
 			statistics(process_epoch, E),
 			get_time(TimeStamp),
 			Ts is TimeStamp - E,
-			format(Stream, '~5f ', [Ts]),
-			writeq(Stream, Term),
-			writeln(Stream, '\n'),
+			format(Stream, 'ct~5f ~w~n', [Ts,Term]),
+			%writeq(Stream, Term),
+			%writeln(Stream, '\n'),
 			flush_output(Stream)
 		)
 	;	true).
