@@ -180,3 +180,5 @@ sort_into_dict_on_success/4(
 
  sort_pairs_into_dict(Pairs, Dict) :-
 	!sort_into_dict2([(A, B), A, B]>>true, Pairs, Dict).
+
+

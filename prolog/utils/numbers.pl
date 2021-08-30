@@ -24,11 +24,13 @@
 	round(X, D, Y).
 
  round(X,_,X) :-
-	integer(X).
+	integer(X),
+	!.
 
  round(X,D,Y2) :-
 	\+integer(X),
 	(float(X);rational(X)),
+	!,
 	Z is X * 10^D,
 	round(Z, ZA),
 	Y is ZA / 10^D,

@@ -6,7 +6,8 @@
 
 
  services_server(S) :-
-	current_prolog_flag(services_server, S).
+	!current_prolog_flag(services_server, S),
+	debug(d, 'current_prolog_flag(services_server, ~q)', [S]).
 
  json_post(Url, Payload, Response) :-
 	json_post(Url, Payload, Response, 5).

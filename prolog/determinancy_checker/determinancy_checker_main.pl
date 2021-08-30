@@ -53,18 +53,20 @@
  determinancy_checker_throw_error(E) :-
 	gtrace,throw(E).
 
+env_bool_has_default('DETERMINANCY_CHECKER__USE__ENFORCER', false).
+env_bool_has_default('DETERMINANCY_CHECKER__USE__UNDO', false).
 
 :- if(env_bool('DETERMINANCY_CHECKER__USE__ENFORCER', true)).
-:- [determinancy_enforcer].
+	:- debug(determinancy_checker, "'DETERMINANCY_CHECKER__USE__ENFORCER', true",[]).
+	:- [determinancy_enforcer].
 :- else.
+	:- if(env_bool('DETERMINANCY_CHECKER__USE__UNDO', true)).
+		:- [determinancy_checker_det_v3_undo].
+	:- else.
+		:- [determinancy_checker_det_v2].
+	:- endif.
 
-:- if(env_bool('DETERMINANCY_CHECKER__USE__UNDO', true)).
-:- [determinancy_checker_det_v3_undo].
-:- else.
-:- [determinancy_checker_det_v2].
-:- endif.
-
-:- [determinancy_checker_semidet_v1].
+	:- [determinancy_checker_semidet_v1].
 :- endif.
 
 

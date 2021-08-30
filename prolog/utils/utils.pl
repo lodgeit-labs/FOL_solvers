@@ -24,7 +24,20 @@
 :- op(900,fx,<$).
 
 
+
+
+
+
+
+/* comment out a goal, structurally. */
+:- op(920,fx,//).
+//_Goal.
+
+
+
 :- use_module(envvars).
+:- [checks].
+
 
 
 :- multifile determinancy_checker_throw_error/1.
@@ -33,8 +46,10 @@
 %:- asserta((determinancy_checker_throw_error(X) :- throw_string(X),!)).
 
 
+
 :- multifile user:goal_expansion/2.
 :- dynamic user:goal_expansion/2.
+
 
 
 :- [compare_xml].

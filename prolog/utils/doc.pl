@@ -118,6 +118,8 @@ maybe this program will even run faster without this?*/
 good thing is i think even with retracts (the backtracking kind), we won't have to worry about prolog reusing variable numbers. anyway, variables are todo
 */
 
+env_bool_has_default('ROBUST_DOC_ENABLE_TRAIL', false).
+
 :- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
 
 /* why 0? Probably, the idea was that there'd also be other, higher level formats? */
@@ -231,6 +233,7 @@ assumption: only O's are allowed to be non-atoms
 
  addd(S2,P2,O2,G2) :-
 	atom(S2),atom(P2),atom(G2),
+	!,
 
 	% get the_theory global
 	b_getval(the_theory,Ss),
@@ -238,7 +241,7 @@ assumption: only O's are allowed to be non-atoms
 	% does it contain the subject?
 
 	(	Ps = Ss.get(S2)
-	%	the it's a dict from preds to graphs
+	%	it's a mapping from preds to graphs
 	->	Ss2 = Ss
 	;	(
 			Ps = preds{},
@@ -257,7 +260,7 @@ assumption: only O's are allowed to be non-atoms
 	),
 
 /*
-todo this is an laternative ending, check if it's faster.
+todo this is an alternative ending, check if it's faster.
 
 	(	Os = Gs.get(G2)
 	->	(
@@ -282,8 +285,9 @@ todo this is an laternative ending, check if it's faster.
 
 
  addd(S2,P2,O2,G2) :-
-	X = spog(S2,P2,O2,G2),
 	\+((atom(S2),atom(P2),atom(G2))),
+	!,
+	X = spog(S2,P2,O2,G2),
 	% adding non-ground triples is nonoptimal, because they aren't indexed.
 	%format(user_error, 'ng:~q~n', [X]),
 	b_getval(the_theory_nonground, Ng),
@@ -301,10 +305,10 @@ dddd(Spog, X) :-
 */
  dddd(Spog, X) :-
 	Spog = spog(S2,P2,O2,G2),
-	(atom(S2);var(S2)),
-	(atom(P2);var(P2)),
-	(atom(G2);var(G2)),
-	/* looks like a bug here not finding a triple is S2 is unbound? At any case, is any of S2, P2 or O2 is unbound, the yields are in random order, so we have to find another way than dicts. (and than lists, which were slow, or was that just the rol- stuff?. */
+	%(atom(S2);var(S2)), i dont think we need to allow this at all
+	%(atom(P2);var(P2)), i dont think we need to allow this at all
+	%(atom(G2);var(G2)), i dont think we need to allow this at all
+	/* looks like a bug here not finding a triple if S2 is unbound? At any case, if any of S2, P2 or O2 are unbound, the yields are in random order, so we have to find another way than dicts. (and than lists, which were slow, or was that just the rol- stuff?. */
 	rol_member(O2, X.get(S2).get(P2).get(G2)).
 
  dddd(Spog, _X) :-
@@ -399,6 +403,9 @@ member
 /*
  ensure Spog is added as a last element of T, while memberchk would otherwise possibly just unify an existing member with it
 */
+
+
+env_bool_has_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
 :- if(env_bool('ROBUST_ROL_ENABLE_CHECKS', true)).
 
@@ -588,6 +595,7 @@ X) :-
 	atomic_list_concat(['doc_', Id, '.', Format],Fn),
 	report_file_path(loc(file_name, Fn), Url, loc(absolute_path,Path)),
 	Url = loc(absolute_url, Url_Value),
+    misc_check(!parse_url(Url_Value, _)),
 	(	var(Report_key)
 	->	Report_key = Fn
 	;	true),
@@ -600,8 +608,8 @@ X) :-
 		prefixes([rdf,rdfs,xsd,l,livestock,excel,r-($>atomic_list_concat([$>result_data_uri_base, '#']))])
 	],
 	(	Format = trig
-	->	rdf_save_trig(Path, Options)
-	;	rdf_save_turtle(Path, Options)).
+	->	!rdf_save_trig(Path, Options)
+	;	!rdf_save_turtle(Path, Options)).
 % ^
 %todo refactor
 % v

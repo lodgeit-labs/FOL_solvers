@@ -45,12 +45,17 @@
 
 
  have_display :-
- 	format(user_error, 'have_display?', []),
-	getenv('DISPLAY', Display),
-	atom_length(Display, X),
-	X > 0,
-	format(user_error, 'yes\n', []).
+	(	(
+			getenv('DISPLAY', Display),
+			atom_length(Display, X),
+			X > 0
+		)
+	->	debug(checklist, 'have_display?yes\n', [])
+	;	debug(checklist, 'have_display?yes\n', [])).
 
+
+
+flag_default(gtrace, true).
 
  gtrace_if_have_display :-
 	(	have_display
