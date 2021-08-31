@@ -274,7 +274,13 @@ optimization_flag2(Debug, Optimization) :-
 run_with_toplevel(Debug, Goal, Script, _Opts) :-
 	optimization_flag2(Debug, Optimization),
 	scriptargs(ScriptArgs),
-	Args0 = ['-v', 'swipl', Optimization, '-s', Script, '--', ScriptArgs],
+
+	Args0 = ['-v',
+
+		'mprof', 'run', '--nopython', '-C', '-E' , '-o', '/app/server_root/tmp/mem',
+
+	'swipl', Optimization, '-s', Script, '--', ScriptArgs],
+
 	flatten(Args0, Args),
 	debug(dev_runner, 'dev_runner: will run with toplevel with args: ~q\n', [Args]),
 	atomics_to_string(['(',Goal,',halt(0));halt(1).\n'], Goal2),

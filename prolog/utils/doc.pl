@@ -726,8 +726,8 @@ X) :-
 
 :- table result/1.
  result(R) :-
-	!doc(R, rdf:type, l:'Result'),
- 	format(user_error, 'result(R): ~q~n', [R]).
+	!doc(R, rdf:type, l:'Result').
+ 	%format(user_error, 'result(R): ~q~n', [R]).
 
 :- table request_data/1.
  request_data(D) :-

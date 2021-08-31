@@ -7,6 +7,13 @@ misc_check(Goal) :-
 	call(Goal).
 
 
+:- meta_predicate 'nicety'(0).
+nicety(Goal) :-
+	//call(Goal),
+	true.
+
+
+
 :- debug(checklist).
 
 
@@ -14,6 +21,7 @@ misc_check(Goal) :-
 
 	%gtrace,
 	debugging,
+
 	findall(Topic, debugging(Topic), Topics),
 	debug(checklist, 'topics: ~q', [Topics]),
 
@@ -21,9 +29,6 @@ misc_check(Goal) :-
 
 	env_bool('DETERMINANCY_CHECKER__USE__ENFORCER', DETERMINANCY_CHECKER__USE__ENFORCER),
 	debug(checklist, 'DETERMINANCY_CHECKER__USE__ENFORCER ~q', [DETERMINANCY_CHECKER__USE__ENFORCER]),
-
-	env_bool('DETERMINANCY_CHECKER__USE__UNDO', DETERMINANCY_CHECKER__USE__UNDO),
-	debug(checklist, 'DETERMINANCY_CHECKER__USE__UNDO ~q', [DETERMINANCY_CHECKER__USE__UNDO]),
 
 	getenv('DISPLAY', DISPLAY),
 	debug(checklist, 'DISPLAY ~q', [DISPLAY]),
