@@ -26,6 +26,6 @@
 
 
  flag(Key, Value) :-
-	(	current_prolog_flag(Key, Value)
- 	->	true
+	(	current_prolog_flag(Key, Value0)
+ 	->	Value = Value0
  	;	flag_default(Key, Value)).
