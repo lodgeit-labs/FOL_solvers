@@ -114,6 +114,13 @@ maybe this program will even run faster without this?*/
 	;	doc_init_trace_0),
 	doc_clear.
 
+ reestablish_doc(G,Ng) :-
+	/* these two global vars together comprise the whole of doc database */
+	b_setval(the_theory, G),
+	b_setval(the_theory_nonground, Ng).
+
+
+
 /*
 good thing is i think even with retracts (the backtracking kind), we won't have to worry about prolog reusing variable numbers. anyway, variables are todo
 */
@@ -1163,7 +1170,7 @@ Anyway, we could store both doc and context in State.
 	->	(
 			retractall(user:exception_doc_dump(_,_)),
 			assert(user:exception_doc_dump(G,Ng)),
-			doc_dump
+			nicety(doc_dump)
 		)
 	;	true).
 
