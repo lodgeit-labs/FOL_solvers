@@ -28,8 +28,8 @@
 
 
 /* comment out a goal, structurally. */
-:- op(920,fx,//).
-//_Goal.
+:- op(920,fx,##).
+##_Goal.
 
 
 

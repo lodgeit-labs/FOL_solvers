@@ -832,6 +832,13 @@ X) :-
  	doc_add_value(S, P, V, G).
 
  doc_add_value(S, P, V, G) :-
+	doc_add_value2(S, P, _Uri, V, G).
+
+ doc_add_value2(S, P, Uri, V) :-
+ 	doc_default_graph(G),
+	doc_add_value2(S, P, Uri, V, G).
+
+ doc_add_value2(S, P, Uri, V, G) :-
  	doc_new_uri(value, Uri),
  	doc_add(S, P, Uri, G),
  	doc_add(Uri, rdf:value, V, G).
