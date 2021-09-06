@@ -262,7 +262,7 @@ run_without_compilation(Debug, Optimization, Script, Viewer) :-
 optimization_flag2(Debug, Optimization) :-
 	(	Debug = true
 	->	(
-			Optimization = ['--debug=true'],
+			Optimization = ['--debug=true', '--debug-on-interrupt'],
 			debug(dev_runner, 'dev_runner: debug is true, no -O...\n', [])
 		)
 	;	(
@@ -275,6 +275,10 @@ run_with_toplevel(Debug, Goal, Script, _Opts) :-
 	optimization_flag2(Debug, Optimization),
 	scriptargs(ScriptArgs),
 
+	(	Debug = true
+	->	Environment = environment(['SWIPL_NODEBUG'=false])
+	;	Environment = environment(['SWIPL_NODEBUG'=true])),
+
 	Args0 = ['-v',
 
 		'mprof', 'run', '--nopython', '-C', '-E' , '-o', '/app/server_root/tmp/mem',
@@ -286,11 +290,12 @@ run_with_toplevel(Debug, Goal, Script, _Opts) :-
 	atomics_to_string(['(',Goal,',halt(0));halt(1).\n'], Goal2),
 	debug(dev_runner, 'dev_runner: will pipe goal: ~w\n', [Goal2]),
 	%process_create(path(swipl), Args, [process(Pid), stdin(pipe(Stdin))]),
-	process_create(path(time), Args, [process(Pid), stdin(pipe(Stdin))]),
+	process_create(path(time), Args, [process(Pid), stdin(pipe(Stdin)), Environment]),
 	%write(Stdin, writeln('script output starts below'),
 	%write(Stdin, "current_prolog_flag(debug,Debug),format(user_error,'debug=~q~n',[Debug]).\n\n"),
 	write(Stdin, Goal2),
-	% "a" to cause an abort after an exception. "." to pretend that was a query, in case tracer isnt on.
+	% "a" to cause an abort after an exception. "." to pretend that the "a" was a query, in case tracer isnt on.
+	% maybe use -t halt or -t goal instead?
 	write(Stdin, 'a. '),
 	write(Stdin, 'halt(1).\n'),
 	flush_output(Stdin),

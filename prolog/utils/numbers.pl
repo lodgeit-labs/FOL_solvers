@@ -53,7 +53,7 @@
 	float_comparison_significant_digits(D),
 	round_term(D, X, Y).
 
- round_term(_, X, '[all]') :-
+ round_term(_, X, '[variable]') :-
 	var(X),
 	!.
 
