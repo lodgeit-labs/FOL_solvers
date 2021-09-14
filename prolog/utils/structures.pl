@@ -7,7 +7,9 @@
 
 /*
 	given a list of terms, for example, of transactions, and a Selector_Predicate, for example transaction_account,
-	produce a dict with keys returned by the selector, and values lists of terms
+	produce a dict with keys returned by the selector, and values lists of transaction terms.
+
+	should be O(n)-ish.
 */
  sort_into_dict(Selector_Predicate, Ts, D) :-
 	sort_into_dict(Selector_Predicate, Ts, _{}, D).
@@ -31,7 +33,7 @@
 
 
 
-/* same as sort_into_dict, but predicate is ternary, and third argument is the binned value */
+/* same as sort_into_dict, but Selector_Predicate is ternary, getting an item of the supplied list, and returning a key and a value. should we merge these ? */
  sort_into_dict2(Selector_Predicate, Ts, D) :-
 	sort_into_dict2(Selector_Predicate, Ts, _{}, D).
 

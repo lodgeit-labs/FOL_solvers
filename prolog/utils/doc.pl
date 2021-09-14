@@ -342,6 +342,7 @@ dddd(Spog, X) :-
 
 /*
 must have at most one match
+not sure if this is followed? why not use determinancy checker?
 */
  doc(S,P,O) :-
 	doc_default_graph(G),
@@ -362,6 +363,7 @@ must have at most one match
 
 /*
 can have multiple matches
+todo, refactor calls of docm into calls of doc with appropriate determinancy checker qualifier (*) */
 */
  docm((S,P,O)) :-
 	docm(S,P,O).
