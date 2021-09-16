@@ -81,8 +81,6 @@ maybe this program will even run faster without this?*/
 :- rdf_meta doc_assert(r,r,r,r).
 :- rdf_meta doc(r,r,r).
 :- rdf_meta doc(r,r,r,r).
-:- rdf_meta docm(r,r,r).
-:- rdf_meta docm(r,r,r,r).
 :- rdf_meta doc_new_(r,-).
 :- rdf_meta result_property(r,r).
 :- rdf_meta rp(r,r).
@@ -161,7 +159,7 @@ env_bool_has_default('ROBUST_DOC_ENABLE_TRAIL', false).
  dump :-
 	findall(_,
 		(
-			docm(S,P,O),
+			*doc(S,P,O),
 			debug(doc, 'dump:~q~n', [(S,P,O)])
 		),
 	_).
@@ -344,6 +342,9 @@ dddd(Spog, X) :-
 must have at most one match
 not sure if this is followed? why not use determinancy checker?
 */
+ doc((S,P,O)) :-
+	doc(S,P,O).
+
  doc(S,P,O) :-
 	doc_default_graph(G),
 	doc(S,P,O,G).
@@ -361,23 +362,6 @@ must have at most one match
 	%debug(doc, 'doc?:~q~n', [(S2,P2,O2,G2)]),
 	dddd(spog(S2,P2,O2,G2), X).
 
-/*
-can have multiple matches
-todo, refactor calls of docm into calls of doc with appropriate determinancy checker qualifier (*) */
-*/
- docm((S,P,O)) :-
-	docm(S,P,O).
- docm(S,P,O) :-
-	doc_default_graph(G),
-	docm(S,P,O,G).
- docm(S,P,O,G) :-
-	rdf_global_id(S, S2),
-	rdf_global_id(P, P2),
-	rdf_global_id(O, O2),
-	rdf_global_id(G, G2),
-	b_getval(the_theory,X),
-	%debug(doc, 'docm:~q~n', [(S2,P2,O2,G2)]),
-	dddd(spog(S2,P2,O2,G2), X).
 /*
 member
 */
@@ -562,8 +546,8 @@ X) :-
 	rdf_create_bnode(Rdf_Graph),
 	findall(_,
 		(
-			%docm(X,Y,Z),
-			docm(T),
+			%*doc(X,Y,Z),
+			*doc(T),
 			round_term(T,T2),
 			%debug(doc, 'to_rdf:~q~n', [T2]),
 			triple_rdf_vs_doc((X2,Y2,Z2),T2),
@@ -594,7 +578,7 @@ X) :-
  doc_to_rdf_graph(G) :-
  	rdf_retractall(_,_,_,_),
 	findall(_,(
-			docm(X,Y,Z,G),
+			*doc(X,Y,Z,G),
 			add_to_rdf((X,Y,Z,G))
 		),_
 	).
@@ -780,7 +764,7 @@ X) :-
 
  get_alert(Type, Msg, Uri) :-
 	result(R),
-	docm(R, l:alert, Uri),
+	*doc(R, l:alert, Uri),
 	doc(Uri, l:type, Type),
 	doc(Uri, l:message, Msg).
 

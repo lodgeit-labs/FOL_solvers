@@ -187,7 +187,7 @@ write_tmp_json_file(Name, Json) :-
 
  get_report_file(Priority, Title, Key, Url) :-
 	result(R),
-	docm(R, l:has_report, Uri, files),
+	*doc(R, l:has_report, Uri, files),
 	(	doc(Uri, l:priority, Priority, files)
 	->	true
 	;	Priority = 0),

@@ -228,4 +228,13 @@ test(0, forall(x(X)), all((X=X))) :-
 	
 
 # SWIPL RPC
+
+https://swi-prolog.discourse.group/t/windows-interopservices-for-libswipl-dll/4409
+
+https://github.com/lodgeit-labs/accounts-assessor/blob/2115c8f1c110de5817b12aacd40d31eb2cdecd20/misc/old/csharp_server/PrologEndpoint/Helpers/PL.cs
+
 https://github.com/rla/node-swipl-stdio
+
+
+
+

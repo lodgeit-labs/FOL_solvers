@@ -283,7 +283,7 @@ run_with_toplevel(Debug, Goal, Script, _Opts) :-
 
 		'mprof', 'run', '--nopython', '-C', '-E' , '-o', '/app/server_root/tmp/mem',
 
-	'swipl', Optimization, '-s', Script, '--', ScriptArgs],
+	'swipl', '--stack_limit=100G', Optimization, '-s', Script, '--', ScriptArgs],
 
 	flatten(Args0, Args),
 	debug(dev_runner, 'dev_runner: will run with toplevel with args: ~q\n', [Args]),

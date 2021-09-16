@@ -28,7 +28,7 @@
 :- meta_predicate '*'(2, ?, ?).
 :- meta_predicate '*'(3, ?, ?, ?).
 :- meta_predicate '*'(4, ?, ?, ?, ?).
-
+/* todo make this a macro? */
 '*'(Callable) :-
 	call(Callable).
 '*'(Callable,A1) :-
