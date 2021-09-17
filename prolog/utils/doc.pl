@@ -1129,21 +1129,21 @@ Anyway, we could store both doc and context in State.
 %:- initialization(init_prolog_exception_hook).
 
  doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
-	%print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
 
 	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
 	->	true
 	;	F = E),
 
-	%print_message(information, "................."),
-
+	print_message(information, "................."),
+	format(user_error, '~q~n', [F]),
 	% a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe?
 
 	catch('store doc data for reporting after exception',E,format(user_error,'~q~n',[E])),
-	%print_message(information, "........."),
+	print_message(information, "........."),
 	catch('store ctx data for reporting after exception',E,format(user_error,'~q~n',[E])),
 
-	%print_message(information, "."),
+	print_message(information, "."),
 	true.
 /*
 */

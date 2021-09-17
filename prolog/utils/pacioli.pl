@@ -97,9 +97,8 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 
  vec_add(As, Bs, Cs_Reduced) :-
 	assertion((flatten(As, As), flatten(Bs, Bs))),
-	/*paste the two vectors togetner*/
 	!append(As, Bs, As_And_Bs),
-	!sort_into_assoc(coord_or_value_unit, As_And_Bs, Sorted),
+	!sort_into_assoc(!coord_or_value_unit, As_And_Bs, Sorted),
 	!assoc_to_values(Sorted, Valueses),
 	!maplist(semigroup_foldl(coord_merge), Valueses, Total),
 	flatten(Total, Total_Flat),
