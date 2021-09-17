@@ -1136,7 +1136,9 @@ Anyway, we could store both doc and context in State.
 	;	F = E),
 
 	print_message(information, "................."),
-	format(user_error, '~q~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	%backtrace(200),
+
 	% a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe?
 
 	catch('store doc data for reporting after exception',E,format(user_error,'~q~n',[E])),

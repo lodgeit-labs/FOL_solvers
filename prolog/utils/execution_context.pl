@@ -18,21 +18,28 @@ exception: blablabla
 
 
  get_context(Ctx_list) :-
-	catch(
-		b_getval(context, Ctx_list),
-		_,
-		Ctx_list = []
-	).
+	(	nb_current(context, Ctx_list)
+	->	true
+	;	Ctx_list = []).
+
+%	catch(
+%		b_getval(context, Ctx_list),
+%		_,
+%		Ctx_list = []
+%	).
 
  get_context_depth(D) :-
 	b_current_num_with_default(context_depth, 0, D).
 
  get_context_trace(X) :-
-	catch(
-		b_getval(context_trace, X),
-		_,
-		X = []
-	).
+	(	nb_current(context_trace, X)
+	->	true
+	;	X = []).
+%	catch(
+%		b_getval(context_trace, X),
+%		_,
+%		X = []
+%	).
 
 
 env_bool_has_default('ENABLE_CONTEXT_TRACE_TRAIL',false).

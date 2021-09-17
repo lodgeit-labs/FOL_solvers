@@ -75,3 +75,4 @@ Warning: file_search_path/2, which is referenced by
 Warning: 	/usr/local/lib/swipl/library/check.pl:1031: 1-st clause of '__aux_meta_call_7245479f91f33b1ad8e44708e07e31fe61bc41a5'/2
 Warning: '__aux_meta_call_7245479f91f33b1ad8e44708e07e31fe61bc41a5'/2, which is referenced by
 Warning: 	/usr/local/lib/swipl/library/check.pl:1031: 1-st clause of aliased_path/2
+Warning: /usr/local/lib/swipl/library/prolog_codewalk.pl:433:
