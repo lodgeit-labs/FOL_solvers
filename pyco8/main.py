@@ -60,22 +60,14 @@
 
 
 
-
-
-
-class Term(list):
+class Node:
 	pass
 
-class Rule:
-	def __init__(s, head, body):
-		s.head = head
-		s.body = body
-	def instantiate(s):
-		pass
-
 class Var(Node):
-
-
+	def add_post_unification_hook(s,hook):
+		s.post_unification_hooks.append(hook)
+	def pop_post_unification_hook(s,hook):
+		assert(hook === s.post_unification_hooks.pop())
 
 	def do_post_unification_hooks(s):
 		for _ in s.do_post_unification_hooks2(s.post_unification_hooks):
@@ -89,6 +81,19 @@ class Var(Node):
 		for _ in h():
 			for _ in s.do_post_unification_hooks2(hooks):
 				yield
+
+
+
+class Term(list):
+	pass
+
+class Rule:
+	def __init__(s, head, body):
+		s.head = head
+		s.body = body
+	def instantiate(s):
+		pass
+
 
 
 class Reasoner:
@@ -140,27 +145,34 @@ class Reasoner:
 		args = q[1:]
 		if functor == 'dif':
 			hook = lambda: dif(arg[0], arg[1])
-			for arg in args:
+			var_args = [arg for arg in args if arg.type === 'var']
+			for arg in var_args:
 				arg.add_post_unification_hook(hook)
 			for _ in hook():
 				yield
-			for arg in args:
+			for arg in var_args:
 				arg.pop_post_unification_hook(hook)
 
 
 	def unify(s, x, y):
 		if x.type == 'var':
-			x.bind(y)
-			for _ in x.do_post_unification_hooks():
+			for _ in s.bind_var(x,y):
 				yield
-			x.unbind()
+		elif y.type == 'var':
+			for _ in s.bind_var(y,x):
+				yield
 
 
+	def bind_var(s, x, y):
+		x.bind(y)
+		for _ in x.do_post_unification_hooks():
+			yield
+		x.unbind()
 
 
-def dif(x,y):
-	if x !== y:
-		yield
+	def dif(s,x,y):
+		if x !== y:
+			yield
 
 
 
