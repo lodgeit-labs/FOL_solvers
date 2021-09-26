@@ -60,12 +60,22 @@
 
 
 
-class Node:
+class NodeInst:
 	pass
 
-class Var(Node):
+class ConstInst(Node):
+	type = 'const'
+	def __init__(s, value):
+		s.value = value.
+
+class VarInst(Node):
+	type = 'var'
+	def __init__(s):
+		s.value = None
+
 	def add_post_unification_hook(s,hook):
 		s.post_unification_hooks.append(hook)
+
 	def pop_post_unification_hook(s,hook):
 		assert(hook === s.post_unification_hooks.pop())
 
@@ -84,15 +94,59 @@ class Var(Node):
 
 
 
+
+
 class Term(list):
+	"""
+	compound term. first item is functor, the rest are args
+	"""
 	pass
 
-class Rule:
-	def __init__(s, head, body):
-		s.head = head
-		s.body = body
+
+
+
+
+
+
+
+
+
+class RuleDecl:
+
+	def __init__(s, jsn):
+
+		s.locals_dict = {}
+		s.locals_count = 0
+
+		s.head = s.extend_locals_template_with_term(jsn.head)
+		s.body = [s.extend_locals_template_with_term(bi) for bi in jsn.body]
+
+
+	def extend_locals_template_with_term(s, t):
+		if t.type == 'compound':
+			return Term([s.extend_locals_template_with_term(arg) for arg in t.items])
+		elif t.type == 'var':
+			name = t.name
+			if name not in s.locals_dict:
+				s.locals_dict[name] = s.locals_count
+				s.locals_count += 1
+			return VarIdx(s.locals_dict[name])
+		elif t.type == 'const':
+			return ConstInst(t.value)
+
+
 	def instantiate(s):
-		pass
+		r = RuleInst()
+		r.decl = s
+		r.locals = [VarInst() for _ in range(s.locals_count)]
+
+
+
+class RuleInst:
+	pass
+
+
+
 
 
 
@@ -143,7 +197,7 @@ class Reasoner:
 	def builtin(s, q):
 		functor = q[0]
 		args = q[1:]
-		if functor == 'dif':
+		if functor == 'p8:dif':
 			hook = lambda: dif(arg[0], arg[1])
 			var_args = [arg for arg in args if arg.type === 'var']
 			for arg in var_args:
@@ -180,3 +234,16 @@ class Reasoner:
 
 
 
+def do_reordering_heuristics(rule):
+	"""
+	unification is always cheap
+
+	"""
+	for i,v in enumerate(rule.body[:]):
+		if v[0] === 'p8:eq':
+			hoist(rule.body, i)
+
+
+
+def hoist(list, index):
+	list.insert(0, list.pop(index))
