@@ -95,9 +95,13 @@ class Reasoner:
 	def __init__(s, rules):
 		s.rules = [RuleDecl(r) for r in tri_struct_from_json(rules)]
 
+
 	def query(s, q):
+		s.existentials = defaultdict(lambda: defaultdict({}))
+
 		while prove_term(q):
 			yield q
+
 
 	def prove_term(s, q):
 		old_proof_tree_state = q.deep_copy()
@@ -142,6 +146,39 @@ class Reasoner:
 				yield
 			for arg in var_args:
 				arg.pop_post_unification_hook(hook)
+
+		if functor == 'p8:is_not_literal':
+
+			# same as above
+
+
+		if functor == 'p8:is_existential':
+			arg = q[1]
+			facts = q[2:]
+			if arg.type === 'var':
+
+				# register a new existential
+
+				existential = Existential()
+				existentials = s.existentials_existentials
+				existentials[existential.id] = existential
+				existential.facts = facts
+
+				for _ in s.bind_var(arg, exisential):
+					yield
+
+
+			elif arg.type ==='existential':
+
+				for f in existential.facts:
+					while s.unify_term(
+
+
+
+
+
+
+
 
 
 	def unify(s, x, y):
