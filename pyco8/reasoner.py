@@ -152,9 +152,11 @@ class Reasoner:
 			# same as above
 
 
-		if functor == 'p8:is_existential':
+		if functor == 'p8:exist':
 			arg = q[1]
-			facts = q[2:]
+			rule_head_term_idx = q[2]
+			rule_head_term = q[3]
+			rule_head_all_terms = q[4:]
 			if arg.type === 'var':
 
 				# register a new existential
@@ -169,11 +171,13 @@ class Reasoner:
 
 
 			elif arg.type ==='existential':
+				for _ in s.unify_term(rule_head_term, existential.facts[rule_head_term_idx]):
+					yield
 
-				for f in existential.facts:
-					while s.unify_term(
 
+			elif arg.type ==='const':
 
+				existentials = s.existentials_consts
 
 
 
