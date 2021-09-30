@@ -97,7 +97,7 @@ class Reasoner:
 
 
 	def query(s, q):
-		s.existentials = defaultdict(lambda: defaultdict({}))
+		s.existentials = defaultdict(lambda: defaultdict(list))
 
 		while prove_term(q):
 			yield q
@@ -162,23 +162,19 @@ class Reasoner:
 			rule_head_all_terms = args[4:]
 
 			existential_id = id(the_existential) # assumed to be unique, immutable, and, for constants, to have a 1:1 mapping to the constant's value
+
 			consequentsets = s.existentials[existential_id][existential_rule_id]
-			if existential_id not in existentials:
+			if not consequentsets.len():
 				existentials[existential_id] = {
-					existential_rule_id: {
+					existential_rule_id: [{
 						'rule_head_all_terms': rule_head_all_terms,
-					}
+					}]
 				}
 				yield
-				existentials.remove(existential_id)
-			elif existential_rule_id not in existentials[existential_id]:
-				existentials[existential_id][existential_rule_id] = {
-					'rule_head_all_terms': rule_head_all_terms,
-				}
-				yield
-				existentials[existential_id].remove(existential_rule_id)
+				consequentsets.pop()
+
 			else:
-				for consequentset in existentials[existential_id][existential_rule_id]:
+				for consequentset in s.existentials[existential_id][existential_rule_id]:
 					#each consequentset is a list of terms that comprise the previously fired existential rule's head
 					for _ in s.unify_term(rule_head_term, consequentset['rule_head_all_terms'][rule_head_term_idx]):
 						yield
@@ -201,10 +197,19 @@ class Reasoner:
 		x.bind(y)
 		for _ in x.do_post_unification_hooks():
 
-			if id(x) in s.existentials:
-				s.existentials[id(y)][
+			# extend consequentsets of y with consequentsets of x.
+			# A variable possibly had consequentsets associated through an existential rule, it is being bound here, to another variable or a const.
+			# Idk, maybe we'd get away with just switching the binding direction, but this seems cleaner
+
+			old = s.existentials[id(y)]
+			y_existentials = s.existentials[id(y)]
+
+			for k,v in s.existentials[id(x)].items():
+				y_existentials[k].extend(v)
 
 			yield
+
+			s.existentials[id(y)] = old
 
 
 		x.unbind()
