@@ -136,17 +136,45 @@ class Reasoner:
 
 
 	def deepen_proof_tree(q):
+
+		q = s.get_term_value(q)
+
 		for p in s.builtin(q):
 			yield p
 		for rule_declaration in s.rules:
+
 			rule = rule_declaration.instantiate()
-			for hi in rule.head:
+			e = rule.existential
+			if e:
+				e = s.get_value(e)
+
+			for head_item_idx,hi in enumerate(rule.head):
 				for _ in unify(q, hi):
-					if s.ep_ok(rule, hi):
-						for p in s.deepen_proof_tree__body(rule.body):
-							yield p
+					if e != None:
+						if e.factset:
+							for _ in s.unify_term(hi, e.factset[head_item_idx]):
+								yield
+						else:
+							e.factset = rule.head
+							yield
+
 					else:
-						yield EP
+						for p in s.do_body(str(id(rule)) + '-' + str(hi), rule.body):
+							yield p
+
+
+
+	def do_body(s, ep_key, body):
+		if s.ep_ok(ep_key):
+			s.add_ep(ep_key)
+			for p in s.deepen_proof_tree__body(body):
+				yield p
+			s.pop_ep()
+		else:
+			yield EP
+
+
+	
 
 
 
@@ -163,57 +191,35 @@ class Reasoner:
 
 
 	def builtin(s, q):
+		"""
+		q is assumed to be get_valued at this point.
+
+		"""
+
 		functor = q[0]
 		args = q[1:]
 
 		if functor == 'p8:dif':
-			hook = lambda: dif(arg[0], arg[1])
+			hook = lambda: dif(args[0], args[1])
 			var_args = [arg for arg in args if arg.type === 'var']
 			for arg in var_args:
 				arg.add_post_unification_hook(hook)
-			for _ in hook():
-				yield
+			for p in hook():
+				yield p
 			for arg in var_args:
 				arg.pop_post_unification_hook(hook)
 
-		if functor == 'p8:is_not_literal':
-
-			# similar to above
-
-
-		if functor == 'p8:exist':
-
-			the_existential = args[0]
-			rule_head_term_idx = args[1]
-			rule_head_term = args[2]
-			erule_id = args[3]
-			rule_head_all_terms = args[4:]
-
-			existential_id = id(the_existential) # assumed to be unique, immutable, and, for constants, to have a 1:1 mapping to the constant's value
-
-			consequentsets = s.existentials[existential_id][erule_id]
-			if not consequentsets.len():
-				existentials[existential_id] = {
-					erule_id: [{
-						'rule_head_all_terms': rule_head_all_terms,
-					}]
-				}
-				yield
-				consequentsets.pop()
-
-			else:
-				for consequentset in s.existentials[existential_id][erule_id]:
-					#each consequentset is a list of terms that comprise the previously fired existential rule's head
-					for _ in s.unify_term(rule_head_term, consequentset['rule_head_all_terms'][rule_head_term_idx]):
-						yield
+		elif functor == 'p8:eq':
+			yield from s.unify(args[0], args[1])
 
 
 
 
 
 
-	def unify(s, proof, x, y):
-		proof = f"{x} = {y}"
+
+	def unify(s, x, y):
+		#proof = f"{x} = {y}"
 		if id(x) == id(y):
 			yield
 		elif x.type == 'var':
@@ -226,49 +232,52 @@ class Reasoner:
 
 	def bind_var(s, x, y):
 		x.bind(y)
-		for _ in x.do_post_unification_hooks():
+		if x.factset == None:
+			for p in x.do_post_unification_hooks():
+				yield p
+		else:
 
 			# extend consequentsets of y with consequentsets of x.
 			# A variable possibly had consequentsets associated through an existential rule, it is being bound here, to another variable or a const.
 			# Idk, maybe we'd get away with just switching the binding direction, but this seems cleaner
 
-			y_existentials = s.existentials[id(y)]
-			old = y_existentials
+			if y.factset == None:
+				y.factset = x.factset
+				for p in x.do_post_unification_hooks():
+					yield p
+				y.factset = None
+			else:
 
-			# x_existentials is a dict from erule_id
-			x_existentials = s.existentials[id(x)]
+				# a factset can only bind to a factset coming from the same rule. This is as if by a constraint.
+				# under the restricted semantics, there can only be one consequentset for each erule_id
 
-			# under the restricted semantics, there can only be one consequentset for each erule_id
-			for erule_id,v in x_existentials.items():
-				# if there's a corresponding consequentset on y (corresponding in the sense of coming from the same erule_id), then try to unify the consequentset of x with it
-				if y_existentials[erule_id].len() != 0:
-					ops.append(['=', x_existentials[erule_id][0], y_existentials[erule_id][0])
+				if y.factset_rule_id != x.factset_rule_id
+					#fail
+					pass
 				else:
-					y_existentials[erule_id].extend(v)
 
-			r = RuleDecl({
-				'head': [],
-				'body':
-					[
-						{
-							'type':'compound',
-							'items':i
-						} for i in ops
-					]
-			}).instantiate()
+					# if there's a corresponding consequentset on y (corresponding in the sense of coming from the same erule_id), then try to unify the consequentset of x with it
 
-			for _ in s.deepen_proof_tree__body(r.body):
-				yield
+					ops = []
+					for i,xf in enumerate(x.factset):
+						yf = y.factset[i]
+						ops.append(['p8:eq', xf, yf])
 
-			s.existentials[id(y)] = old
-
+					for p1 in s.do_body('bind_var', ops):
+						for p2 in x.do_post_unification_hooks():
+							yield p1 and p2
 
 		x.unbind()
 
 
 	def dif(s,x,y):
 		if x !== y:
-			yield
+			yield OK
+
+
+
+
+
 
 
 
@@ -289,53 +298,4 @@ def do_reordering_heuristics(rule):
 
 def hoist(list, index):
 	list.insert(0, list.pop(index))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		# if functor == 'p8:exist':
-		# 	arg = q[1]
-		# 	rule_head_term_idx = q[2]
-		# 	rule_head_term = q[3]
-		# 	rule_head_all_terms = q[4:]
-		# 	if arg.type === 'var':
-		#
-		# 		# register a new existential
-		#
-		# 		existential = Existential()
-		# 		existentials = s.existentials_existentials
-		# 		existentials[existential.id] = existential
-		# 		existential.facts = facts
-		#
-		# 		for _ in s.bind_var(arg, exisential):
-		# 			yield
-		#
-		#
-		# 	elif arg.type ==='existential':
-		# 		for _ in s.unify_term(rule_head_term, existential.facts[rule_head_term_idx]):
-		# 			yield
-		#
-		#
-		# 	elif arg.type ==='const':
-		#
-		# 		existentials = s.existentials_consts
-		#
-
 
