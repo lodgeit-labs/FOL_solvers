@@ -4,9 +4,6 @@
 from utils import *
 
 
-EP = False
-OK = True
-
 
 class NodeInst:
 	pass
@@ -107,60 +104,43 @@ class Reasoner:
 
 
 	def query(s, q):
-		"""main entrypoint"""
-
-		# dict from node to a structure describing the existential
-		s.existentials = defaultdict(dict)
+		s.existentials = defaultdict(lambda: defaultdict(list))
 
 		while prove_term(q):
 			yield q
 
 
 	def prove_term(s, q):
-		"""
-		fixpoint logic here.
-
-		deepen_proof_tree yields a value that signifies if a solution was found, or if it's an ep-yield.
-		if it's an ep-yield, we recurse to give the proof tree a chance to deepen.
-		if it's a true solution, we yield.
-		"""
-
 		old_proof_tree_state = q.deep_copy()
-		for p in s.deepen_proof_tree(q):
-			if p is OK:
-				yield p
-			elif not q.eq(old_proof_tree_state):
-				for p in s.prove_term(q):
-					yield p
-
-
+		for proof in s.deepen_proof_tree(q):
+			if q.eq(old_proof_tree_state):
+				# this model stopped deepening. is it ground?
+				if q.is_ground():
+					yield q
+			else:
+				for _ in s.prove_term(q):
+					yield
 
 	def deepen_proof_tree(q):
-		for p in s.builtin(q):
-			yield p
+		for _ in s.builtin(q):
+			yield
 		for rule_declaration in s.rules:
 			rule = rule_declaration.instantiate()
 			for hi in rule.head:
 				for _ in unify(q, hi):
-					if s.ep_ok(rule, hi):
-						for p in s.deepen_proof_tree__body(rule.body):
-							yield p
-					else:
-						yield EP
-
-
+					for _ in s.ep_guarded(rule, hi):
+						for _ in s.deepen_proof_tree__body(rule.body):
+							yield
 
 	def deepen_proof_tree__body(s, body):
 		if body.len == 0:
-			yield OK
+			yield
 		else:
 			i = body[0]
 			body = body[1:]
-			for p1 in s.deepen_proof_tree(i):
-				for p2 in s.deepen_proof_tree__body(body):
-					yield p1 and p2
-
-
+			for _ in s.deepen_proof_tree(i):
+				for _ in s.deepen_proof_tree__body(body):
+					yield
 
 	def builtin(s, q):
 		functor = q[0]

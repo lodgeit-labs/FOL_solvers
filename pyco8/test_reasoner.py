@@ -7,13 +7,15 @@ class TestReasoner(TestCase):
 		r = Reasoner([
 			{
 				'head':
-					{
+					[{
 						'type':'compound',
 						'items':[
+					}],
+				'body':
+					[
 
 
-					}
-
+					]
 			},
 
 			{
