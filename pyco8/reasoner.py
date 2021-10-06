@@ -159,22 +159,64 @@ class Reasoner:
 							yield
 
 					else:
-						for p in s.do_body(str(id(rule)) + '-' + str(hi), rule.body):
+						for p in s.do_body(str(id(rule)) + '-' + str(hi), hi, rule.body):
 							yield p
 
 
 
-	def do_body(s, ep_key, body):
-		if s.ep_ok(ep_key):
-			s.add_ep(ep_key)
+	def do_body(s, ep_key, ep_guard_term, body):
+		if s.ep_ok(ep_key, ep_guard_term):
+			s.add_ep(ep_key, ep_guard_term)
 			for p in s.deepen_proof_tree__body(body):
 				yield p
-			s.pop_ep()
+			s.pop_ep(ep_key)
 		else:
 			yield EP
 
 
-	
+	def is_arg_productively_different(s, old, now):
+		if now.type == 'var':
+			if old.type == 'var':
+				if old.factset:
+					if new.factset:
+						if old == new:
+							return False
+						else
+							return s.is_bnode_productively_different(old, new)
+					else:
+						return True
+				return False
+			elif old.type == 'const':
+				return True
+			else: assert False
+
+
+	def is_bnode_productively_different(old, now):
+		""" if both args are existentials of the same type, (and not the exact same Thing), 'now' is considered productively different if it was asserted into existence earlier than old. That is, a recursion is allowed where the only difference between iterations is that different pre-existing existentials are considered, but a recursion is not allowed where iterations only differ because of presence of newly minted existentials. In yet other words, it's not allowed to try to prove something through invoking an existential rule ad infinitum.
+		"""
+		
+
+
+
+	def is_term_productively_different(s, old, now):
+		if old.len() != now.len():
+			return True
+		for i,old_item in enumerate(old):
+			if is_arg_productively_different(old_item, now[i]):
+		return False
+
+
+	def ep_ok(key, guard_term):
+		if key in s.eps:
+			for old in s.eps[key]:
+				if not s.is_term_productively_different(old, guard_term):
+					return False
+		return True
+
+
+
+	def add_ep(key, guard_term):
+		pass
 
 
 
@@ -263,7 +305,7 @@ class Reasoner:
 						yf = y.factset[i]
 						ops.append(['p8:eq', xf, yf])
 
-					for p1 in s.do_body('bind_var', ops):
+					for p1 in s.do_body('bind_var', Compound([x,y]), ops):
 						for p2 in x.do_post_unification_hooks():
 							yield p1 and p2
 
