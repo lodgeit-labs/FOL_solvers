@@ -2,56 +2,13 @@
 
 
 from utils import *
+from collections import defaultdict
+from nodes import *
+from eps import *
 
 
 EP = False
 OK = True
-
-
-class NodeInst:
-	pass
-
-
-
-class ConstInst(NodeInst):
-	type = 'const'
-	def __init__(s, value):
-		s.value = value
-
-
-
-class VarInst(NodeInst):
-	type = 'var'
-	def __init__(s):
-		s.value = None
-
-	def add_post_unification_hook(s,hook):
-		s.post_unification_hooks.append(hook)
-
-	def pop_post_unification_hook(s,hook):
-		assert(hook === s.post_unification_hooks.pop())
-
-	def do_post_unification_hooks(s):
-		for _ in s.do_post_unification_hooks2(s.post_unification_hooks):
-			yield
-
-	def do_post_unification_hooks2(s, hooks):
-		"""recurse on remaining hooks. proof is a conjunction of all hook's truth"""
-		if hooks.len() == 0:
-			yield
-		h = hooks[0]
-		hooks = hooks[1:]
-		for _ in h():
-			for _ in s.do_post_unification_hooks2(hooks):
-				yield
-
-
-
-class Term(list):
-	"""
-	compound term. first item of list is functor, the rest are args
-	"""
-	pass
 
 
 
@@ -106,13 +63,20 @@ class Reasoner:
 		s.rules = [RuleDecl(r) for r in rules]
 
 
+
+	def get_existential_id(s):
+		s.last_existential_id += 1
+		return s.last_existential_id
+
+
 	def query(s, q):
 		"""main entrypoint"""
 
-		# dict from node to a structure describing the existential
-		s.existentials = defaultdict(dict)
+		s.eps = Eps()
 
-		while prove_term(q):
+		s.last_existential_id = 0
+
+		while s.prove_term(q):
 			yield q
 
 
@@ -135,88 +99,42 @@ class Reasoner:
 
 
 
-	def deepen_proof_tree(q):
+	def deepen_proof_tree(s, q0):
 
-		q = s.get_term_value(q)
+		q = s.get_term_value(q0)
 
-		for p in s.builtin(q):
-			yield p
+		yield from s.builtin(q)
+
 		for rule_declaration in s.rules:
+			yield from s.prove_rule(rule_declaration.instantiate())
 
-			rule = rule_declaration.instantiate()
+
+
+	def prove_rule(s, rule):
+
 			e = rule.existential
 			if e:
 				e = s.get_value(e)
 
 			for head_item_idx,hi in enumerate(rule.head):
-				for _ in unify(q, hi):
+				for _ in s.unify(q, hi):
+
+
 					if e != None:
 						if e.factset:
 							for _ in s.unify_term(hi, e.factset[head_item_idx]):
 								yield
 						else:
 							e.factset = rule.head
-							yield
+							e.existential_id = s.get_existential_id()
+							yield OK
+							e.existential_id = None
+							e.factset = None
+
 
 					else:
 						for p in s.do_body(str(id(rule)) + '-' + str(hi), hi, rule.body):
 							yield p
-
-
-
-	def do_body(s, ep_key, ep_guard_term, body):
-		if s.ep_ok(ep_key, ep_guard_term):
-			s.add_ep(ep_key, ep_guard_term)
-			for p in s.deepen_proof_tree__body(body):
-				yield p
-			s.pop_ep(ep_key)
-		else:
-			yield EP
-
-
-	def is_arg_productively_different(s, old, now):
-		if now.type == 'var':
-			if old.type == 'var':
-				if old.factset:
-					if new.factset:
-						if old == new:
-							return False
-						else
-							return s.is_bnode_productively_different(old, new)
-					else:
-						return True
-				return False
-			elif old.type == 'const':
-				return True
-			else: assert False
-
-
-	def is_bnode_productively_different(old, now):
-		""" if both args are existentials of the same type, (and not the exact same Thing), 'now' is considered productively different if it was asserted into existence earlier than old. That is, a recursion is allowed where the only difference between iterations is that different pre-existing existentials are considered, but a recursion is not allowed where iterations only differ because of presence of newly minted existentials. In yet other words, it's not allowed to try to prove something through invoking an existential rule ad infinitum.
-		"""
-		
-
-
-
-	def is_term_productively_different(s, old, now):
-		if old.len() != now.len():
-			return True
-		for i,old_item in enumerate(old):
-			if is_arg_productively_different(old_item, now[i]):
-		return False
-
-
-	def ep_ok(key, guard_term):
-		if key in s.eps:
-			for old in s.eps[key]:
-				if not s.is_term_productively_different(old, guard_term):
-					return False
-		return True
-
-
-
-	def add_ep(key, guard_term):
-		pass
 
 
 
@@ -229,6 +147,18 @@ class Reasoner:
 			for p1 in s.deepen_proof_tree(i):
 				for p2 in s.deepen_proof_tree__body(body):
 					yield p1 and p2
+
+
+
+
+	def do_body(s, ep_key, ep_guard_term, body):
+		if s.ep_ok(ep_key, ep_guard_term):
+			s.add_ep(ep_key, ep_guard_term)
+			for p in s.deepen_proof_tree__body(body):
+				yield p
+			s.pop_ep(ep_key)
+		else:
+			yield EP
 
 
 
@@ -320,6 +250,19 @@ class Reasoner:
 
 
 
+	def do_reordering_heuristics(s, rule):
+		"""
+		unification is always cheap
+
+		"""
+		for i,v in enumerate(rule.body[:]):
+			if v[0] === 'p8:eq':
+				s.hoist(rule.body, i)
+
+
+
+	def hoist(s, list, index):
+		list.insert(0, list.pop(index))
 
 
 
@@ -327,17 +270,5 @@ class Reasoner:
 
 
 
-def do_reordering_heuristics(rule):
-	"""
-	unification is always cheap
 
-	"""
-	for i,v in enumerate(rule.body[:]):
-		if v[0] === 'p8:eq':
-			hoist(rule.body, i)
-
-
-
-def hoist(list, index):
-	list.insert(0, list.pop(index))
 
