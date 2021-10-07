@@ -2,7 +2,7 @@
 
 
 from utils import *
-from collections import defaultdict
+#from collections import defaultdict
 from nodes import *
 from eps import *
 
@@ -106,11 +106,11 @@ class Reasoner:
 		yield from s.builtin(q)
 
 		for rule_declaration in s.rules:
-			yield from s.prove_rule(rule_declaration.instantiate())
+			yield from s.prove_rule(q, rule_declaration.instantiate())
 
 
 
-	def prove_rule(s, rule):
+	def prove_rule(s, q, rule):
 
 			e = rule.existential
 			if e:
@@ -172,8 +172,8 @@ class Reasoner:
 		args = q[1:]
 
 		if functor == 'p8:dif':
-			hook = lambda: dif(args[0], args[1])
-			var_args = [arg for arg in args if arg.type === 'var']
+			hook = lambda: s.dif(args[0], args[1])
+			var_args = [arg for arg in args if arg.type == 'var']
 			for arg in var_args:
 				arg.add_post_unification_hook(hook)
 			for p in hook():
@@ -223,9 +223,8 @@ class Reasoner:
 				# a factset can only bind to a factset coming from the same rule. This is as if by a constraint.
 				# under the restricted semantics, there can only be one consequentset for each erule_id
 
-				if y.factset_rule_id != x.factset_rule_id
-					#fail
-					pass
+				if y.factset_rule_id != x.factset_rule_id:
+					pass #fail
 				else:
 
 					# if there's a corresponding consequentset on y (corresponding in the sense of coming from the same erule_id), then try to unify the consequentset of x with it
@@ -235,7 +234,7 @@ class Reasoner:
 						yf = y.factset[i]
 						ops.append(['p8:eq', xf, yf])
 
-					for p1 in s.do_body('bind_var', Compound([x,y]), ops):
+					for p1 in s.do_body('bind_var', Term([x,y]), ops):
 						for p2 in x.do_post_unification_hooks():
 							yield p1 and p2
 
@@ -243,10 +242,15 @@ class Reasoner:
 
 
 	def dif(s,x,y):
-		if x !== y:
+		if x != y:
 			yield OK
 
 
+
+	def get_value(s, v):
+		if v.type == 'var':
+			return s.get_value(v.value)
+		return v
 
 
 
@@ -256,7 +260,7 @@ class Reasoner:
 
 		"""
 		for i,v in enumerate(rule.body[:]):
-			if v[0] === 'p8:eq':
+			if v[0] == 'p8:eq':
 				s.hoist(rule.body, i)
 
 
