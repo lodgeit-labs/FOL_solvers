@@ -184,9 +184,99 @@ class Reasoner:
 		elif functor == 'p8:eq':
 			yield from s.unify(args[0], args[1])
 
+		elif functor == 'p8:math':
+			yield from p8math(args)
 
 
 
+	def p8math(args):
+		"""
+		we will use built-in "constraints" - invisible
+		X = (Y + Z)
+
+		inputs:
+			formula -->
+				term compop term
+			compop -->
+				=
+				>
+				<
+				>=
+				<=
+			term -->
+				fact_selector
+				const
+				term op term
+			op -->
+				+
+				-
+				*
+				/
+
+
+		[
+			a formula;
+			compop p8math:lt;
+			term1 [
+				a p8facts:selector;
+				p8facts:selector_name "xxxxx";
+		...
+		]
+
+		maplist(formula_application, Formulas, Applications)...
+
+		Facts p8:eq (
+			[
+				concept xxx;
+				value yyy;
+				year_dimension zzz;
+			]
+			...
+		)...
+
+		formula_application(Formula, Application) :-
+
+		formula_has_selectors(...
+
+		formula_with_bound_selectors(Facts, Formula_template, Formula_instance) :-
+			traverse formula tree, copying it into _instance, and when we run into a selector:
+			member(Fact, Facts),
+			selector_matches_fact(Selector, Fact)
+
+
+
+
+		==================
+
+
+
+
+
+		facts, templates, [application|applications] :-
+			member(template, templates),
+			formula_with_bound_selectors(facts, template, application).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		"""
 
 
 
