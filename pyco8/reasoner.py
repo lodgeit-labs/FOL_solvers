@@ -257,9 +257,62 @@ class Reasoner:
 			formula_with_bound_selectors(facts, template, application).
 
 
+====
+
+
+	facts <Facts> without values are <Fw>
+
+
+====
 
 
 
+
+
+
+
+ledger model <Model> :-
+	<Model> has facts <Facts>
+	ledger formulas are <Formulas>
+	<Model>, given facts <Facts>, and formulas <Formulas>, has applications <Apps>.
+
+
+<Model>, given facts <Facts>, and formulas <Formulas>, has applications <Apps> :-
+	application list cell <Apps> with previous item <_>, given <Facts>, <Formulas>.
+
+
+application list cell <Cell> with previous item <Prev>, given <Facts>, <Formulas> :-
+	/*
+	Prev keeps the recursion from ep'ing, and only allows it to continue with each item unique.
+	*/
+	Cell first App,
+	Cell rest Rest,
+	application(Formulas, Facts, App),
+	application list cell <Rest> with previous item <App>, given <Facts>, <Formulas>.
+
+
+
+application(<Formulas>, <Facts>, <App>) :-
+	member(Formula, Formulas),
+	application2(Formula, Facts, App.
+
+
+/* here we match on Formula's tree to produce an application */
+
+application2(<Formula>, <Facts>, <App>) :-
+	Formula	a equality
+	Formula args Args
+	maplist(expression_applied(Facts), Args, Applied_args)
+	App a equality
+	App args Applied_args.
+
+expression_applied(<Facts>, <Exp>, <Applied>) :-
+	Exp a selector
+
+	/*
+	if we choose the semantics of existential rules that a bnode can bind to a bnode of another type:
+	*/
+	member(Exp,
 
 
 
