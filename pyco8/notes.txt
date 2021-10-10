@@ -57,3 +57,18 @@
 
 
 
+
+
+
+
+
+	/*
+	member(Exp,Facts)
+	if we choose the semantics of existential rules that a bnode can bind to a bnode of another type, given that all declared properties have a matching counterpart, how'd that work with constants? An uri with a bunch of facts would not have the same semantics when being unified with some existential. And two uris just won't unify no matter what.
+	*/
+
+
+
+
+
+

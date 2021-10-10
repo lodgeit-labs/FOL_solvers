@@ -278,23 +278,28 @@ ledger model <Model> :-
 
 
 <Model>, given facts <Facts>, and formulas <Formulas>, has applications <Apps> :-
+	is_set(Apps),
 	application list cell <Apps> with previous item <_>, given <Facts>, <Formulas>.
 
 
 application list cell <Cell> with previous item <Prev>, given <Facts>, <Formulas> :-
 	/*
 	Prev keeps the recursion from ep'ing, and only allows it to continue with each item unique.
+
+	The problem with this rule is that in backtracking, we only want the hopefully first answer, which *hopefully* would be the one with the longest list of applications. In other words, there is no nonextra-logical way to constrain the list to be the "longest possible".
 	*/
+
 	Cell first App,
 	Cell rest Rest,
 	application(Formulas, Facts, App),
+	(App > Prev ; App = Prev)
 	application list cell <Rest> with previous item <App>, given <Facts>, <Formulas>.
 
 
 
 application(<Formulas>, <Facts>, <App>) :-
 	member(Formula, Formulas),
-	application2(Formula, Facts, App.
+	application2(Formula, Facts, App).
 
 
 /* here we match on Formula's tree to produce an application */
@@ -306,28 +311,50 @@ application2(<Formula>, <Facts>, <App>) :-
 	App a equality
 	App args Applied_args.
 
+
 expression_applied(<Facts>, <Exp>, <Applied>) :-
-	Exp a selector
-
 	/*
-	if we choose the semantics of existential rules that a bnode can bind to a bnode of another type:
+	find a fact by properties
 	*/
-	member(Exp,
+
+	Exp a selector
+	member(Fact,Facts)
+	Exp properties Sp
+	Fact properties Fp
+	/*if they're ordered, i guess*/
+	Sp = Fp
+	Applied = Fact
+
+
+
+<Application> > <Application2> :-
+	some simple ordering of Application trees, like,
+	equality before lt and gt,
+	math functions before leaf nodes,
+	selectors before constants,
+	etc.
 
 
 
 
 
 
+===
 
+	The requirement that each item should be unique could probably be formalized like this:
 
+	set(List, Cell) :-
+		/* probably with the help of a marker symmetric to nil:*/
 
+		Prev rdf:rest Cell
+		maplist_backwards(cell_has_item_different_from(This_item), Prev)
+		...
 
-
-
-
-
-
+	cell_has_item_different_from(Cell, Diff) :-
+		Cell rdf:first X
+		dif(X, Diff).
+	...
+===
 
 		"""
 
