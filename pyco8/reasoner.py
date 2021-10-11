@@ -335,10 +335,56 @@ expression_applied(<Facts>, <Exp>, <Applied>) :-
 	etc.
 
 
+====
+
+nevermind, let's do induction on formulas:
+	each formula:
+		applies
+		or
+		doesn't apply
+
+	applies if:
+		each selector is bound (ignoring actual fact values for now)
+
+	doesn't apply if:
+		each selector is paired with a hypothetical fact and the fact is dif'd to all real facts
+
+^^ nvm
+
+
+
+==============
 
 
 
 
+
+
+
+termination:
+the introduction of a helper argument for overthrowing ep-checking can possibly be seen equivalent to proving termination of a function? Should we look at ep-cuts as bugs?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=============
 ===
 
 	The requirement that each item should be unique could probably be formalized like this:
