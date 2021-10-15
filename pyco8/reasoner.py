@@ -119,6 +119,60 @@ class Reasoner:
 			for head_item_idx,hi in enumerate(rule.head):
 				for _ in s.unify(q, hi):
 
+"""
+	L first F, L rest R :-
+		dif(L, nil).
+---	
+	L first F, L rest R, L a list :-
+		dif(L, nil).
+	nil a list.
+---
+
+account tree facts for year Y and rphase P(Facts) :-
+	maplist(account tree fact(Y, P, Facts), Account_tree_concepts),
+	maplist(smsf         fact(Y, P, Facts), Account_tree_concepts),
+	
+
+account tree fact(Y, P, Facts, Concept) :-
+	F has_concept Concept,
+	F has_rphase P,
+	F has_year Y,
+	member(F, Facts)
+
+smsf fact(Y, P, Facts, Concept) :-
+	Concept has_smsf_member_dimension false.
+smsf fact(Y, P, Facts, Concept) :-
+	Concept has_smsf_member_dimension true,
+	smsf_members(Members),
+	maplist('member has smsf equity facts'(Y, P, Facts), Members, Values),
+	math(sum(Values), Total),
+	
+	member(Total_fact, Facts),
+	F has_concept Concept,
+	F has_rphase P,
+	F has_year Y,
+	\+F has_smsf_member _,
+	F has_value Votal.
+	
+'member has smsf equity facts'(Y,P,Facts, Member,V) :-
+	member(F, Facts),
+	F has_concept Concept,
+	F has_rphase P,
+	F has_year Y,
+	F has_smsf_member Member,
+	F has_value V.
+^^^^^^^
+V should be a rdf:value, for the usual purpose of avoiding statements about literals
+--
+math(sum(Values) = Total)
+the equation expression can be a light syntax sugar for invocations of a rule that allows formulas to exist.  
+
+
+
+
+
+"""
+
 
 					if e != None:
 						if e.factset:
@@ -366,19 +420,19 @@ the introduction of a helper argument for overthrowing ep-checking can possibly 
 
 
 
+====
 
 
 
 
+the list of facts is terminated by the same predicate that concludes that no more applications can be made. Or at least, the open list where formulas can generate new facts into.
 
 
+for each formula:
+	for each selector:
+		partition the list of facts into those that match and those that dont (those that dif)
 
-
-
-
-
-
-
+===========
 
 
 
@@ -401,6 +455,206 @@ the introduction of a helper argument for overthrowing ep-checking can possibly 
 		dif(X, Diff).
 	...
 ===
+
+
+
+
+
+xbrl (formulas) semantics are their own inference model:
+	iterate over all facts
+		iterate over all formulas
+			match input facts
+			produce new facts
+	repeat until no new facts are being added
+
+
+but we want to model everything with rules interpreted in one semantic, that of the datalog with E-rules, so that the application of formulas can be just a one part of a larger search. For example, it is unknown how many persons there are in a SMSF fund, so the engine goes back and forth between
+
+
+i can't seem to be able to figure out how to model the application cycle within the datalog's semantics.
+
+
+why i'm trying to stick to the semantics:
+1) it has the power to infer back and forth between rules with mathematical calculations and rules about structure of the result (model).
+2) there is a clear set of possible outcomes:
+* all results found
+* no results found
+* still running
+
+"no results found" is very interesting for us, as it translates to "your inputs are invalid, they fail to validate against your (mathematical and structural) rules", and it specifically doesn't translate to: we're not sure if this engine can handle the task, maybe your inputs are valid but the engine can't make the connection.
+
+
+
+
+3 options:
+### run the application engine extralogically
+it would be able to run only if some conditions are satisfied, namely, ...
+
+
+###
+
+
+
+
+
+
+
+
+members of a fund:
+
+the assets of the fund must equal the sum of equities of its members
+
+may be expressed as a summation calculation in xbrl
+
+
+the interesting case that we should be able to solve is when we dont know how many members there are
+
+
+Ledger model valid :-
+	Ledger facts Facts
+	Ledger smsf_members Members
+	smsf_rules Facts Members
+
+
+smsf_rules Facts Members :-
+	member(Member, Members),
+	member(Fact, Facts),
+	Fact attributes [member Member, concept "equity"]
+
+
+
+
+
+
+
+
+
+whatever :-
+	member(X, List),
+	member(Y, List),
+
+
+
+
+
+smsf_stuff :-
+	value($>get_optional_singleton_sheet_data(smsf_ui:members_sheet), Members),
+	maplist(smsf report must have member facts(Facts), Members).
+
+smsf report must have member facts(Facts, Member) :-
+	!maplist(!smsf_member_details_report_aspectses3(Facts, Member),
+	[
+		x(final/bs/current, 'Opening_Balance', []),
+		/* effect etc should be something else than an aspect. A tag perhaps. */
+		x(final/bs/current, 'Transfers_In', [effect - addition]),
+		x(final/bs/current, 'Pensions_Paid', [effect - subtraction]),
+		x(final/bs/current, 'Benefits_Paid', [effect - subtraction]),
+		x(final/bs/current, 'Transfers_Out', [effect - subtraction]),
+		x(final/bs/current, 'Life_Insurance_Premiums', [effect - subtraction]),
+		x(final/bs/current, 'Share_of_Profit/(Loss)', [effect - addition]),
+		x(final/bs/current, 'Income_Tax', [effect - subtraction]),
+		x(final/bs/current, 'Contribution_Tax', [effect - subtraction]),
+		x(final/bs/current, 'Internal_Transfers_In', [effect - addition]),
+		x(final/bs/current, 'Internal_Transfers_Out', [effect - subtraction])
+	],
+	Aspectses0),
+	%smsf_member_details_report_aspectses6(Member, Aspectses1),....
+	!append($>flatten(Aspectses0), $>flatten(Aspectses1), Aspectses).
+
+smsf_member_details_report_aspectses3(Member, x(Report, Concept, Additional_aspects), Facts) :-
+	/*
+	these accounts are all subcategorized into phase and taxability in the same way, so we generate the aspect sets automatically
+	*/
+	'='(
+		Facts,
+		[
+			aspects($>append([
+				report - Report,
+				concept - smsf/member/gl/Concept,
+				phase - 'Preserved',
+				taxability - 'Taxable',
+				member - Member
+			], Additional_aspects)),
+			aspects($>append([
+				report - Report,
+				account_role - ($>atomic_list_concat([Concept, '_-_Preserved/Tax-Free'])) / Member,
+				concept - smsf/member/gl/Concept,
+				phase - 'Preserved',
+				taxability - 'Tax-Free',
+				member - Member
+			], Additional_aspects)),
+			aspects($>append([
+				report - Report,
+				account_role - ($>atomic_list_concat([Concept, '_-_Unrestricted_Non_Preserved/Taxable'])) / Member,
+				concept - smsf/member/gl/Concept,
+				phase - 'Unrestricted_Non_Preserved',
+				taxability - 'Taxable',
+				member - Member
+			], Additional_aspects)),
+			aspects($>append([
+				report - Report,
+				account_role - ($>atomic_list_concat([Concept, '_-_Unrestricted_Non_Preserved/Tax-Free'])) / Member,
+				concept - smsf/member/gl/Concept,
+				phase - 'Unrestricted_Non_Preserved',
+				taxability - 'Tax-Free',
+				member - Member
+			], Additional_aspects)),
+			aspects($>append([
+				report - Report,
+				account_role - ($>atomic_list_concat([Concept, '_-_Restricted_Non_Preserved/Taxable'])) / Member,
+				concept - smsf/member/gl/Concept,
+				phase - 'Restricted_Non_Preserved',
+				taxability - 'Taxable',
+				member - Member
+			], Additional_aspects)),
+			aspects($>append([
+				report - Report,
+				account_role - ($>atomic_list_concat([Concept, '_-_Restricted_Non_Preserved/Tax-Free'])) / Member,
+				concept - smsf/member/gl/Concept,
+				phase - 'Restricted_Non_Preserved',
+				taxability - 'Tax-Free',
+				member - Member
+			], Additional_aspects))
+		]
+	).
+
+	!doc_new_uri(fact, Uri),
+	!doc_add(Uri, rdf:type, l:fact),
+	!doc_add(Uri, l:vec, $>flatten([Vec])),
+	!doc_add(Uri, l:aspects, Aspects),
+
+
+
+
+
+member(I, L) :-
+	L first I.
+
+member(I, L) :-
+	L rest R,
+	member(I, R).
+
+
+
+
+
+
+member(I, L) :-
+	L first I.
+
+member(I, L) :-
+	L rest R,
+	member(I, R).
+
+
+
+
+
+
+
+
+
+
 
 		"""
 
