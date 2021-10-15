@@ -168,6 +168,10 @@ math(sum(Values) = Total)
 the equation expression can be a light syntax sugar for invocations of a rule that allows formulas to exist.  
 
 
+once again, just generally stating that a concept that is split in a dimension has value that is the sum of the values of the dimension's points:
+
+
+
 
 
 
