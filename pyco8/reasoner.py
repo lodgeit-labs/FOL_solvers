@@ -175,6 +175,18 @@ once again, just generally stating that a concept that is split in a dimension h
 
 
 
+why we can't fake findall:
+	findall(Callable, Items) :-
+		call(Callable),
+		Items first Callable,
+		Items rest Rest.
+		
+
+
+
+
+
+
 """
 
 
