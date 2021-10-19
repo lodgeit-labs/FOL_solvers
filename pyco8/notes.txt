@@ -29,43 +29,7 @@
 
 
 
-# '<X> is last cell of some list' :-
-# 	X rfd:rest rdf:nil.
-#
-# '<X> is last cell of <List>' :-
-# 	member(x, List),
-# 	X rfd:rest rdf:nil.
-#
-# '<X> is last item of <List>' :-
-# 	C is last cell of List,
-# 	C rdf:first X.
 
-
-
-
-
-
-
-# all members of a list satisfy some property:
-# this is literally maplist(property, List).
-# when the list is not terminated, once maplist gets to the unbound "last" item, there are two options:
-# property is normal code:
-# 	this will be a choicepoint. repeated recursion on multiple unknown tail items will be possible thanks to fixpoint mechanism.
-# 	1) tail gets unified with nil, nothing to apply prop to, and later this branch fails
-# 	2) tail gets unified with list bnode followed by nil, prop builds out an existential variable, this later fails
-# 	3) tail gets unified with list bnode followed by unbound variable, this is suspended by ep, later resumed.
-
-
-
-
-
-
-
-
-	/*
-	member(Exp,Facts)
-	if we choose the semantics of existential rules that a bnode can bind to a bnode of another type, given that all declared properties have a matching counterpart, how'd that work with constants? An uri with a bunch of facts would not have the same semantics when being unified with some existential. And two uris just won't unify no matter what.
-	*/
 
 
 
@@ -115,6 +79,42 @@ lists lib:
 	member(I, L) :-
 		L rest R,
 		member(I, R).
+
+
+
+
+
+	'<X> is last cell of some list' :-
+		X rfd:rest rdf:nil.
+	'<X> is last cell of <List>' :-
+		cell(X, List),
+		X rfd:rest rdf:nil.
+	'<X> is last item of <List>' :-
+		C is last cell of List,
+		C rdf:first X.
+
+
+
+
+
+
+	notes:
+
+		# all members of a list satisfy some Callable:
+		# this is literally maplist(Callable, List).
+		# when the list is not terminated, once maplist gets to the unbound "last" item, there are two options:
+		# property is normal code:
+		# 	this will be a choicepoint. repeated recursion on multiple unknown tail items will be possible thanks to fixpoint mechanism.
+		# 	1) tail gets unified with nil, nothing to apply prop to, and later this branch fails
+		# 	2) tail gets unified with list bnode followed by nil, prop builds out an existential variable, this later fails
+		# 	3) tail gets unified with list bnode followed by unbound variable, this is suspended by ep, later resumed.
+
+		/*
+		member(Exp,Facts)
+		if we choose the semantics of existential rules that a bnode can bind to a bnode of another type, given that all declared properties have a matching counterpart, how'd that work with constants? An uri with a bunch of facts would not have the same semantics when being unified with some existential. And two uris just won't unify no matter what.
+		*/
+
+
 
 
 

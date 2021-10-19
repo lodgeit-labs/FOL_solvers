@@ -195,9 +195,32 @@ class Reasoner:
 
 
 
-	def p8math(args):
+	def p8math_apply(args):
 		"""
+in source code, a math constraint is a term of the form:
+	formula -->
+		term compop term
+	compop -->
+		=
+		>
+		<
+		>=
+		<=
+	term -->
+		variable
+		const
+		term op term
+	op -->
+		+
+		-
+		*
+		/
+
+we translate it into a series of invocations of E-rules.
+
 		"""
+		formula = args[0]
+		
 
 
 
