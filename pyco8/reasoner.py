@@ -110,35 +110,36 @@ class Reasoner:
 
 
 
-	def prove_rule(s, q, rule):
+	def prove_rule(s, q, inst: RuleInst):
 
-			e = rule.existential
+			e = inst.existential
 			if e:
 				e = s.get_value(e)
 
-			for head_item_idx,hi in enumerate(rule.head):
+			for head_item_idx,hi in enumerate(inst.head):
 				for _ in s.unify(q, hi):
 
-"""
-
-
-"""
-
-
+					"""
+					
+					woops, can't have factset attached to a const
+					actually you can
+					
+					"""
 					if e != None:
 						if e.factset:
 							for _ in s.unify_term(hi, e.factset[head_item_idx]):
-								yield
+								yield OK
 						else:
-							e.factset = rule.head
+							e.factset = inst.head
 							e.existential_id = s.get_existential_id()
-							yield OK
+							for p in s.do_body(str(id(inst)) + '-' + str(hi), hi, inst.body):
+								yield p
 							e.existential_id = None
 							e.factset = None
 
 
 					else:
-						for p in s.do_body(str(id(rule)) + '-' + str(hi), hi, rule.body):
+						for p in s.do_body(str(id(inst)) + '-' + str(hi), hi, inst.body):
 							yield p
 
 
@@ -169,7 +170,7 @@ class Reasoner:
 
 	def builtin(s, q):
 		"""
-		q is assumed to be get_valued at this point.
+		q is assumed to be get_value'd at this point.
 
 		"""
 
@@ -196,417 +197,6 @@ class Reasoner:
 
 	def p8math(args):
 		"""
-		we will use built-in "constraints" - invisible
-		X = (Y + Z)
-
-		inputs:
-			formula -->
-				term compop term
-			compop -->
-				=
-				>
-				<
-				>=
-				<=
-			term -->
-				fact_selector
-				const
-				term op term
-			op -->
-				+
-				-
-				*
-				/
-
-
-		[
-			a formula;
-			compop p8math:lt;
-			term1 [
-				a p8facts:selector;
-				p8facts:selector_name "xxxxx";
-		...
-		]
-
-		maplist(formula_application, Formulas, Applications)...
-
-		Facts p8:eq (
-			[
-				concept xxx;
-				value yyy;
-				year_dimension zzz;
-			]
-			...
-		)...
-
-		formula_application(Formula, Application) :-
-
-		formula_has_selectors(...
-
-		formula_with_bound_selectors(Facts, Formula_template, Formula_instance) :-
-			traverse formula tree, copying it into _instance, and when we run into a selector:
-			member(Fact, Facts),
-			selector_matches_fact(Selector, Fact)
-
-
-
-
-		==================
-
-
-
-
-
-		facts, templates, [application|applications] :-
-			member(template, templates),
-			formula_with_bound_selectors(facts, template, application).
-
-
-====
-
-
-	facts <Facts> without values are <Fw>
-
-
-====
-
-
-
-
-
-
-
-ledger model <Model> :-
-	<Model> has facts <Facts>
-	ledger formulas are <Formulas>
-	<Model>, given facts <Facts>, and formulas <Formulas>, has applications <Apps>.
-
-
-<Model>, given facts <Facts>, and formulas <Formulas>, has applications <Apps> :-
-	is_set(Apps),
-	application list cell <Apps> with previous item <_>, given <Facts>, <Formulas>.
-
-
-application list cell <Cell> with previous item <Prev>, given <Facts>, <Formulas> :-
-	/*
-	Prev keeps the recursion from ep'ing, and only allows it to continue with each item unique.
-
-	The problem with this rule is that in backtracking, we only want the hopefully first answer, which *hopefully* would be the one with the longest list of applications. In other words, there is no nonextra-logical way to constrain the list to be the "longest possible".
-	*/
-
-	Cell first App,
-	Cell rest Rest,
-	application(Formulas, Facts, App),
-	(App > Prev ; App = Prev)
-	application list cell <Rest> with previous item <App>, given <Facts>, <Formulas>.
-
-
-
-application(<Formulas>, <Facts>, <App>) :-
-	member(Formula, Formulas),
-	application2(Formula, Facts, App).
-
-
-/* here we match on Formula's tree to produce an application */
-
-application2(<Formula>, <Facts>, <App>) :-
-	Formula	a equality
-	Formula args Args
-	maplist(expression_applied(Facts), Args, Applied_args)
-	App a equality
-	App args Applied_args.
-
-
-expression_applied(<Facts>, <Exp>, <Applied>) :-
-	/*
-	find a fact by properties
-	*/
-
-	Exp a selector
-	member(Fact,Facts)
-	Exp properties Sp
-	Fact properties Fp
-	/*if they're ordered, i guess*/
-	Sp = Fp
-	Applied = Fact
-
-
-
-<Application> > <Application2> :-
-	some simple ordering of Application trees, like,
-	equality before lt and gt,
-	math functions before leaf nodes,
-	selectors before constants,
-	etc.
-
-
-====
-
-nevermind, let's do induction on formulas:
-	each formula:
-		applies
-		or
-		doesn't apply
-
-	applies if:
-		each selector is bound (ignoring actual fact values for now)
-
-	doesn't apply if:
-		each selector is paired with a hypothetical fact and the fact is dif'd to all real facts
-
-^^ nvm
-
-
-
-==============
-
-
-
-
-
-
-
-termination:
-the introduction of a helper argument for overthrowing ep-checking can possibly be seen equivalent to proving termination of a function? Should we look at ep-cuts as bugs?
-
-
-
-====
-
-
-
-
-the list of facts is terminated by the same predicate that concludes that no more applications can be made. Or at least, the open list where formulas can generate new facts into.
-
-
-for each formula:
-	for each selector:
-		partition the list of facts into those that match and those that dont (those that dif)
-
-===========
-
-
-
-
-
-=============
-===
-
-	The requirement that each item should be unique could probably be formalized like this:
-
-	set(List, Cell) :-
-		/* probably with the help of a marker symmetric to nil:*/
-
-		Prev rdf:rest Cell
-		maplist_backwards(cell_has_item_different_from(This_item), Prev)
-		...
-
-	cell_has_item_different_from(Cell, Diff) :-
-		Cell rdf:first X
-		dif(X, Diff).
-	...
-===
-
-
-
-
-
-xbrl (formulas) semantics are their own inference model:
-	iterate over all facts
-		iterate over all formulas
-			match input facts
-			produce new facts
-	repeat until no new facts are being added
-
-
-but we want to model everything with rules interpreted in one semantic, that of the datalog with E-rules, so that the application of formulas can be just a one part of a larger search. For example, it is unknown how many persons there are in a SMSF fund, so the engine goes back and forth between
-
-
-i can't seem to be able to figure out how to model the application cycle within the datalog's semantics.
-
-
-why i'm trying to stick to the semantics:
-1) it has the power to infer back and forth between rules with mathematical calculations and rules about structure of the result (model).
-2) there is a clear set of possible outcomes:
-* all results found
-* no results found
-* still running
-
-"no results found" is very interesting for us, as it translates to "your inputs are invalid, they fail to validate against your (mathematical and structural) rules", and it specifically doesn't translate to: we're not sure if this engine can handle the task, maybe your inputs are valid but the engine can't make the connection.
-
-
-
-
-3 options:
-### run the application engine extralogically
-it would be able to run only if some conditions are satisfied, namely, ...
-
-
-###
-
-
-
-
-
-
-
-
-members of a fund:
-
-the assets of the fund must equal the sum of equities of its members
-
-may be expressed as a summation calculation in xbrl
-
-
-the interesting case that we should be able to solve is when we dont know how many members there are
-
-
-Ledger model valid :-
-	Ledger facts Facts
-	Ledger smsf_members Members
-	smsf_rules Facts Members
-
-
-smsf_rules Facts Members :-
-	member(Member, Members),
-	member(Fact, Facts),
-	Fact attributes [member Member, concept "equity"]
-
-
-
-
-
-
-
-
-
-whatever :-
-	member(X, List),
-	member(Y, List),
-
-
-
-
-
-smsf_stuff :-
-	value($>get_optional_singleton_sheet_data(smsf_ui:members_sheet), Members),
-	maplist(smsf report must have member facts(Facts), Members).
-
-smsf report must have member facts(Facts, Member) :-
-	!maplist(!smsf_member_details_report_aspectses3(Facts, Member),
-	[
-		x(final/bs/current, 'Opening_Balance', []),
-		/* effect etc should be something else than an aspect. A tag perhaps. */
-		x(final/bs/current, 'Transfers_In', [effect - addition]),
-		x(final/bs/current, 'Pensions_Paid', [effect - subtraction]),
-		x(final/bs/current, 'Benefits_Paid', [effect - subtraction]),
-		x(final/bs/current, 'Transfers_Out', [effect - subtraction]),
-		x(final/bs/current, 'Life_Insurance_Premiums', [effect - subtraction]),
-		x(final/bs/current, 'Share_of_Profit/(Loss)', [effect - addition]),
-		x(final/bs/current, 'Income_Tax', [effect - subtraction]),
-		x(final/bs/current, 'Contribution_Tax', [effect - subtraction]),
-		x(final/bs/current, 'Internal_Transfers_In', [effect - addition]),
-		x(final/bs/current, 'Internal_Transfers_Out', [effect - subtraction])
-	],
-	Aspectses0),
-	%smsf_member_details_report_aspectses6(Member, Aspectses1),....
-	!append($>flatten(Aspectses0), $>flatten(Aspectses1), Aspectses).
-
-smsf_member_details_report_aspectses3(Member, x(Report, Concept, Additional_aspects), Facts) :-
-	/*
-	these accounts are all subcategorized into phase and taxability in the same way, so we generate the aspect sets automatically
-	*/
-	'='(
-		Facts,
-		[
-			aspects($>append([
-				report - Report,
-				concept - smsf/member/gl/Concept,
-				phase - 'Preserved',
-				taxability - 'Taxable',
-				member - Member
-			], Additional_aspects)),
-			aspects($>append([
-				report - Report,
-				account_role - ($>atomic_list_concat([Concept, '_-_Preserved/Tax-Free'])) / Member,
-				concept - smsf/member/gl/Concept,
-				phase - 'Preserved',
-				taxability - 'Tax-Free',
-				member - Member
-			], Additional_aspects)),
-			aspects($>append([
-				report - Report,
-				account_role - ($>atomic_list_concat([Concept, '_-_Unrestricted_Non_Preserved/Taxable'])) / Member,
-				concept - smsf/member/gl/Concept,
-				phase - 'Unrestricted_Non_Preserved',
-				taxability - 'Taxable',
-				member - Member
-			], Additional_aspects)),
-			aspects($>append([
-				report - Report,
-				account_role - ($>atomic_list_concat([Concept, '_-_Unrestricted_Non_Preserved/Tax-Free'])) / Member,
-				concept - smsf/member/gl/Concept,
-				phase - 'Unrestricted_Non_Preserved',
-				taxability - 'Tax-Free',
-				member - Member
-			], Additional_aspects)),
-			aspects($>append([
-				report - Report,
-				account_role - ($>atomic_list_concat([Concept, '_-_Restricted_Non_Preserved/Taxable'])) / Member,
-				concept - smsf/member/gl/Concept,
-				phase - 'Restricted_Non_Preserved',
-				taxability - 'Taxable',
-				member - Member
-			], Additional_aspects)),
-			aspects($>append([
-				report - Report,
-				account_role - ($>atomic_list_concat([Concept, '_-_Restricted_Non_Preserved/Tax-Free'])) / Member,
-				concept - smsf/member/gl/Concept,
-				phase - 'Restricted_Non_Preserved',
-				taxability - 'Tax-Free',
-				member - Member
-			], Additional_aspects))
-		]
-	).
-
-	!doc_new_uri(fact, Uri),
-	!doc_add(Uri, rdf:type, l:fact),
-	!doc_add(Uri, l:vec, $>flatten([Vec])),
-	!doc_add(Uri, l:aspects, Aspects),
-
-
-
-
-
-member(I, L) :-
-	L first I.
-
-member(I, L) :-
-	L rest R,
-	member(I, R).
-
-
-
-
-
-
-member(I, L) :-
-	L first I.
-
-member(I, L) :-
-	L rest R,
-	member(I, R).
-
-
-
-
-
-
-
-
-
-
-
 		"""
 
 

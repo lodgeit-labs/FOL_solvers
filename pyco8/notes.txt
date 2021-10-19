@@ -92,10 +92,29 @@ why we can't fake findall:
 
 lists lib:
 
+
 	L first F, L rest R, L a list :-
 		dif(L, nil).
 	nil a list.
 
+
+
+	cell(List, Cell) :-
+		List = Cell.
+
+	cell(List, Cell) :-
+		List rest Rest,
+		cell(Rest, Cell).
+
+
+
+
+	member(I, L) :-
+		L first I.
+
+	member(I, L) :-
+		L rest R,
+		member(I, R).
 
 
 
@@ -154,10 +173,18 @@ smsf:
 	the equation expression can be a light syntax sugar for invocations of a rule that allows formulas to exist.
 
 
-once again, just generally stating that a concept that is split in a dimension has value that is the sum of the values of the dimension's points:
+	once again, just generally stating that a concept that is split in a dimension has value that is the sum of the values of the dimension's points:
 
 
 
 
-sum of dimension points Points equal parent value Sum :-
+	sum of dimension points Points equal parent value Sum :-
+
+
+
+
+
+
+
+p8math:
 
