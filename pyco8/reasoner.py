@@ -220,7 +220,25 @@ we translate it into a series of invocations of E-rules.
 
 		"""
 		formula = args[0]
+
+		"""
+		first, attempt to apply the whole formula
+		ep out if there's a hole
+		put a post-unif hook on every variable - to cause a recalculation possibly of just the immediate parent expression?
 		
+		
+		
+		value_center + precision_adjustment + value_center + precision_adjustment = value_center + precision_adjustment
+		5 + 4 = 9.1
+		9 + pa1 + pa2 + pa3 = 9.1
+		pa1 + pa2 + pa3 = 0.1
+		now we can distribute the 0.1 into the three pa's, given that they are constrained to be in some range?
+		
+		 
+		
+		"""
+
+
 
 
 
