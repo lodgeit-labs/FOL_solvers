@@ -238,22 +238,26 @@ we translate it into a series of invocations of E-rules.
 	
 		"""
 
+		s.formula_apply(formula)
+		# also add hook to every var to rerun formula_apply on changes
+
+
+	def formula_apply(s, formula):
 		query1 = [
 			!(formula, 'has_op', OpLit) / "expected a formula"
 			?(formula, 'has_arg1', Arg1) / "formula expected to have arg1"
 			?(formula, 'has_arg1', Arg1) / "formula expected to have arg1"
 		]
 
-		"""
-		to simplify things a bit, a rational literal might already be expressed as a division term
-		"""
-
 		for p1 in s.prove(query1):
-			for sides in ((Arg1, Arg2), (Arg2, Arg1)):
-				if Arg1 is a variable
+			e = VarInst()
+			for p1 in term_evaluation(Arg1):
+				for p2 in term_evaluation(Arg2):
 
 
-	def term_is_var_literal
+
+	def term_evaluation(s, Arg):
+		
 
 
 	def unify(s, x, y):
