@@ -232,14 +232,28 @@ we translate it into a series of invocations of E-rules.
 		5 + 4 = 9.1
 		9 + pa1 + pa2 + pa3 = 9.1
 		pa1 + pa2 + pa3 = 0.1
+		
 		now we can distribute the 0.1 into the three pa's, given that they are constrained to be in some range?
-		
-		 
-		
+			i don't think that that's the right approach, as it's equvalent to just picking a "labelling" kinda randomly and sticking with it
+	
 		"""
 
+		query1 = [
+			!(formula, 'has_op', OpLit) / "expected a formula"
+			?(formula, 'has_arg1', Arg1) / "formula expected to have arg1"
+			?(formula, 'has_arg1', Arg1) / "formula expected to have arg1"
+		]
+
+		"""
+		to simplify things a bit, a rational literal might already be expressed as a division term
+		"""
+
+		for p1 in s.prove(query1):
+			for sides in ((Arg1, Arg2), (Arg2, Arg1)):
+				if Arg1 is a variable
 
 
+	def term_is_var_literal
 
 
 	def unify(s, x, y):
