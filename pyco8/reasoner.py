@@ -238,26 +238,66 @@ we translate it into a series of invocations of E-rules.
 	
 		"""
 
-		s.formula_apply(formula)
-		# also add hook to every var to rerun formula_apply on changes
+		done = False
+		for p in s.formula_apply(formula):
+			done = True
+			yield p
+
+		if not done:
+			# also add hook to every var to rerun formula_apply on changes
+			todo
+
+
 
 
 	def formula_apply(s, formula):
 		query1 = [
 			!(formula, 'has_op', OpLit) / "expected a formula"
 			?(formula, 'has_arg1', Arg1) / "formula expected to have arg1"
-			?(formula, 'has_arg1', Arg1) / "formula expected to have arg1"
+			?(formula, 'has_arg2', Arg2) / "formula expected to have arg2"
 		]
 
 		for p1 in s.prove(query1):
-			e = VarInst()
-			for p1 in term_evaluation(Arg1):
-				for p2 in term_evaluation(Arg2):
+			for p2,t2 in term_evaluation(Arg1):
+				for p3,t3 in term_evaluation(Arg2):
+
 
 
 
 	def term_evaluation(s, Arg):
-		
+
+		#"""case 1, it's a rdf:value, or it's a variable that we'll bind to a new rdf:value here."""
+		#"""This implies that a variable can only stand for a single value, never for a compound"""
+		for p in q(?(Arg, 'rdf:value', Value)):
+			yield p,Value
+
+
+		#"""case 2, it's a compound."""
+		for p in q([
+			?(Arg, 'rdf:type', 'p8math:term')
+			?(Arg, 'term_has_op', Op)
+			?(Arg, 'term_has_arg1', Arg1)
+			?(Arg, 'term_has_arg2', Arg2)
+		]):
+			for p2,v2 in s.term_evaluation(Arg1):
+				for p3,v3 in s.term_evaluation(Arg2):
+					# we got here if both terms evaluated into constants, time to do the calculation
+					if Op.value == '+':
+						result = s.rat_add(v2,v3)
+						yield some_proof, result
+
+		# that's it,
+
+
+
+
+
+
+
+
+
+
+
 
 
 	def unify(s, x, y):

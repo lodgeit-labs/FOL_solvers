@@ -1,0 +1,3 @@
+rat_add(x,y):
+	result = .../...
+	return ensure_constnode_exists(result)
