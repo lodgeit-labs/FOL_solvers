@@ -264,10 +264,9 @@ we translate it into a series of invocations of E-rules.
 
 
 
-	def term_evaluation(s, Arg):
+	def term_evaluates_to_const_node(s, Arg):
 
-		#"""case 1, it's a rdf:value, or it's a variable that we'll bind to a new rdf:value here."""
-		#"""This implies that a variable can only stand for a single value, never for a compound"""
+		#"""case 1, it's a rdf:value
 		for p in q(?(Arg, 'rdf:value', Value)):
 			yield p,Value
 
@@ -290,7 +289,31 @@ we translate it into a series of invocations of E-rules.
 
 
 
+"""
+	term_evaluates_to_const(Arg, Const) :-
 
+			?(Arg, 'rdf:value', Const)
+
+		;
+		(
+			?(Arg, 'term_has_op', Op)
+			?(Arg, 'term_has_arg1', Arg1)
+			?(Arg, 'term_has_arg2', Arg2)
+			,
+			term_evaluates_to_const(Arg1, Const1)
+			term_evaluates_to_const(Arg2, Const2)
+	
+			(
+				(
+					Op.value = '+'
+					rat_add(Const1,Const2,Const)
+				)
+			;
+			..
+			)
+		)
+
+"""
 
 
 
