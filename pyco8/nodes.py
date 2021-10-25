@@ -66,3 +66,11 @@ class VarIdx(int):
 
 	"""
 	pass
+
+
+
+
+from fractions import Fraction
+
+Rational = Fraction
+

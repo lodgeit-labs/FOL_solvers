@@ -188,3 +188,25 @@ smsf:
 
 p8math:
 
+	term_evaluates_to_const(Arg, Const) :-
+
+			?(Arg, 'rdf:value', Const)
+
+		;
+		(
+			?(Arg, 'term_has_op', Op)
+			?(Arg, 'term_has_arg1', Arg1)
+			?(Arg, 'term_has_arg2', Arg2)
+			,
+			term_evaluates_to_const(Arg1, Const1)
+			term_evaluates_to_const(Arg2, Const2)
+
+			(
+				(
+					Op.value = '+'
+					rat_add(Const1,Const2,Const)
+				)
+			;
+			..
+			)
+		)

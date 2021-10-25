@@ -258,8 +258,8 @@ we translate it into a series of invocations of E-rules.
 		]
 
 		for p1 in s.prove(query1):
-			for p2,t2 in term_evaluation(Arg1):
-				for p3,t3 in term_evaluation(Arg2):
+			for p2,t2 in s.term_evaluates_to_const_node(Arg1):
+				for p3,t3 in s.term_evaluates_to_const_node(Arg2):
 
 
 
@@ -289,36 +289,35 @@ we translate it into a series of invocations of E-rules.
 
 
 
-"""
-	term_evaluates_to_const(Arg, Const) :-
 
-			?(Arg, 'rdf:value', Const)
+	def is_rat_node(s, Node):
+		return Node.type == 'const' and typeof(node.value) == Rational
 
-		;
-		(
-			?(Arg, 'term_has_op', Op)
-			?(Arg, 'term_has_arg1', Arg1)
-			?(Arg, 'term_has_arg2', Arg2)
-			,
-			term_evaluates_to_const(Arg1, Const1)
-			term_evaluates_to_const(Arg2, Const2)
-	
-			(
-				(
-					Op.value = '+'
-					rat_add(Const1,Const2,Const)
-				)
-			;
-			..
-			)
-		)
+	def rat_add(s,Const1,Const2,Const3):
+		m = ratmap((Const1,Const2,Const3))
+		if m == ('c','c','c'):
+			if Const1.value + Const2.value == Const3.value:
+				yield
+		elif m == ('c','c','v'):
+			yield from s.bind_var(Const3, s.get_const(Const1.value + Const2.value))
+		elif m == ('c','v','c'):
+			yield from s.bind_var(Const2, s.get_const(Const3.value - Const1.value))
+		elif m == ('v','c','c'):
+			yield from s.bind_var(Const1, s.get_const(Const3.value - Const2.value))
 
-"""
+	def rat_sub(s,Const1,Const2,Const3):
+		yield from s.rat_add(Const3,Const2,Const1):
 
 
 
+	def ratmap(s, Nodes):
+		return tuple(ratmap_item(node) for node in Nodes)
 
-
+	def ratmap_item(Node):
+		if s.is_rat_node(Node):
+			return 'r'
+		if s.is_var_node(Node):
+			return 'v'
 
 
 
