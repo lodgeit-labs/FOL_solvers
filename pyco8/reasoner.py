@@ -255,11 +255,11 @@ we translate it into a series of invocations of E-rules.
 			!(formula, 'has_op', OpLit) / "expected a formula"
 			?(formula, 'has_arg1', Arg1) / "formula expected to have arg1"
 			?(formula, 'has_arg2', Arg2) / "formula expected to have arg2"
+			?(term_evaluates_to_const_node(Arg2, Const2)
 		]
 
 		for p1 in s.prove(query1):
-			for p2,t2 in s.term_evaluates_to_const_node(Arg1):
-				for p3,t3 in s.term_evaluates_to_const_node(Arg2):
+			yield from s.unify(Arg1, Const2)
 
 
 
