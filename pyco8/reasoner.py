@@ -160,8 +160,7 @@ class Reasoner:
 	def do_body(s, ep_key, ep_guard_term, body):
 		if s.ep_ok(ep_key, ep_guard_term):
 			s.add_ep(ep_key, ep_guard_term)
-			for p in s.deepen_proof_tree__body(body):
-				yield p
+			yield from s.deepen_proof_tree__body(body)
 			s.pop_ep(ep_key)
 		else:
 			yield EP
@@ -176,6 +175,10 @@ class Reasoner:
 
 		functor = q[0]
 		args = q[1:]
+
+		if functor == 'p8:disjunction':
+			yield from s.deepen_proof_tree__body(args[0])
+			yield from s.deepen_proof_tree__body(args[1])
 
 		if functor == 'p8:dif':
 			hook = lambda: s.dif(args[0], args[1])

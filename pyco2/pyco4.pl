@@ -543,9 +543,9 @@ collect_rules :-
 		Rule,
 		(
 			T = pyco3_rule(_,_,_,_,_,Names,_),
-	call(T),
-	print_term(T, [variable_names(Names)]),
-	nl,nl,
+			call(T),
+			print_term(T, [variable_names(Names)]),
+			nl,nl,
 	fail.
 
 
