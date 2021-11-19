@@ -30,6 +30,12 @@
 
 # debugging
 	
+	## http://www.sealion.at/
+		ide for potassco and DLV
+		
+	
+	
+	
 	## DLV / http://www.dlvsystem.com/aspide/
 	
 	
@@ -204,6 +210,8 @@ This is the default optimisation.
 	## highly relevant
 		### https://github.com/graphik-team/graal
 			http://graphik-team.github.io/graal/downloads/kiabora
+				| Kiabora is dedicated to the analysis of a set of existential rules. 
+				
 	
 		
 	
@@ -362,8 +370,6 @@ This is the default optimisation.
 
 
 
-# qt widgets
-	https://doc.qt.io/qt-5/richtext-html-subset.html
 
 
 
@@ -379,24 +385,47 @@ This is the default optimisation.
 	
 	
 	
-# qt websocket server
-	https://doc.qt.io/qt-5/qtwebchannel-javascript.html
-	https://doc.qt.io/qt-5/qtwebchannel-standalone-example.html
-	https://doc.qt.io/qt-5/qtwebchannel-javascript.html
-	https://doc.qt.io/qt-5/qwebchannel.html#details
-	https://doc.qt.io/qt-5/qml-qtwebchannel-webchannel.html
-	https://decovar.dev/blog/2018/07/14/html-from-qml-over-webchannel-websockets/#mostly-c
+
+
+
+# c++ visualization
+
+	# https://github.com/ArsMasiuk/qvge
+	
+	
+	# qt websocket server
+		https://doc.qt.io/qt-5/qtwebchannel-javascript.html
+		https://doc.qt.io/qt-5/qtwebchannel-standalone-example.html
+		https://doc.qt.io/qt-5/qtwebchannel-javascript.html
+		https://doc.qt.io/qt-5/qwebchannel.html#details
+		https://doc.qt.io/qt-5/qml-qtwebchannel-webchannel.html
+		https://decovar.dev/blog/2018/07/14/html-from-qml-over-webchannel-websockets/#mostly-c
+		
+	# qt widgets
+		https://doc.qt.io/qt-5/richtext-html-subset.html
+
+	# QGraphicsScene
+		| Graphics View uses a BSP (Binary Space Partitioning) tree to provide very fast item discovery, and as a result of this, it can visualize large scenes in real-time, even with millions of items.
+
+	## widgets inside 2D graphics
+
+		https://doc.qt.io/qtforpython/PySide6/QtWidgets/QGraphicsProxyWidget.html
+
+		| Warning: This class is provided for convenience when bridging QWidgets and QGraphicsItems, it should not be used for high-performance scenarios. In particular, embedding widgets into a scene that is then displayed through a QGraphicsView that uses an OpenGL viewport will not work for all combinations.
+
+
+
+
+
+
+
+
+
+# js
+	git@github.com:davidedc/Algebrite.git
 	
 
 
-# QGraphicsScene
-	| Graphics View uses a BSP (Binary Space Partitioning) tree to provide very fast item discovery, and as a result of this, it can visualize large scenes in real-time, even with millions of items.
 
-## widgets inside 2D graphics
-
-	https://doc.qt.io/qtforpython/PySide6/QtWidgets/QGraphicsProxyWidget.html
-
-	| Warning: This class is provided for convenience when bridging QWidgets and QGraphicsItems, it should not be used for high-performance scenarios. In particular, embedding widgets into a scene that is then displayed through a QGraphicsView that uses an OpenGL viewport will not work for all combinations.
-
-
-
+https://ur.booksc.eu/book/44896270/0dc548
+https://www.researchgate.net/publication/263886722_AN_INFERENCE_BROWSER_FOR_VERIFYING_THE_KNOWLEDGE_BASE_IN_KNOWLEDGE-BASED_SYSTEMS

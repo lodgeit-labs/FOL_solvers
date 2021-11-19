@@ -9,13 +9,13 @@ class Rule:
 		""",
 			() =>
 	{
-
+	
 	}
 		"""
-		rules with matching predicate and arity 
+		rules with matching predicate and arity
 		""",
 		"""
-		rules with matching predicate, arity, and constants 
+		rules with matching predicate, arity, and constants
 		"""
 	]
 
