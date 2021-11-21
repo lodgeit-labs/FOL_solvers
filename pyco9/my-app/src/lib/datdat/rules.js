@@ -1,6 +1,28 @@
 
 
 
+
+quadstore = writable([])
+
+
+
+
+storages = [
+	memory,
+	localStorage,
+	pouch,
+	ipfs
+]
+
+
+query(options = {remember_dependencies: true})
+{
+
+	
+}
+
+
+
 class Rule:
 	sources = [
 		GraphSource(
