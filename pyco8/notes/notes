@@ -30,8 +30,26 @@
 
 # debugging
 	
+	## http://www.lirmm.fr/cogui/index.html
+		| CoGui is an extensible platform to use, transform and query graph based knowledge.
+		| Cogui is a visual tool for building conceptual graph knowledge bases (KB). It allows to create a KB, to edit its structure and content, and to control it. Imports and exports from and to RDFS, OWL and Datalog+ are also provided. Wizards allow to analyze and check facts with respect to some constraints, as well as to query them while taking into account inferences enabled by the ontology. 
+		| To/From Datalog± 
+		
+	
+	## https://github.com/idaks/PW-explorer
+	
+	
+	## ASPIDE
+		free download
+		https://www.mat.unical.it/ricca/aspide/documentation.html
+			
+	### https://www.dbai.tuwien.ac.at/research/project/arvis/
+		ARVis - Answer Set Relationship Visualizer
+		free download
+		
+	
 	## http://www.sealion.at/
-		ide for potassco and DLV
+		for potassco and DLV, eclipse plugin, free download, visualization, ...
 		
 		https://www.researchgate.net/publication/51941895_Kara_A_System_for_Visualising_and_Visual_Editing_of_Interpretations_forAnswer-Set_Programs	
 	
@@ -53,6 +71,9 @@
 		| The thing that made Excel so popular as an exploratory modelling environment (esp. for financial models) is that it does not suffer from the inverted UI problem that plagues all other programming environments.
 		
 		
+		
+	## http://www.kr.tuwien.ac.at/research/systems/debug/index.html
+		SPOCK - Finding errors by means of logic 
 
 
 	## https://www.youtube.com/watch?v=4aXy9UGq4Ng
@@ -147,32 +168,6 @@ Numbers denote len(F ) (in firing nodes) and len(A) (in atom nodes), respectivel
 	
 	
 
-# graph exploration
-## xdot
-has: interactive highlight edges of nodes under mouse
-todo: https://github.com/jrfonseca/xdot.py/issues/79
-forks: https://github.com/pfalcon/xdot.py/commit/489b606d7bdf6b4be46719dc44605006da98dc27
-even better viewer?: http://zvtm.sourceforge.net/zgrviewer.html
-
-## graphviz - make edges traceable
-edge [fontname=arial penwidth=0.5]
-no a fakt bych dal kazdy edgi trochu jinou barvu, a jestli tam mas tri ruzny typy, tak to by se dalo znazornit ruznejma line stylama
-edge [fontname=arial penwidth=0.5 style=dashed]
-"dashed"
-    "dotted"
-    "solid"
-    "invis"
-    "bold"
-    "tapered"
-
-	
-## gruff + sparql
-	https://www.youtube.com/watch?v=LLmbHcP8ngw
-
-## gephi
-	aimed at statistical visualization but ok
-	
-
 
 
 
@@ -192,31 +187,48 @@ edge [fontname=arial penwidth=0.5 style=dashed]
 		
 			
 	## DLV
-		http://www.dlvsystem.com/html/DLV_User_Manual.html
 		
-		| 	Positive body literals are ordered for efficiency:
-
-- Those literals with unique variables are placed at the end of the re-order rule body, since the join operation with the rest of the body literals is equivalent to their Cartesian product.
-
-- Literals using built-in predicates are moved to the foremost position in the body where all their variables have been bound by previous literals. This is because built-in predicates are evaluated very easily, once their parameters are known, but would give a large range of values to unbound variables.
-
-- Other literals are sorted by increasing cardinality of their ground occurrences and by decreasing number of shared variables.
-
-This is the default optimisation. 
-
-
-		http://www.dlvsystem.com/dlvwrapper/
-		
-		
+		### DLV^E
+			https://www.mat.unical.it/dlve/dlemanual.html
+			this seems the most promising system to check against?
+			
+						
+	# papers
+		https://link.springer.com/chapter/10.1007/978-3-642-32925-8_3
+			| We consider rules that allow to assert the existence of new individuals, an ability called value invention in databases [AHV95]. These rules are of the form body → head, where the body and the head are function-free conjunctions of atoms, and variables that occur only in the head are existentially quantified, hence their name ∀ ∃-rules in [BLMS09, BLM10] or existential rules in [BMRT11, KR11]. Existential rules have long been studied in databases as high-level constraints called tuple generating dependencies (TGDs) [BV84]. Recently, there has been renewed interest for these rules in the context of ontology-based data access (OBDA), a new paradigm that seeks to exploit the semantics encoded in ontologies while querying data. The deductive database language Datalog could be seen as a natural candidate for expressing ontological knowledge in this context, however its limitation is that it does not allow for value invention, since all variables in a rule head necessarily occur in the rule body. Value invention has been recognized as a necessary prerequisite in an open-world perspective, where all individuals are not known a priori. It is in particular a feature of description logics (DLs), well-known languages dedicated to ontological representation and reasoning. This prerequisite motivated the recent extension of Datalog to existential rules, which gave rise to the Datalog +/- formalism [CGK08, CGL09].
 		
 
 
 # other projects
 	## highly relevant
+	
+	
+	
 		### https://github.com/graphik-team/graal
 			http://graphik-team.github.io/graal/downloads/kiabora
+				http://www.lirmm.fr/~mugnier/graphik/kiabora/
 				| Kiabora is dedicated to the analysis of a set of existential rules. 
 				
+			http://graphik-team.github.io/graal/
+				http://graphik-team.github.io/graal/downloads/pure
+			
+				
+		### DLV
+		
+			http://www.dlvsystem.com/html/DLV_User_Manual.html
+			
+			| 	Positive body literals are ordered for efficiency:
+
+			- Those literals with unique variables are placed at the end of the re-order rule body, since the join operation with the rest of the body literals is equivalent to their Cartesian product.
+
+			- Literals using built-in predicates are moved to the foremost position in the body where all their variables have been bound by previous literals. This is because built-in predicates are evaluated very easily, once their parameters are known, but would give a large range of values to unbound variables.
+
+			- Other literals are sorted by increasing cardinality of their ground occurrences and by decreasing number of shared variables.
+
+			This is the default optimisation. 
+
+
+			http://www.dlvsystem.com/dlvwrapper/
 	
 		
 	
@@ -332,25 +344,50 @@ This is the default optimisation.
 		wrapping around / landscape memory
 		
 	
-	
+	https://graphia.app/guide/section2/2_first_start_up.html
 	https://networkx.org/documentation/stable/reference/drawing.html#module-networkx.drawing.nx_agraph
 	https://pygraphviz.github.io/
 	https://github.com/benmaier/netwulf/
 	https://kroki.io/examples.html#packetdiag
 	
 	
+# graph exploration
 
+## cogui
+	!
 
+## xdot
 
-### interesting apps
+	has: interactive highlight edges of nodes under mouse
+	todo: https://github.com/jrfonseca/xdot.py/issues/79
+	forks: https://github.com/pfalcon/xdot.py/commit/489b606d7bdf6b4be46719dc44605006da98dc27
+	even better viewer?: http://zvtm.sourceforge.net/zgrviewer.html
 
-	https://graphia.app/guide/section2/2_first_start_up.html
+## graphviz - make edges traceable
+
+	edge [fontname=arial penwidth=0.5]
+	no a fakt bych dal kazdy edgi trochu jinou barvu, a jestli tam mas tri ruzny typy, tak to by se dalo znazornit ruznejma line stylama
+	edge [fontname=arial penwidth=0.5 style=dashed]
+	"dashed"
+		"dotted"
+		"solid"
+		"invis"
+		"bold"
+		"tapered"
+
+	
+## gruff + sparql
+	https://www.youtube.com/watch?v=LLmbHcP8ngw
+
+## gephi
+	aimed at statistical visualization but ok
+	
 	
 
 
 
-### debugging questions
-	#### why
+# declarative debugging 
+#### why
 	
 	when we're asking why, we can probably point to an exact proof that our system gave but shouldn't have. 
 	
@@ -360,11 +397,14 @@ This is the default optimisation.
 	
 	Again easy if we can point to a specific theory to prove.
 
-### querying the proof graph
-	
+
+#### querying the proof graph
 	
 
-### random
+
+	
+
+#### random
 
 	https://search.creativecommons.org/photos/c21b9174-c6ef-4416-9fd3-b35c13460f15
 	
@@ -379,21 +419,21 @@ This is the default optimisation.
 
 
 
-# 3d graphics with text
+
+
+
+
+# embedded-ish visualization, technicalities
+
+
+
+## 3d graphics with text
 	https://threejs.org/examples/?q=css#css3d_periodictable
 		yep, looks like a fairly sensible high-level-ish way to do complex text and ui in 3d
 		
-	
-	
-	
-	
-	
-	
-	
 
 
-
-# c++ visualization
+## c++ visualization
 
 	# https://github.com/ArsMasiuk/qvge
 	
@@ -421,16 +461,24 @@ This is the default optimisation.
 
 
 
+# clp/algebra implementations
 
-
-
-
-
-# js
+## js 
 	git@github.com:davidedc/Algebrite.git
 	
 
 
 
+
+
+
+# misc
+
 https://ur.booksc.eu/book/44896270/0dc548
 https://www.researchgate.net/publication/263886722_AN_INFERENCE_BROWSER_FOR_VERIFYING_THE_KNOWLEDGE_BASE_IN_KNOWLEDGE-BASED_SYSTEMS
+https://github.com/potassco/
+
+
+https://dblp.org/rec/conf/dood/ZanioloAO93.html
+	"Negation and Aggregates in Recursive Rules: the LDL++ Approach."
+
