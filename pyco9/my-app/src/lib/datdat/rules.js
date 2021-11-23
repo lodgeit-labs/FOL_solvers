@@ -9,6 +9,12 @@ d e f.
 
 
 
+def prove_rule(R):
+	for p in prove_body(my_body):
+		yield
+
+
+
 
 quadstore = writable([])
 

@@ -482,3 +482,35 @@ https://github.com/potassco/
 https://dblp.org/rec/conf/dood/ZanioloAO93.html
 	"Negation and Aggregates in Recursive Rules: the LDL++ Approach."
 
+
+
+
+# todo
+cogui
+
+sealion
+
+Fast Query Answering over Existential Rules
+	| We implemented the parsimonious-chase resumption tecnique introduced in Section
+4 inside the well-known Answer Set Programming (ASP) system DLV [Leone et al.
+2006]. This implementation is referred to as DLV∃ and it constitutes a powerful system
+for answering (unrestricted) conjunctive queries over strongly parsimonious programs.
+Following the DLV philosophy, it has been designed as an in-memory system. Basically,
+we extended the DLV parser and the rule safety check because of the presence of exis-
+tentially quantified variables. Moreover, we evolved the DLV fixpoint computation so
+that it can be now resumed an arbitrary number of times. Finally, we developed an
+optimized homomorphism checker which exploits some of the standard routines im-
+plemented in DLV. To speed-up the computation, a number of optimization techniques
+has been introduced. In particular, we implemented a rewriting strategy to avoid the
+evaluation of the rules that are not relevant for answering the input query. Before
+parsing the input facts we find out the list of predicates that are significant for the
+query at hand and, consequently, we load only facts belonging to such predicates. To
+compute the number of times the parsimonious chase needs to be resumed, we execute
+an optimized version of the algorithm induced by Theorem 4.9. In the following subsec-
+tions, after showing the overall architecture of the main components of the system, we
+give a detailed description of the implemented tecniques and optimizations. All data
+and encodings used in our evaluation, along with the Unix executable of the system,
+are publicly available.5
+
+
+http://igrom.sourceforge.net/
