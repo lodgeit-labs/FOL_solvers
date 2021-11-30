@@ -70,6 +70,9 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
  coord_or_value_unit(coord(Unit,_), Unit).
  coord_or_value_unit(value(Unit,_), Unit).
 
+ coord_or_value_amount(coord(_,A), A).
+ coord_or_value_amount(value(_,A), A).
+
  vec_units(Vec, Units) :-
 	findall(Unit,
 	(
@@ -93,19 +96,58 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	vec_add(X, [], Y).
 
 
+
 % Adds the two given vectors together and reduces coords or values in a vector to a minimal (normal) form.
 
- vec_add(As, Bs, Cs_Reduced) :-
-	assertion((flatten(As, As), flatten(Bs, Bs))),
-	!append(As, Bs, As_And_Bs),
-	!sort_into_assoc(!coord_or_value_unit, As_And_Bs, Sorted),
-	!assoc_to_values(Sorted, Valueses),
-	!maplist(semigroup_foldl(coord_merge), Valueses, Total),
-	flatten(Total, Total_Flat),
-	!vec_reduce_coords(Total_Flat, Cs_Reduced).
+% vec_add(As, Bs, Cs_Reduced) :-
+%	cd('ensure As and Bs are flat lists', assertion((flatten(As, As), flatten(Bs, Bs))),
+%	!append(As, Bs, As_And_Bs),
+%	!sort_into_assoc_of_lists(!coord_or_value_unit, As_And_Bs, Assoc),
+%	!assoc_to_values(Assoc, Valueses),
+%	!maplist(semigroup_foldl(coord_or_value_merge), Valueses, Total),
+%	% Total_Flat is a list with one coord per each unittype in As and Bs combined
+%	flatten(Total, Total_Flat),
+%	!vec_reduce_coords(Total_Flat, Cs_Reduced).
 
+
+% faster.
+ vec_add(A, B, C) :-
+ 	vec_add2_(A, vec{}, Dict2),
+ 	vec_add2_(B, Dict2, Dict3),
+ 	assoc_to_values(Dict3, Coords),
+	!vec_reduce_coords(Coords, C).
+
+ vec_add2_([], Dict, Dict).
+
+ vec_add2_([coord(U,A1)|Coords], Dict, Dict_out) :-
+ 	coord_or_value_unit(C, U),
+ 	(	Dict.get(U, coord(U, A2)
+ 	->	(
+ 			{A1 + A2 = A3},
+ 			Dict2 = Dict.put(U, coord(U, A3))
+ 		)
+ 	;	Dict2 = Dict.put(U, coord(U, A1))),
+ 	vec_add2_(Coords, Dict2, Dict_out) :-
+
+ vec_add2_([value(U,A1)|Coords], Dict, Dict_out) :-
+ 	coord_or_value_unit(C, U),
+ 	(	Dict.get(U, value(U, A2)
+ 	->	(
+ 			{A1 + A2 = A3},
+ 			Dict2 = Dict.put(U, value(U, A3))
+ 		)
+ 	;	Dict2 = Dict.put(U, value(U, A1))),
+ 	vec_add2_(Coords, Dict2, Dict_out) :-
+
+
+
+
+% sum a list of vectors
  vec_sum(Vectors, Sum) :-
 	foldl(vec_add, Vectors, [], Sum).
+
+
+
 
 
 /*
@@ -211,10 +253,16 @@ vec_sum_by_pred(
 	value_unit(A, A_Unit),
 	value_unit(B, A_Unit).
 
- coord_merge(coord(Unit, D1), coord(Unit, D2), coord(Unit, D3)) :-
+ coord_or_value_merge(coord(Unit, D1), coord(Unit, D2), coord(Unit, D3)) :-
 	{D3 = D2 + D1}.
 	
- coord_merge(value(Unit, D1), value(Unit, D2), value(Unit, D3)) :-
+ coord_or_value_merge(value(Unit, D1), value(Unit, D2), value(Unit, D3)) :-
+	{D3 = D2 + D1}.
+
+ coord_merge(coord(Unit, D1), coord(Unit, D2), coord(Unit, D3)) :-
+	{D3 = D2 + D1}.
+
+ value_merge(value(Unit, D1), value(Unit, D2), value(Unit, D3)) :-
 	{D3 = D2 + D1}.
 
  value_convert(value(Unit, Amount1), exchange_rate(_,Src,Dst,Rate), value(Unit2, Amount2)) :-

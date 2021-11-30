@@ -89,13 +89,13 @@ sort_into_dict_on_success/4(
 
 
 
- sort_into_assoc(Selector_Predicate, Ts, D) :-
+ sort_into_assoc_of_lists(Selector_Predicate, Ts, D) :-
 	empty_assoc(A),
-	sort_into_assoc(Selector_Predicate, Ts, A, D).
+	sort_into_assoc_of_lists(Selector_Predicate, Ts, A, D).
 
-:- meta_predicate sort_into_assoc(2, ?, ?, ?).
+:- meta_predicate sort_into_assoc_of_lists(2, ?, ?, ?).
 
- sort_into_assoc(Selector_Predicate, [T|Ts], D, D_Out) :-
+ sort_into_assoc_of_lists(Selector_Predicate, [T|Ts], D, D_Out) :-
 	call(Selector_Predicate, T, A),
 	(
 		get_assoc(A, D, L)
@@ -106,9 +106,9 @@ sort_into_dict_on_success/4(
 	),
 	append(L, [T], L2),
 	put_assoc(A, D, L2, D2),
-	sort_into_assoc(Selector_Predicate, Ts, D2, D_Out).
+	sort_into_assoc_of_lists(Selector_Predicate, Ts, D2, D_Out).
 
- sort_into_assoc(_, [], D, D).
+ sort_into_assoc_of_lists(_, [], D, D).
 
 
 

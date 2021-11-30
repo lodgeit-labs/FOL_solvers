@@ -230,6 +230,12 @@ env_bool_has_default('ENABLE_CONTEXT_TRACE',true).
 
 
 
+% dummy (or debug?) context wrapper
+
+ cd(_Context, Callable) :-
+	call(Callable).
+
+
 /*
 ┏━┓╺┳╸┏━┓╻┏┓╻┏━╸╻┏━╸╻ ╻╻┏┓╻┏━╸
 ┗━┓ ┃ ┣┳┛┃┃┗┫┃╺┓┃┣╸ ┗┳┛┃┃┗┫┃╺┓
