@@ -99,46 +99,44 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 
 % Adds the two given vectors together and reduces coords or values in a vector to a minimal (normal) form.
 
-% vec_add(As, Bs, Cs_Reduced) :-
-%	cd('ensure As and Bs are flat lists', assertion((flatten(As, As), flatten(Bs, Bs))),
-%	!append(As, Bs, As_And_Bs),
-%	!sort_into_assoc_of_lists(!coord_or_value_unit, As_And_Bs, Assoc),
-%	!assoc_to_values(Assoc, Valueses),
-%	!maplist(semigroup_foldl(coord_or_value_merge), Valueses, Total),
-%	% Total_Flat is a list with one coord per each unittype in As and Bs combined
-%	flatten(Total, Total_Flat),
-%	!vec_reduce_coords(Total_Flat, Cs_Reduced).
+ vec_add(As, Bs, Cs_Reduced) :-
+	cd('ensure As and Bs are flat lists', assertion((flatten(As, As), flatten(Bs, Bs)))),
+	!append(As, Bs, As_And_Bs),
+	!sort_into_assoc_of_lists(!coord_or_value_unit, As_And_Bs, Assoc),
+	!assoc_to_values(Assoc, Valueses),
+	!maplist(semigroup_foldl(coord_or_value_merge), Valueses, Total),
+	% Total_Flat is a list with one coord per each unittype in As and Bs combined
+	flatten(Total, Total_Flat),
+	!vec_reduce_coords(Total_Flat, Cs_Reduced).
 
 
-% faster.
- vec_add(A, B, C) :-
- 	vec_add2_(A, vec{}, Dict2),
- 	vec_add2_(B, Dict2, Dict3),
- 	assoc_to_values(Dict3, Coords),
-	!vec_reduce_coords(Coords, C).
-
- vec_add2_([], Dict, Dict).
-
- vec_add2_([coord(U,A1)|Coords], Dict, Dict_out) :-
- 	coord_or_value_unit(C, U),
- 	(	Dict.get(U, coord(U, A2)
- 	->	(
- 			{A1 + A2 = A3},
- 			Dict2 = Dict.put(U, coord(U, A3))
- 		)
- 	;	Dict2 = Dict.put(U, coord(U, A1))),
- 	vec_add2_(Coords, Dict2, Dict_out) :-
-
- vec_add2_([value(U,A1)|Coords], Dict, Dict_out) :-
- 	coord_or_value_unit(C, U),
- 	(	Dict.get(U, value(U, A2)
- 	->	(
- 			{A1 + A2 = A3},
- 			Dict2 = Dict.put(U, value(U, A3))
- 		)
- 	;	Dict2 = Dict.put(U, value(U, A1))),
- 	vec_add2_(Coords, Dict2, Dict_out) :-
-
+% faster, but will not work while units are compound terms.
+% vec_add(A, B, C) :-
+% 	vec_add2_(A, vec{}, Dict2),
+% 	vec_add2_(B, Dict2, Dict3),
+% 	assoc_to_values(Dict3, Coords),
+%	!vec_reduce_coords(Coords, C).
+%
+% vec_add2_([], Dict, Dict).
+%
+% vec_add2_([coord(U,A1)|Coords], Dict, Dict_out) :-
+% 	(	get_dict(U, Dict, coord(U, A2))
+% 	->	(
+% 			{A1 + A2 = A3},
+% 			Dict2 = Dict.put(U, coord(U, A3))
+% 		)
+% 	;	Dict2 = Dict.put(U, coord(U, A1))),
+% 	vec_add2_(Coords, Dict2, Dict_out).
+%
+% vec_add2_([value(U,A1)|Coords], Dict, Dict_out) :-
+% 	(	get_dict(U, Dict, value(U, A2))
+% 	->	(
+% 			{A1 + A2 = A3},
+% 			Dict2 = Dict.put(U, value(U, A3))
+% 		)
+% 	;	Dict2 = Dict.put(U, value(U, A1))),
+% 	vec_add2_(Coords, Dict2, Dict_out).
+%
 
 
 
