@@ -279,9 +279,13 @@ run_with_toplevel(Debug, Goal, Script, _Opts) :-
 	->	Environment = environment(['SWIPL_NODEBUG'=false])
 	;	Environment = environment(['SWIPL_NODEBUG'=true])),
 
+	(	getenv('MPROF_OUTPUT_PATH', MPROF_OUTPUT_PATH)
+	->	true
+	;	MPROF_OUTPUT_PATH = '/app/server_root/tmp/mem'),
+
 	Args0 = ['-v',
 
-		'mprof', 'run', '--nopython', '-C', '-E' , '-o', '/app/server_root/tmp/mem',
+		'mprof', 'run', '--nopython', '-C', '-E' , '-o', MPROF_OUTPUT_PATH,
 
 	'swipl', '--stack_limit=100G', Optimization, '-s', Script, '--', ScriptArgs],
 
