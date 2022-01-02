@@ -523,3 +523,7 @@ https://news.ycombinator.com/item?id=29652139
 
 
 
+Also, like λProlog, Twelf generalizes Horn clauses to hereditary Harrop formulas, which for logically well-founded operational notions of fresh-name generation and scoped extension of the clause database.
+
+
+
