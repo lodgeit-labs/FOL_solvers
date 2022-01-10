@@ -186,6 +186,6 @@ sort_into_dict_on_success/4(
 
 
  pair_to_json(Pair, Dict) :-
- 	Dict0 = j{},
  	Pair =.. [_,K,V],
+ 	Dict0 = j{},
  	Dict = Dict0.put(K,V).
