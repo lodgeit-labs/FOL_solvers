@@ -542,4 +542,22 @@ https://niklasl.github.io/quid/#
 
 interval arithmetic:
 	https://github.com/mlliarm/ia
-	
+
+
+
+
+
+
+
+
+
+https://medium.com/computational-law-diary/s-casp-as-a-rules-as-code-tool-97ec3435975c :
+```
+Answer Set Programming Kicks Ass for Rules as Code
+
+Until now I’ve been encoding laws in declarative logic languages. But answer set programming does not tell you just what the right answer is, but all of the ways that you could potentially reach that right answer, and everything else that you know about the world while that answer is true, and s(CASP) adds on an English-language explanation for each method of reaching the right answer.
+
+That’s just a lot more information, and a lot of critically useful information if what you are trying to do is figure out whether or not you faithfully encoded the rule.
+
+Most of the time, when you have a query that doesn’t behave as expected, you can throw a “not” in front of it, run it again, and get a natural language explanation for why the original query failed. I have never used a tool with that capability before, and it is blowing my mind.
+```
