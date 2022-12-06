@@ -1,4 +1,4 @@
-:- ['../../sources/public_lib/lodgeit_solvers/prolog/pyco2/pyco3.pl'].
+:- ['../../pyco2/pyco3.pl'].
 :- use_module(library(clpq)).
 
 

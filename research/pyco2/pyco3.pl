@@ -1,6 +1,6 @@
 
-:- ['../utils/exceptions.pl'].
-:- ['../determinancy_checker/determinancy_checker_main.pl'].
+:- ['../../prolog/utils/exceptions.pl'].
+:- ['../../prolog/determinancy_checker/determinancy_checker_main.pl'].
 
 :- multifile delay/2.
 :- dynamic pyco3_rule/7.
@@ -19,7 +19,7 @@
 compile-time clause expansion, produces 'pyco3_rule' terms from 'r' declarations
 */
 
-:- ['../utils/compile_with_variable_names_preserved.pl'].
+:- ['../../prolog/utils/compile_with_variable_names_preserved.pl'].
 
 user:term_expansion(P, pyco3_rule(Id, Head, Body, Notes, Cnls, Names, Preps)) :-
 	P =.. [r|X],
