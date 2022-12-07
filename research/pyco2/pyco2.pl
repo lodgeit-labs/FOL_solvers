@@ -482,3 +482,8 @@ But it is a question if any data should be treated as a-priori static.
 /*
 in v3, we'll use Id instead of Desc (for ep tables etc).
 */
+/*
+selection of speed-optimal order of body items: perhaps this is best defined on the level of predicate definitions. Might be even more optimal on the level of rule definitions, but i'm not sure that we can realistically implement that in prolog.
+So let's say preprocess/3 has delay-hint: if Verbs is unbound, shift me back by X seconds. X may be a constant or an expression possibly even calling more pyco preds, taking lengts of lists or whatnot.
+The next pred invoked after preprocess/3 may shift back to, etc, until we get to the end of the body, at which point, we sort the body items by "delay-hint" and commit to the lowest.
+*/
