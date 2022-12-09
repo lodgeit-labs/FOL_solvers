@@ -591,7 +591,7 @@ nicer_arg2(Bn, Nicer) :-
 
 nicer_bn(Bn, Nicer) :-
 	nonvar(Bn),
-	\+ \+ Bn = bn(_, _{first:_,rest:_}),
+	\+ \+ Bn = bn(_, _{'First':_,'Rest':_}),
 	nicer_bn2(Bn, Nice_items),
 	Bn = bn(Id, _),
 	'='(Nice_functor, $>atomic_list_concat([
@@ -608,8 +608,8 @@ collect_items(Bn, []) :-
 
 collect_items(Bn, [F|Rest]) :-
 	nonvar(Bn),
-	\+ \+ Bn = bn(_, _{first:_,rest:_}),/*?*/
-	Bn = bn(_, _{first:F,rest:R}),
+	\+ \+ Bn = bn(_, _{'First':_,'Rest':_}),/*?*/
+	Bn = bn(_, _{'First':F,'Rest':R}),
 	collect_items2(R, Rest).
 
 collect_items2(R, Rest) :-
