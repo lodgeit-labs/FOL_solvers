@@ -6,8 +6,9 @@
 
 
  services_server(S) :-
-	!current_prolog_flag(services_server, S),
-	debug(d, 'current_prolog_flag(services_server, ~q)', [S]).
+    !getenv('SERVICES_URL',S),
+	%!current_prolog_flag(services_server, S),
+	debug(d, 'services_server = ~q', [S]).
 
  json_post(Url, Payload, Response) :-
 	json_post(Url, Payload, Response, 5).
@@ -47,9 +48,9 @@
 
 
  services_server_shell_cmd(Cmd) :-
-	format(string(Url), '~w/shell/rpc/', [$>services_server(<$)]),
+	format(string(Url), '~w/shell', [$>services_server(<$)]),
 	debug(shell, 'POST: ~w', Url),
-	json_post(Url, _{cmd:Cmd,quiet_success:true}, _).
+	json_post(Url, _{cmd:Cmd}, _).
 
 
 
