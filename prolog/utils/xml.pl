@@ -157,23 +157,28 @@ a (variable, default value) tuple can also be passed */
 
 
 
- xsd_validator_url(X) :-
-	atomic_list_concat([$>(!current_prolog_flag(services_server)), '/xml_xsd_validator'], X).
-
 /*
 Validates an XML instance against an XSD schema by calling an external Python script
 */
  validate_xml(loc(absolute_path,Instance_File), loc(absolute_path,Schema_File), Schema_Errors) :-
 	!uri_encoded(query_value,Instance_File,Instance_File_Encoded),
 	!uri_encoded(query_value,Schema_File,Schema_File_Encoded),
-	!xsd_validator_url(XSD_Validator_URL),
-	!atomic_list_concat([xml,Instance_File_Encoded], "=", Instance_File_Query_Component),
-	!atomic_list_concat([xsd,Schema_File_Encoded], "=", Schema_File_Query_Component),
-	!atomic_list_concat([Instance_File_Query_Component, Schema_File_Query_Component], "&", Query),
-	!atomic_list_concat([XSD_Validator_URL,Query],"/?",Request_URI),
-	%format("Request URI: ~w~n", [Request_URI]),
 	setup_call_cleanup(
-		!http_open(Request_URI, In, [request_header('Accept'='application/json')]),
+		!http_open(
+		    $>append($>url_parts($>services_server),
+		    [
+                path('/xml_xsd_validator'),
+                search([
+                    xml=Instance_File_Encoded,
+                    xsd=Schema_File_Encoded
+                ])
+            ]),
+            In,
+            [
+				request_header('Accept'='application/json'),
+				method(post)
+			]
+        ),
 		!json_read_dict(In, Response_JSON),
 		/* todo is this correct, or can In be unbound here? */
 		(var(In) -> true ; close(In))

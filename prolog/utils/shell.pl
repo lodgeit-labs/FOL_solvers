@@ -6,9 +6,15 @@
 
 
  services_server(S) :-
-    !getenv('SERVICES_URL',S),
+	!getenv('SERVICES_URL',S),
 	%!current_prolog_flag(services_server, S),
 	debug(d, 'services_server = ~q', [S]).
+
+ url_parts(Url, Parts) :-
+	parse_url(Url, X),
+	member(X, protocol(P)),
+	append(X, [scheme(P)], Parts),
+	true.
 
  json_post(Url, Payload, Response) :-
 	json_post(Url, Payload, Response, 5).
