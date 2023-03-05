@@ -12,8 +12,10 @@
 
  url_parts(Url, Parts) :-
 	parse_url(Url, X),
-	member(X, protocol(P)),
-	append(X, [scheme(P)], Parts),
+	member(protocol(S), X),
+	member(host(H), X),
+	member(port(P), X),
+	[scheme(S), host(H), port(P)] = Parts,
 	true.
 
  json_post(Url, Payload, Response) :-
