@@ -12,6 +12,7 @@
 
  url_parts(Url, Parts) :-
 	parse_url(Url, X),
+	member(path('/'), X),
 	member(protocol(S), X),
 	member(host(H), X),
 	member(port(P), X),

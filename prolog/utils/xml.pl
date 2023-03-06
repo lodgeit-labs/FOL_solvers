@@ -165,7 +165,7 @@ Validates an XML instance against an XSD schema by calling an external Python sc
 	!uri_encoded(query_value,Schema_File,Schema_File_Encoded),
 	setup_call_cleanup(
 		!http_open(
-		    $>append($>url_parts($>services_server),
+		    $>append($>!url_parts($>services_server),
 		    [
                 path('/xml_xsd_validator'),
                 search([
