@@ -588,7 +588,7 @@ X) :-
 	atomic_list_concat(['doc_', Id, '.', Format],Fn),
 	report_file_path(loc(file_name, Fn), Url, loc(absolute_path,Path)),
 	Url = loc(absolute_url, Url_Value),
-    misc_check(!parse_url(Url_Value, _)),
+    %misc_check(!parse_url(Url_Value, _)), % ipv6 syntax is not supported yet, apparently
 	(	var(Report_key)
 	->	Report_key = Fn
 	;	true),
@@ -737,6 +737,10 @@ X) :-
 	result(D),
 	!doc(D, l:has_accounts, As).
 
+
+ add_alert_stringified(Type, Msg) :-
+	term_string(Msg, Str),
+ 	add_alert(Type, Str, _).
 
  add_alert(Type, Msg) :-
  	add_alert(Type, Msg, _).

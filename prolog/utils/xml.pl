@@ -189,8 +189,8 @@ Validates an XML instance against an XSD schema by calling an external Python sc
 	->
 		Schema_Errors = []
 	;
-		atomic_list_concat([Response_JSON.error_type, Response_JSON.error_message], ": ", Schema_Error),
-		Schema_Errors = [error:Schema_Error]
+		atomic_list_concat(['XML validation error', Response_JSON.error_message], ": ", Schema_Error),
+		Schema_Errors = [Schema_Error]
 	).
 
  validate_xml2(Xml, Xsd) :-
@@ -198,4 +198,8 @@ Validates an XML instance against an XSD schema by calling an external Python sc
 	!validate_xml(Xml, Schema_File, Schema_Errors),
 	(	Schema_Errors = []
 	->	true
-	;	!maplist(add_alert(error), Schema_Errors)).
+	;	(
+			!maplist(add_alert(error), Schema_Errors),
+			throw_string(['aborted.'])
+		)
+	).
