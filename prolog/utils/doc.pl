@@ -529,7 +529,8 @@ X) :-
 	catch(
 		(	node_rdf_vs_doc(O,O2)
 		->	true
-		;	throw('conversion from rdf to doc failed')),
+		;	throw($>format(string(<$), 'conversion from rdf to doc failed: ~q <-> ~q', [O,O2]))
+		),
 		E,
 		(
 			format(user_error, '~q', [E]),
