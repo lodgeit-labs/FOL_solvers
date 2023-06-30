@@ -1,57 +1,33 @@
 :- use_module(library(clpfd)).
 
-:- rdf_register_prefix(code,
-'https://rdf.lodgeit.net.au/v1/code#').
-:- rdf_register_prefix(kb,
-'https://rdf.lodgeit.net.au/v1/kb#').
-:- rdf_register_prefix(l,
-'https://rdf.lodgeit.net.au/v1/request#').
-:- rdf_register_prefix(account_taxonomies,
-'https://rdf.lodgeit.net.au/v1/account_taxonomies#').
-:- rdf_register_prefix(accounts,
-'https://rdf.lodgeit.net.au/v1/accounts#').
-:- rdf_register_prefix(livestock,
-'https://rdf.lodgeit.net.au/v1/livestock#').
-:- rdf_register_prefix(excel,
-'https://rdf.lodgeit.net.au/v1/excel#').
-:- rdf_register_prefix(depr,
-'https://rdf.lodgeit.net.au/v1/calcs/depr#').
-:- rdf_register_prefix(ic,
-'https://rdf.lodgeit.net.au/v1/calcs/ic#').
-:- rdf_register_prefix(hp,
-'https://rdf.lodgeit.net.au/v1/calcs/hp#').
-:- rdf_register_prefix(depr_ui,
-'https://rdf.lodgeit.net.au/v1/calcs/depr/ui#').
-:- rdf_register_prefix(ic_ui,
-'https://rdf.lodgeit.net.au/v1/calcs/ic/ui#').
-:- rdf_register_prefix(hp_ui,
-'https://rdf.lodgeit.net.au/v1/calcs/hp/ui#').
-:- rdf_register_prefix(transactions,
-'https://rdf.lodgeit.net.au/v1/transactions#').
-:- rdf_register_prefix(s_transactions,
-'https://rdf.lodgeit.net.au/v1/s_transactions#').
-:- rdf_register_prefix(report_entries,
-'https://rdf.lodgeit.net.au/v1/report_entries#').
-:- rdf_register_prefix(smsf,
-'https://rdf.lodgeit.net.au/v1/calcs/smsf#').
-:- rdf_register_prefix(smsf_ui,
-'https://rdf.lodgeit.net.au/v1/calcs/smsf/ui#').
-:- rdf_register_prefix(smsf_distribution,
-'https://rdf.lodgeit.net.au/v1/calcs/smsf/distribution#').
-:- rdf_register_prefix(smsf_distribution_ui,
-'https://rdf.lodgeit.net.au/v1/calcs/smsf/distribution_ui#').
-:- rdf_register_prefix(smsf_computation,
-'https://rdf.lodgeit.net.au/v1/calcs/smsf/computation#').
-:- rdf_register_prefix(reallocation,
-'https://rdf.lodgeit.net.au/v1/calcs/ic/reallocation#').
-:- rdf_register_prefix(bs,
-'https://rdf.lodgeit.net.au/v1/bank_statement#').
-:- rdf_register_prefix(av,
-'https://rdf.lodgeit.net.au/v1/action_verbs#').
-:- rdf_register_prefix(uv,
-'https://rdf.lodgeit.net.au/v1/unit_values#').
-:- rdf_register_prefix(phases,
-'https://rdf.lodgeit.net.au/v1/phases#').
+:- rdf_register_prefix(code,				'https://rdf.lodgeit.net.au/v1/code#').
+:- rdf_register_prefix(kb,					'https://rdf.lodgeit.net.au/v1/kb#').
+:- rdf_register_prefix(l,					'https://rdf.lodgeit.net.au/v1/request#').
+:- rdf_register_prefix(account_taxonomies,	'https://rdf.lodgeit.net.au/v1/account_taxonomies#').
+:- rdf_register_prefix(accounts,			'https://rdf.lodgeit.net.au/v1/accounts#').
+:- rdf_register_prefix(livestock,			'https://rdf.lodgeit.net.au/v1/livestock#').
+:- rdf_register_prefix(excel,				'https://rdf.lodgeit.net.au/v1/excel#').
+:- rdf_register_prefix(depr,				'https://rdf.lodgeit.net.au/v1/calcs/depr#').
+:- rdf_register_prefix(ic,					'https://rdf.lodgeit.net.au/v1/calcs/ic#').
+:- rdf_register_prefix(hp,					'https://rdf.lodgeit.net.au/v1/calcs/hp#').
+:- rdf_register_prefix(depr_ui,				'https://rdf.lodgeit.net.au/v1/calcs/depr/ui#').
+:- rdf_register_prefix(ic_ui,				'https://rdf.lodgeit.net.au/v1/calcs/ic/ui#').
+:- rdf_register_prefix(hp_ui,				'https://rdf.lodgeit.net.au/v1/calcs/hp/ui#').
+:- rdf_register_prefix(transactions,		'https://rdf.lodgeit.net.au/v1/transactions#').
+:- rdf_register_prefix(s_transactions,		'https://rdf.lodgeit.net.au/v1/s_transactions#').
+:- rdf_register_prefix(report_entries,		'https://rdf.lodgeit.net.au/v1/report_entries#').
+:- rdf_register_prefix(smsf,				'https://rdf.lodgeit.net.au/v1/calcs/smsf#').
+:- rdf_register_prefix(smsf_ui,				'https://rdf.lodgeit.net.au/v1/calcs/smsf/ui#').
+:- rdf_register_prefix(smsf_distribution,	'https://rdf.lodgeit.net.au/v1/calcs/smsf/distribution#').
+:- rdf_register_prefix(smsf_distribution_ui,'https://rdf.lodgeit.net.au/v1/calcs/smsf/distribution_ui#').
+:- rdf_register_prefix(smsf_computation,	'https://rdf.lodgeit.net.au/v1/calcs/smsf/computation#').
+:- rdf_register_prefix(reallocation,		'https://rdf.lodgeit.net.au/v1/calcs/ic/reallocation#').
+:- rdf_register_prefix(bs,					'https://rdf.lodgeit.net.au/v1/bank_statement#').
+:- rdf_register_prefix(av,					'https://rdf.lodgeit.net.au/v1/action_verbs#').
+:- rdf_register_prefix(uv,					'https://rdf.lodgeit.net.au/v1/unit_values#').
+:- rdf_register_prefix(phases,				'https://rdf.lodgeit.net.au/v1/phases#').
+
+
 :- rdf_register_prefix(rdf,
 'http://www.w3.org/1999/02/22-rdf-syntax-ns#').
 :- rdf_register_prefix(rdfs,
