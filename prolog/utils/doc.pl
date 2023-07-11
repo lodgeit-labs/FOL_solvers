@@ -656,7 +656,7 @@ X) :-
 	doc_new_uri(T),
 	doc_add(T, rdf:type, l:theory).
 
- request_data_property(P, O) :-
+ request_data_property(P, O) :-qqq
 	request_data(Request_Data),
 	doc(Request_Data, P, O).
 
@@ -1242,6 +1242,7 @@ Required Property Value
 
  get_sheet_data(Type, Data) :-
 	*get_sheet(Type, Sheet),
+	!doc_add(Sheet, l:was_processed, true),% todo check.
 	!doc(Sheet, excel:sheet_instance_has_sheet_data, Data).
 
  get_sheets_data(Type, Datas) :-
