@@ -656,7 +656,7 @@ X) :-
 	doc_new_uri(T),
 	doc_add(T, rdf:type, l:theory).
 
- request_data_property(P, O) :-qqq
+ request_data_property(P, O) :-
 	request_data(Request_Data),
 	doc(Request_Data, P, O).
 
