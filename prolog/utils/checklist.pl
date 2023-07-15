@@ -8,8 +8,8 @@
 
 		debugging,
 
-		flag(die_on_error, Die_on_error),
-		format(user_error, '* die_on_error ~q~n', [Die_on_error]),
+		flag(disable_graceful_resume_on_unexpected_error, Disable_graceful_resume_on_unexpected_error),
+		format(user_error, '* disable_graceful_resume_on_unexpected_error ~q~n', [Disable_graceful_resume_on_unexpected_error]),
 
 		flag(gtrace, Gtrace),
 		format(user_error, '* gtrace ~q~n', [Gtrace]),
