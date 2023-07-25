@@ -30,8 +30,8 @@
 	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
 	resolve_specifier(loc(specifier, my_tmp(Tmp_Dir)), loc(absolute_path, Tmp_Dir_Path)),
 
-	!doc($>request_data, l:has_request_tmp_directory_name, Request_Files_Tmp_Directory_Name),
-	resolve_specifier(loc(specifier, my_tmp(Request_Files_Tmp_Directory_Name), loc(absolute_path, Request_Files_Tmp_Directory_Path)),
+	!doc($>request_data, l:request_tmp_directory_name, Request_Files_Tmp_Directory_Name),
+	resolve_specifier(loc(specifier, my_tmp(Request_Files_Tmp_Directory_Name)), loc(absolute_path, Request_Files_Tmp_Directory_Path)),
 
 	atomic_list_concat([Tmp_Dir_Path, '.zip'], Zip_Fn),
 	atomic_list_concat([Tmp_Dir_Path, '/'], Tmp_Dir_With_Slash),
