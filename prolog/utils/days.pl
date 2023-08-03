@@ -204,12 +204,15 @@
  	(	V = date(_,_,_)
  	->	(
  			(	V = date(1,1,1)
- 			->	throw_format('error reading date at ~w, found: ~q', [$>sheet_and_cell_string(O), V])
- 			%->	throw_format('error reading date at ~w, found: ~q', [sheet_and_cell_string(O), V])
+ 			->	(
+ 					sheet_and_cell_string(O, Str),
+ 					throw_format('error reading date at ~w, found: ~q', [Str, V])
+ 				)
  			;	true)
  		)
  	;	(
- 			throw_format('error reading date at ~w, found: ~q', [$>sheet_and_cell_string(O), V])
+ 			sheet_and_cell_string(O, Str),
+ 			throw_format('error reading date at ~w, found: ~q', [Str, V])
  		)
  	).
 
