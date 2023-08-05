@@ -59,9 +59,7 @@ flag_default(gtrace, true).
 
  gtrace_if_have_display :-
 	(	have_display
-	->	(
-			(	\+current_prolog_flag(gtrace, false)
-			)
+	->	(	\+current_prolog_flag(gtrace, false)
 		->	(
 				format(user_error, '**********', []),
 				backtrace(200),
