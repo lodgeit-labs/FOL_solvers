@@ -1167,7 +1167,9 @@ Required Property Value
  rpv(S,P,V) :-
 	(	doc(S,P,V0)
 	->	!doc(V0, rdf:value, V)
-	;	(
+	;
+		/* throw an error */
+		(
 			(	doc(P, rdfs:label, Label)
 			->	true
 			;	rdf_global_id(Label, P)),
