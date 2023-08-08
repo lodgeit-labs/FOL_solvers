@@ -1,9 +1,11 @@
+:- use_module(library(clpfd)).
+
 % -------------------------------------------------------------------
 % The purpose of the following program is to define modular dates, a generalization of
 % Gregorian dates where the day and month can take on any integral value. They allow you
 % to do things like specify a date relative to the end of a month, add a month to it and
 % get a date relative to the end of the next month. The program also defines absolute
-% days, the number of days since since 1st January 2001. And accordingly it provides
+% days, the number of days since since 1st January 0001. And accordingly it provides
 % relations to convert from modular dates to absolute days.
 %
 % This program is a part of a larger system for deriving various pieces of information on
@@ -14,18 +16,38 @@
 % Some facts about the Gregorian calendar, needed to count days between dates
 %---------------------------------------------------------------------
 
- leap_year(Year) :- 0 is mod(Year, 4), X is mod(Year, 100), X =\= 0.
+
+
+ /* The year must be evenly divisible by 4;
+ If the year can also be evenly divided by 100, it is not a leap year;
+ unless...The year is also evenly divisible by 400. Then it is a leap year.*/
+ leap_year(Year) :-
+ 		0 is mod(Year, 4),
+ 		X is mod(Year, 100),
+ 		X =\= 0.
 
  leap_year(Year) :- 0 is mod(Year, 400).
 
+/* common year should be the inverse of leap_year, which is presumably checked in various places thanks to determinancy checker */
  common_year(Year) :-
 	((Y is mod(Year, 4), Y =\= 0); 0 is mod(Year, 100)),
 	Z is mod(Year, 400), Z =\= 0.
 
- days_in(_, 1, 31). days_in(Year, 2, 29) :- leap_year(Year).
- days_in(Year, 2, 28) :- common_year(Year). days_in(_, 3, 31). days_in(_, 4, 30).
- days_in(_, 5, 31). days_in(_, 6, 30). days_in(_, 7, 31). days_in(_, 8, 31).
- days_in(_, 9, 30). days_in(_, 10, 31). days_in(_, 11, 30). days_in(_, 12, 31).
+
+
+ days_in(_, 1, 31).
+ days_in(Year, 2, 29) :- leap_year(Year).
+ days_in(Year, 2, 28) :- common_year(Year).
+ days_in(_, 3, 31).
+ days_in(_, 4, 30).
+ days_in(_, 5, 31).
+ days_in(_, 6, 30).
+ days_in(_, 7, 31).
+ days_in(_, 8, 31).
+ days_in(_, 9, 30).
+ days_in(_, 10, 31).
+ days_in(_, 11, 30).
+ days_in(_, 12, 31).
 
  days_in(Year, Month, Days) :-
  	Month =< 0,
@@ -98,6 +120,26 @@
  absolute_day(Date, Abs_Day) :-
  	((
  	Date = date(Year, Month, Day),
+
+ 	(	Day #< 32
+ 	->	true
+ 	;	throw_format('bad day: ~q', [Day])),
+ 	(	Day #> 0
+ 	->	true
+ 	;	throw_format('bad day: ~q', [Day])),
+ 	(	Month #< 13
+ 	->	true
+ 	;	throw_format('bad month: ~q', [Day])),
+ 	(	Month #> 0
+ 	->	true
+ 	;	throw_format('bad month: ~q', [Day])),
+ 	(	Year #< 2030
+ 	->	true
+ 	;	throw_format('suspicious year: ~q', [Day])),
+ 	(	Year #> 2000
+ 	->	true
+ 	;	throw_format('suspicious year: ~q', [Day])),
+
  	Month_A is (Year - 1) * 12 + (Month - 1),
  	Num_400Y is Month_A div (400 * 12),
  	Num_100Y is Month_A div (100 * 12),
@@ -110,17 +152,25 @@
  	Abs_Day is Years_Day + Year_Day.
 
  gregorian_date(Abs_Day, date(Year, Month, Day)) :-
- 	Days_1Y is 365,
- 	Days_4Y is (4 * Days_1Y) + 1,
- 	Days_100Y is (25 * Days_4Y) - 1,
- 	Days_400Y is (4 * Days_100Y) + 1,
- 	Num_400Y is (Abs_Day - 1) div Days_400Y,
- 	Num_100Y is ((Abs_Day - 1) mod Days_400Y) div Days_100Y,
- 	Num_4Y is (((Abs_Day - 1) mod Days_400Y) mod Days_100Y) div Days_4Y,
- 	Num_1Y is ((((Abs_Day - 1) mod Days_400Y) mod Days_100Y) mod Days_4Y) div Days_1Y,
- 	Year_Day is 1 + (((((Abs_Day - 1) mod Days_400Y) mod Days_100Y) mod Days_4Y) mod Days_1Y),
- 	Year is 1 + (400 * Num_400Y) + (100 * Num_100Y) + (4 * Num_4Y) + (1 * Num_1Y),
- 	month_day(Year, Year_Day, Month, Day).
+ 	/*
+		Days_1Y = 365,
+		Days_4Y = 1461,
+		Days_100Y = 36524,
+		Days_400Y = 146097.
+ 	*/
+
+  Abs_Day = 737791,
+  Days_1Y is 365,
+  Days_4Y is (4 * Days_1Y) + 1,
+  Days_100Y is (25 * Days_4Y) - 1,
+  Days_400Y is (4 * Days_100Y) + 1,
+  Num_400Y is (Abs_Day - 1) div Days_400Y,
+  Num_100Y is ((Abs_Day - 1) mod Days_400Y) div Days_100Y,
+  Num_4Y is (((Abs_Day - 1) mod Days_400Y) mod Days_100Y) div Days_4Y,
+  Num_1Y is ((((Abs_Day - 1) mod Days_400Y) mod Days_100Y) mod Days_4Y) div Days_1Y,
+  Year_Day is 1 + (((((Abs_Day - 1) mod Days_400Y) mod Days_100Y) mod Days_4Y) mod Days_1Y),
+  Year is 1 + (400 * Num_400Y) + (100 * Num_100Y) + (4 * Num_4Y) + (1 * Num_1Y),
+  month_day(Year, Year_Day, Month, Day).
 
 
  % -------------------------------------------------------------------
