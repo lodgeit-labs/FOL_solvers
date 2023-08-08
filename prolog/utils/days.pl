@@ -152,6 +152,9 @@
  	Abs_Day is Years_Day + Year_Day.
 
  gregorian_date(Abs_Day, date(Year, Month, Day)) :-
+
+  Z is (Abs_Day - 1),
+
  	/*
 		Days_1Y = 365,
 		Days_4Y = 1461,
@@ -164,13 +167,25 @@
   Days_4Y is (4 * Days_1Y) + 1,
   Days_100Y is (25 * Days_4Y) - 1,
   Days_400Y is (4 * Days_100Y) + 1,
-  Num_400Y is (Abs_Day - 1) div Days_400Y,
-  Num_100Y is ((Abs_Day - 1) mod Days_400Y) div Days_100Y,
-  Num_4Y is (((Abs_Day - 1) mod Days_400Y) mod Days_100Y) div Days_4Y,
-  Num_1Y is ((((Abs_Day - 1) mod Days_400Y) mod Days_100Y) mod Days_4Y) div Days_1Y,
-  Year_Day is 1 + (((((Abs_Day - 1) mod Days_400Y) mod Days_100Y) mod Days_4Y) mod Days_1Y),
+
+  Num_400Y is Z div Days_400Y,
+  Num_100Y is (Z mod Days_400Y) div Days_100Y,
+  Num_4Y is ((Z mod Days_400Y) mod Days_100Y) div Days_4Y,
+  Num_1Y is (((Z mod Days_400Y) mod Days_100Y) mod Days_4Y) div Days_1Y,
+
+  Year_Day is 1 + ((((Z mod Days_400Y) mod Days_100Y) mod Days_4Y) mod Days_1Y),
   Year is 1 + (400 * Num_400Y) + (100 * Num_100Y) + (4 * Num_4Y) + (1 * Num_1Y),
   month_day(Year, Year_Day, Month, Day).
+
+/*
+>>> (((737790-1) % 146097) % 36524) % 1461
+  1460
+  >>> ((((737790-1) % 146097) % 36524) % 1461) /365
+  4.0
+  >>> ((((737790-1) % 146097) % 36524) % 1461) / 365
+  4.0
+  >>>
+*/
 
 
  % -------------------------------------------------------------------
