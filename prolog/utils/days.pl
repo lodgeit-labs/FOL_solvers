@@ -151,6 +151,14 @@
  	)->true;throw_string('absolute_day error'(Date, Abs_Day))),
  	Abs_Day is Years_Day + Year_Day.
 
+	% https://en.wikipedia.org/wiki/Julian_day
+
+
+julian_
+JDN #= (1461 * (Y + 4800 + (M - 14)/12))/4 + (367 * (M - 2 − 12 * ((M - 14)/12)))/12 - (3 * ((Y + 4900 + (M - 14)/12)/100))/4 + D - 32075
+
+
+
  gregorian_date(Abs_Day, date(Year, Month, Day)) :-
 
   Z is (Abs_Day - 1),
