@@ -196,12 +196,12 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 ░▀▀░░▀░▀░░▀░░░░░▀░░▀▀▀░░░▀▀░░▀░▀░░▀░░▀▀▀
 */
 /*
- day_to_gregorian_date(Abs_Day, Date) :-
+ gregorian_date(Abs_Day, Date) :-
 	gregorian_date_old(Abs_Day, Date1),
 	rata_die_to_gregorian_date(Abs_Day, Date2),
 	(	Date1 = Date2
 	->	true
-	;	throw_format('implementations of rata_die to gregorian_date disagree: ~q ~q ~q', [Abs_Day, Date1, Date2])),
+	;	throw_format('implementations of rata_die disagree: ~q ~q ~q', [Abs_Day, Date1, Date2])),
 	Date = Date2,
 	sensible_date(Date).
 */
@@ -209,7 +209,7 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 todo tests, lookup table..
 */
 
- day_to_gregorian_date(Abs_Day, Date) :-
+ gregorian_date(Abs_Day, Date) :-
 	rata_die_to_gregorian_date(Abs_Day, Date),
 	sensible_date(Date).
 
@@ -263,7 +263,7 @@ todo tests, lookup table..
  % -------------------------------------------------------------------
 
  day_between(Opening_Date, Closing_Date, Day) :-
- 	day_to_gregorian_date(Day, Date),
+ 	gregorian_date(Day, Date),
  	date_between(Opening_Date, Closing_Date, Date).
 
  date_between(
@@ -326,7 +326,7 @@ todo tests, lookup table..
  add_days(Date, Absolute_Days, Date2) :-
  	absolute_day(Date, Day),
  	Day2 is Day + Absolute_Days,
- 	day_to_gregorian_date(Day2, Date2).
+ 	gregorian_date(Day2, Date2).
 
   date_in_request_period(Date) :-
  	result_property(l:start_date, Start_Date),
