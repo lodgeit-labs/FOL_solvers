@@ -12,12 +12,39 @@
 % different financial arrangements, hire purchase arrangements being an example. This
 % larger system uses absolute days to represent time internally because they are easier
 % to manipulate with than Gregorian dates.
+
+
+
+
+ sensible_date(date(Year, Month, Day)) :-
+	% not entirely comfortable with making this put hooks on a variable and then have unrelated code fail mysteriously,
+	% so, let's limit it to checking ground terms for now
+	!ground(date(Year, Month, Day)),
+ 	(	Day #< 32
+ 	->	true
+ 	;	throw_format('bad day: ~q', [Day])),
+ 	(	Day #> 0
+ 	->	true
+ 	;	throw_format('bad day: ~q', [Day])),
+ 	(	Month #< 13
+ 	->	true
+ 	;	throw_format('bad month: ~q', [Day])),
+ 	(	Month #> 0
+ 	->	true
+ 	;	throw_format('bad month: ~q', [Day])),
+ 	(	Year #< 2035
+ 	->	true
+ 	;	throw_format('suspicious year: ~q', [Day])),
+ 	(	Year #> 1985
+ 	->	true
+ 	;	throw_format('suspicious year: ~q', [Day])).
+
+
+
+
 %
 % Some facts about the Gregorian calendar, needed to count days between dates
 %---------------------------------------------------------------------
-
-
-
  /* The year must be evenly divisible by 4;
  If the year can also be evenly divided by 100, it is not a leap year;
  unless...The year is also evenly divisible by 400. Then it is a leap year.*/
@@ -113,33 +140,36 @@
  	Month_Day is Year_Day + 1 - Month_Start_Year_Day.
 
 
+
+
+
+/* date to day, day to date.
+in the end we should probably implement this mainly with a lookup table anyway, and run the implementations just in debug mode for checking purposes. */
+
+
+/*
+░█▀▄░█▀█░▀█▀░█▀▀░░░▀█▀░█▀█░░░█▀▄░█▀█░█░█
+░█░█░█▀█░░█░░█▀▀░░░░█░░█░█░░░█░█░█▀█░░█░
+░▀▀░░▀░▀░░▀░░▀▀▀░░░░▀░░▀▀▀░░░▀▀░░▀░▀░░▀░
+*/
+ absolute_day(Date, Abs_Day) :-
+ 	ground(Date),
+ 	sensible_date(Date),
+	date_to_absolute_day(Date, Abs_Day1),
+	date_to_rata_die(Date, Abs_Day2),
+	(	Abs_Day1 = Abs_Day2
+	->	true
+	;	throw_format('implementations of absolute_day disagree: ~q ~q ~q', [Date, Abs_Day1, Abs_Day1])),
+	Abs_Day = Abs_Day1.
+
+
  % -------------------------------------------------------------------
  % Internal representation for dates is absolute day count since 1st January 0001
  % -------------------------------------------------------------------
 
- absolute_day(Date, Abs_Day) :-
+ date_to_absolute_day(Date, Abs_Day) :-
  	((
  	Date = date(Year, Month, Day),
-
- 	(	Day #< 32
- 	->	true
- 	;	throw_format('bad day: ~q', [Day])),
- 	(	Day #> 0
- 	->	true
- 	;	throw_format('bad day: ~q', [Day])),
- 	(	Month #< 13
- 	->	true
- 	;	throw_format('bad month: ~q', [Day])),
- 	(	Month #> 0
- 	->	true
- 	;	throw_format('bad month: ~q', [Day])),
- 	(	Year #< 2030
- 	->	true
- 	;	throw_format('suspicious year: ~q', [Day])),
- 	(	Year #> 2000
- 	->	true
- 	;	throw_format('suspicious year: ~q', [Day])),
-
  	Month_A is (Year - 1) * 12 + (Month - 1),
  	Num_400Y is Month_A div (400 * 12),
  	Num_100Y is Month_A div (100 * 12),
@@ -151,26 +181,45 @@
  	)->true;throw_string('absolute_day error'(Date, Abs_Day))),
  	Abs_Day is Years_Day + Year_Day.
 
-	% https://en.wikipedia.org/wiki/Julian_day
+% https://en.wikipedia.org/wiki/Rata_Die | https://en.wikipedia.org/wiki/Julian_day
+ date_to_rata_die(date(Y,M,D), Abs_Day) :-
+	JDN #= (1461 * (Y + 4800 + (M - 14)/12))/4 + (367 * (M - 2 - 12 * ((M - 14)/12)))/12 - (3 * ((Y + 4900 + (M - 14)/12)/100))/4 + D - 32075,
+	Abs_Day #= JDN - 1721425. % 1721425 is the Julian day number for 1 January 1 CE
 
 
-julian_
-JDN #= (1461 * (Y + 4800 + (M - 14)/12))/4 + (367 * (M - 2 − 12 * ((M - 14)/12)))/12 - (3 * ((Y + 4900 + (M - 14)/12)/100))/4 + D - 32075
 
 
 
- gregorian_date(Abs_Day, date(Year, Month, Day)) :-
+/*
+░█▀▄░█▀█░█░█░░░▀█▀░█▀█░░░█▀▄░█▀█░▀█▀░█▀▀
+░█░█░█▀█░░█░░░░░█░░█░█░░░█░█░█▀█░░█░░█▀▀
+░▀▀░░▀░▀░░▀░░░░░▀░░▀▀▀░░░▀▀░░▀░▀░░▀░░▀▀▀
+*/
+/*
+ day_to_gregorian_date(Abs_Day, Date) :-
+	gregorian_date_old(Abs_Day, Date1),
+	rata_die_to_gregorian_date(Abs_Day, Date2),
+	(	Date1 = Date2
+	->	true
+	;	throw_format('implementations of rata_die to gregorian_date disagree: ~q ~q ~q', [Abs_Day, Date1, Date2])),
+	Date = Date2,
+	sensible_date(Date).
+*/
+/*
+todo tests, lookup table..
+*/
 
+ day_to_gregorian_date(Abs_Day, Date) :-
+	rata_die_to_gregorian_date(Abs_Day, Date),
+	sensible_date(Date).
+
+
+ gregorian_date_old(Abs_Day, date(Year, Month, Day)) :-
   Z is (Abs_Day - 1),
-
- 	/*
-		Days_1Y = 365,
-		Days_4Y = 1461,
-		Days_100Y = 36524,
-		Days_400Y = 146097.
- 	*/
-
-  Abs_Day = 737791,
+/*	Days_1Y = 365,
+	Days_4Y = 1461,
+	Days_100Y = 36524,
+	Days_400Y = 146097.*/
   Days_1Y is 365,
   Days_4Y is (4 * Days_1Y) + 1,
   Days_100Y is (25 * Days_4Y) - 1,
@@ -185,15 +234,28 @@ JDN #= (1461 * (Y + 4800 + (M - 14)/12))/4 + (367 * (M - 2 − 12 * ((M - 14)/12
   Year is 1 + (400 * Num_400Y) + (100 * Num_100Y) + (4 * Num_4Y) + (1 * Num_1Y),
   month_day(Year, Year_Day, Month, Day).
 
-/*
->>> (((737790-1) % 146097) % 36524) % 1461
-  1460
-  >>> ((((737790-1) % 146097) % 36524) % 1461) /365
-  4.0
-  >>> ((((737790-1) % 146097) % 36524) % 1461) / 365
-  4.0
-  >>>
-*/
+
+ rata_die_to_gregorian_date(Abs_Day, date(VY, VM, VD)) :-
+	JDN #= Abs_Day + 1721425,
+	Vy #= 4716,
+	Vv #= 3,
+	Vj #= 1401,
+	Vu #= 5,
+	Vm #= 2,
+	Vs #= 153,
+	Vn #= 12,
+	Vw #= 2,
+	Vr #= 4,
+	VB #= 274277,
+	Vp #= 1461,
+	VC #= -38,
+	Vf #= JDN + Vj + (((4 * JDN + VB) // 146097) * 3) // 4 + VC,
+	Ve #= Vr * Vf + Vv,
+	Vg #= (Ve mod Vp) // Vr,
+	Vh #= Vu * Vg + Vw,
+	VD #= ((Vh mod Vs)) // Vu + 1,
+	VM #= ((Vh // Vs + Vm) mod Vn) + 1,
+	VY #= (Ve // Vp) - Vy + (Vn + Vm - VM) // Vn.
 
 
  % -------------------------------------------------------------------
@@ -201,7 +263,7 @@ JDN #= (1461 * (Y + 4800 + (M - 14)/12))/4 + (367 * (M - 2 − 12 * ((M - 14)/12
  % -------------------------------------------------------------------
 
  day_between(Opening_Date, Closing_Date, Day) :-
- 	gregorian_date(Day, Date),
+ 	day_to_gregorian_date(Day, Date),
  	date_between(Opening_Date, Closing_Date, Date).
 
  date_between(
@@ -264,7 +326,7 @@ JDN #= (1461 * (Y + 4800 + (M - 14)/12))/4 + (367 * (M - 2 − 12 * ((M - 14)/12
  add_days(Date, Absolute_Days, Date2) :-
  	absolute_day(Date, Day),
  	Day2 is Day + Absolute_Days,
- 	gregorian_date(Day2, Date2).
+ 	day_to_gregorian_date(Day2, Date2).
 
   date_in_request_period(Date) :-
  	result_property(l:start_date, Start_Date),
