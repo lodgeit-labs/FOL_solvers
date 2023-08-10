@@ -32,6 +32,15 @@ test(Abs_Day) :-
 
 
 
-d(Day, Date):-gregorian_date(Day, Date).
+d(Day, Date) :- 
+	findall(Date0, gregorian_date(Day, Date0), [Date]),
+	gregorian_date(Day, Date),
+	findall(Day0, absolute_day(Date, Day0), [Day]),
+	absolute_day(Date, Day).
+
+
 
 :- ['helper/days_python_enumerated_comparison.pl'].
+:- format('days_python_enumerated_comparison.pl loaded~n', []).
+:- run.
+:- format('success', []).

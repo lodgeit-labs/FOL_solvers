@@ -16,9 +16,40 @@
 
 
 
+
+
+
+/*
+┏━╸╻ ╻┏━╸┏━╸╻┏ ┏━┓
+┃  ┣━┫┣╸ ┃  ┣┻┓┗━┓
+┗━╸╹ ╹┗━╸┗━╸╹ ╹┗━┛
+*/
+
+% not entirely comfortable with making this put hooks on a variable and then have unrelated code fail mysteriously,
+% so, let's limit it to checking ground terms for now
+
+:- if(env_bool('ROBUST_DAYS_ENABLE_SENSIBLE_YEAR_CHECK', true)).
+
  sensible_date(date(Year, Month, Day)) :-
-	% not entirely comfortable with making this put hooks on a variable and then have unrelated code fail mysteriously,
-	% so, let's limit it to checking ground terms for now
+	!ground(date(Year, Month, Day)),
+ 	sensible_monthday(date(Year, Month, Day)),
+ 	(	Year #< 2035
+ 	->	true
+ 	;	throw_format('suspicious year: ~q', [Day])),
+ 	(	Year #> 1985
+ 	->	true
+ 	;	throw_format('suspicious year: ~q', [Day])).
+
+:-  else.
+
+ sensible_date(date(Year, Month, Day)) :-
+	!ground(date(Year, Month, Day)),
+ 	sensible_monthday(date(Year, Month, Day)).
+	
+:- endif.
+
+
+ sensible_monthday(date(Year, Month, Day)) :-
 	!ground(date(Year, Month, Day)),
  	(	Day #< 32
  	->	true
@@ -31,15 +62,7 @@
  	;	throw_format('bad month: ~q', [Day])),
  	(	Month #> 0
  	->	true
- 	;	throw_format('bad month: ~q', [Day])),
- 	(	Year #< 2035
- 	->	true
- 	;	throw_format('suspicious year: ~q', [Day])),
- 	(	Year #> 1985
- 	->	true
- 	;	throw_format('suspicious year: ~q', [Day])).
-
-
+ 	;	throw_format('bad month: ~q', [Day])).
 
 
 %
@@ -153,13 +176,13 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 ░▀▀░░▀░▀░░▀░░▀▀▀░░░░▀░░▀▀▀░░░▀▀░░▀░▀░░▀░
 */
  absolute_day(Date, Abs_Day) :-
- 	ground(Date),
  	sensible_date(Date),
+ 	ground(Date),
 	date_to_absolute_day(Date, Abs_Day1),
 	date_to_rata_die(Date, Abs_Day2),
-	(	Abs_Day1 = Abs_Day2
+	(	Abs_Day1 #= Abs_Day2
 	->	true
-	;	throw_format('implementations of absolute_day disagree: ~q ~q ~q', [Date, Abs_Day1, Abs_Day1])),
+	;	throw_format('implementations of absolute_day disagree: ~q ~q ~q', [Date, Abs_Day1, Abs_Day2])),
 	Abs_Day = Abs_Day1.
 
 
@@ -183,8 +206,8 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 
 % https://en.wikipedia.org/wiki/Rata_Die | https://en.wikipedia.org/wiki/Julian_day
  date_to_rata_die(date(Y,M,D), Abs_Day) :-
-	JDN #= (1461 * (Y + 4800 + (M - 14)/12))/4 + (367 * (M - 2 - 12 * ((M - 14)/12)))/12 - (3 * ((Y + 4900 + (M - 14)/12)/100))/4 + D - 32075,
-	Abs_Day #= JDN - 1721425. % 1721425 is the Julian day number for 1 January 1 CE
+	JDN #= (1461 * (Y + 4800 + (M - 14) div 12)) div 4 + (367 * (M - 2 - 12 * ((M - 14) div 12))) div 12 - (3 * ((Y + 4900 + (M - 14) div 12) div 100)) div 4 + D - 32075,
+	Abs_Day #= JDN - 172142.
 
 
 

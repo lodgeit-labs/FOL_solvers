@@ -1,3 +1,6 @@
+
+prolog:error_message(msg(Msg)) --> [Msg].
+    
 /*
 	throw a msg(Message) term, these errors are caught by our http server code and turned into nice error messages
 */
