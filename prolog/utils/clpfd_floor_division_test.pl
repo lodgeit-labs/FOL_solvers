@@ -1,7 +1,8 @@
 :- use_module(library(clpfd)).
 
 clpfd_floor_division_test :-
-	findall(_,
+	findall(
+		_,
 		(
 			between(-10, 10, X),
 			between(-10, 10, Y),

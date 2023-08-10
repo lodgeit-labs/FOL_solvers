@@ -272,7 +272,7 @@ todo tests, lookup table..
  	Closing_Date,
  	Date
  ) :-
- 	/* todo check that all uses of this pred intend to cut off the end date */
+ 	/* todo check that all uses of this pred mean to exclude the end date */
  	absolute_day(Opening_Date, Opening_Day),
  	absolute_day(Closing_Date, Closing_Day),
  	absolute_day(Date, Day),
