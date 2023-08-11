@@ -238,7 +238,7 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 	JDN #= (1461 * (Y + 4800 + (M - 14) div 12)) div 4 + (367 * (M - 2 - 12 * ((M - 14) div 12))) div 12 - (3 * ((Y + 4900 + (M - 14) div 12) div 100)) div 4 + D - 32075,
 	julian_111(Offset),
 	Abs_Day #= JDN - Offset. % empirically determined
-*/
+
 
 
 
@@ -294,7 +294,7 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 
  rata_die_to_gregorian_date(Abs_Day, date(VY, VM, VD)) :-
 	julian_111(Offset),
-	JDN #= Abs_Day + Offset,
+	JDN #= Abs_Day + Offset + 1,
 	Vy #= 4716,
 	Vv #= 3,
 	Vj #= 1401,
