@@ -39,6 +39,6 @@ def write_asserts():
 
 
 			day = day_rata_die - 724642
-			f.write(f"""d({day},{python_date.year},{python_date.month},{python_date.day}).""")
+			f.write(f"""d({day},{python_date.year},{python_date.month},{python_date.day}). """)
 
 write_asserts()
