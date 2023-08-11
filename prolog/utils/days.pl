@@ -219,6 +219,7 @@ in the end we should probably implement this mainly with a lookup table anyway, 
  % Internal representation for dates is absolute day count since 1st January 0001
  % -------------------------------------------------------------------
 
+% original impl, seems to agree with python.
  date_to_absolute_day0(Date, Abs_Day) :-
  	((
  	Date = date(Year, Month, Day),
@@ -234,10 +235,11 @@ in the end we should probably implement this mainly with a lookup table anyway, 
  	Abs_Day is Years_Day + Year_Day.
 
 % https://en.wikipedia.org/wiki/Rata_Die | https://en.wikipedia.org/wiki/Julian_day
+% adapted from wikipedia. seems to jump around at month bonndary
  date_to_rata_die0(date(Y,M,D), Abs_Day) :-
 	JDN #= (1461 * (Y + 4800 + (M - 14) div 12)) div 4 + (367 * (M - 2 - 12 * ((M - 14) div 12))) div 12 - (3 * ((Y + 4900 + (M - 14) div 12) div 100)) div 4 + D - 32075,
 	julian_111(Offset),
-	Abs_Day #= JDN - Offset. % empirically determined
+	Abs_Day #= JDN - Offset - 1.
 
 
 
@@ -292,9 +294,11 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 
  julian_111(1721425).
 
+
+% adapted from wikipedia. seems to agree with python.
  rata_die_to_gregorian_date(Abs_Day, date(VY, VM, VD)) :-
 	julian_111(Offset),
-	JDN #= Abs_Day + Offset + 1,
+	JDN #= Abs_Day + Offset,
 	Vy #= 4716,
 	Vv #= 3,
 	Vj #= 1401,

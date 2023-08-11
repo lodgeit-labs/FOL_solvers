@@ -45,13 +45,13 @@ test0a(Abs_Day) :-
 
 test1a(J, Date) :-
 
-	!gregorian_date0(J, Date0),
+	!rata_die_to_gregorian_date(J, Date0),
 	!(Date0 = Date),
-	!gregorian_date0(J, Date0),
+	!rata_die_to_gregorian_date(J, Date0),
 
-	!absolute_day0(Date0, Day0),
+	!date_to_absolute_day0(Date0, Day0),
 	!(Day0 = J),
-	!absolute_day0(Date0, Day0).
+	!date_to_absolute_day0(Date0, Day0).
 
 
 :- initialization(run).
