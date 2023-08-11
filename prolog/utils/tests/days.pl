@@ -1,6 +1,6 @@
 :- ['../utils.pl'].
 
-run :-
+run0 :-
 	findall(
 		_,
 		(
@@ -32,15 +32,28 @@ test(Abs_Day) :-
 
 
 
-d(Day, Date) :- 
-	findall(Date0, gregorian_date(Day, Date0), [Date]),
-	gregorian_date(Day, Date),
-	findall(Day0, absolute_day(Date, Day0), [Day]),
-	absolute_day(Date, Day).
+
+ run1 :-
+ 	findall(_,
+ 	d(J,Y,M,D),
+
+	!gregorian_date(J, Date0),
+	!(Date0 = date(Y,M,D)),
+	!gregorian_date(J, Date0),
+
+	!absolute_day(Date, Day0),
+	Day0 = Day,
+	!absolute_day(Date, Day).
 
 
 
-:- ['helper/days_python_enumerated_comparison.pl'].
-:- format('days_python_enumerated_comparison.pl loaded~n', []).
-:- run.
-:- format('success', []).
+
+
+:- initialization(run).
+
+run :-
+	debug,
+	load_files('helper/days_python_enumerated_comparison.pl'),
+	format('days_python_enumerated_comparison.pl loaded~n', []),
+	run1,
+	format('success', []).

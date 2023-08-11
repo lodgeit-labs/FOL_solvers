@@ -167,7 +167,15 @@
 
 
 /* date to day, day to date.
-in the end we should probably implement this mainly with a lookup table anyway, and run the implementations just in debug mode for checking purposes. */
+in the end we should probably implement this mainly with a lookup table anyway, and run the implementations just in debug mode for checking purposes.
+
+
+
+ january 1st, year 1 is 1721425
+
+
+
+ */
 
 
 /*
@@ -175,22 +183,42 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 ░█░█░█▀█░░█░░█▀▀░░░░█░░█░█░░░█░█░█▀█░░█░
 ░▀▀░░▀░▀░░▀░░▀▀▀░░░░▀░░▀▀▀░░░▀▀░░▀░▀░░▀░
 */
+
+:- ['tests/helper/days_python_enumerated_comparison.pl']
+
+ absolute_day(date(Y,M,D), Abs_Day) :-
+ 	!absolute_day2(date(Y,M,D), Abs_Day).
+
+ absolute_day2(date(Y,M,D), Abs_Day) :-
+	ground(date(Y,M,D)),
+	d(Abs_1985, Y, M, D),
+ 	Abs_Day #= Abs_1985 + 724642.
+
+
+
+/*
  absolute_day(Date, Abs_Day) :-
+ 	sensible_date(Date),
+ 	ground(Date),
+	date_to_rata_die(Date, Abs_Day).
+*/
+/*
+ absolute_day0(Date, Abs_Day) :-
  	sensible_date(Date),
  	ground(Date),
 	date_to_absolute_day(Date, Abs_Day1),
 	date_to_rata_die(Date, Abs_Day2),
 	(	Abs_Day1 #= Abs_Day2
-	->	true
+	->	format('absolute_day: ~q ~q ~q~n', [Date, Abs_Day1, Abs_Day2])
 	;	throw_format('implementations of absolute_day disagree: ~q ~q ~q', [Date, Abs_Day1, Abs_Day2])),
 	Abs_Day = Abs_Day1.
-
+*/
 
  % -------------------------------------------------------------------
  % Internal representation for dates is absolute day count since 1st January 0001
  % -------------------------------------------------------------------
 
- date_to_absolute_day(Date, Abs_Day) :-
+ date_to_absolute_day0(Date, Abs_Day) :-
  	((
  	Date = date(Year, Month, Day),
  	Month_A is (Year - 1) * 12 + (Month - 1),
@@ -205,10 +233,11 @@ in the end we should probably implement this mainly with a lookup table anyway, 
  	Abs_Day is Years_Day + Year_Day.
 
 % https://en.wikipedia.org/wiki/Rata_Die | https://en.wikipedia.org/wiki/Julian_day
- date_to_rata_die(date(Y,M,D), Abs_Day) :-
+ date_to_rata_die0(date(Y,M,D), Abs_Day) :-
 	JDN #= (1461 * (Y + 4800 + (M - 14) div 12)) div 4 + (367 * (M - 2 - 12 * ((M - 14) div 12))) div 12 - (3 * ((Y + 4900 + (M - 14) div 12) div 100)) div 4 + D - 32075,
-	Abs_Day #= JDN - 172142.
-
+	julian_111(Offset),
+	Abs_Day #= JDN - Offset. % empirically determined
+*/
 
 
 
@@ -218,6 +247,11 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 ░█░█░█▀█░░█░░░░░█░░█░█░░░█░█░█▀█░░█░░█▀▀
 ░▀▀░░▀░▀░░▀░░░░░▀░░▀▀▀░░░▀▀░░▀░▀░░▀░░▀▀▀
 */
+
+ gregorian_date(Abs_Day, date(Y,M,D)) :-
+ 	Abs_1985 #= Abs_Day - 724642,
+	!d(Abs_1985, Y, M, D).
+
 /*
  gregorian_date(Abs_Day, Date) :-
 	gregorian_date_old(Abs_Day, Date1),
@@ -229,13 +263,10 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 	sensible_date(Date).
 */
 /*
-todo tests, lookup table..
-*/
-
  gregorian_date(Abs_Day, Date) :-
 	rata_die_to_gregorian_date(Abs_Day, Date),
 	sensible_date(Date).
-
+*/
 
  gregorian_date_old(Abs_Day, date(Year, Month, Day)) :-
   Z is (Abs_Day - 1),
@@ -258,8 +289,11 @@ todo tests, lookup table..
   month_day(Year, Year_Day, Month, Day).
 
 
+ julian_111(1721425).
+
  rata_die_to_gregorian_date(Abs_Day, date(VY, VM, VD)) :-
-	JDN #= Abs_Day + 1721425,
+	julian_111(Offset),
+	JDN #= Abs_Day + Offset,
 	Vy #= 4716,
 	Vv #= 3,
 	Vj #= 1401,
