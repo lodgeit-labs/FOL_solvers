@@ -184,7 +184,8 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 ░▀▀░░▀░▀░░▀░░▀▀▀░░░░▀░░▀▀▀░░░▀▀░░▀░▀░░▀░
 */
 
-:- ['tests/helper/days_python_enumerated_comparison.pl']
+:- ['tests/helper/days_python_enumerated_comparison.pl'].
+
 
  absolute_day(date(Y,M,D), Abs_Day) :-
  	!absolute_day2(date(Y,M,D), Abs_Day).
@@ -202,17 +203,17 @@ in the end we should probably implement this mainly with a lookup table anyway, 
  	ground(Date),
 	date_to_rata_die(Date, Abs_Day).
 */
-/*
+
  absolute_day0(Date, Abs_Day) :-
  	sensible_date(Date),
  	ground(Date),
-	date_to_absolute_day(Date, Abs_Day1),
-	date_to_rata_die(Date, Abs_Day2),
+	date_to_absolute_day0(Date, Abs_Day1),
+	date_to_rata_die0(Date, Abs_Day2),
 	(	Abs_Day1 #= Abs_Day2
 	->	format('absolute_day: ~q ~q ~q~n', [Date, Abs_Day1, Abs_Day2])
 	;	throw_format('implementations of absolute_day disagree: ~q ~q ~q', [Date, Abs_Day1, Abs_Day2])),
 	Abs_Day = Abs_Day1.
-*/
+
 
  % -------------------------------------------------------------------
  % Internal representation for dates is absolute day count since 1st January 0001
@@ -252,8 +253,8 @@ in the end we should probably implement this mainly with a lookup table anyway, 
  	Abs_1985 #= Abs_Day - 724642,
 	!d(Abs_1985, Y, M, D).
 
-/*
- gregorian_date(Abs_Day, Date) :-
+
+ gregorian_date0(Abs_Day, Date) :-
 	gregorian_date_old(Abs_Day, Date1),
 	rata_die_to_gregorian_date(Abs_Day, Date2),
 	(	Date1 = Date2
@@ -261,7 +262,7 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 	;	throw_format('implementations of rata_die disagree: ~q ~q ~q', [Abs_Day, Date1, Date2])),
 	Date = Date2,
 	sensible_date(Date).
-*/
+
 /*
  gregorian_date(Abs_Day, Date) :-
 	rata_die_to_gregorian_date(Abs_Day, Date),

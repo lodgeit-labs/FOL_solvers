@@ -35,15 +35,19 @@ test(Abs_Day) :-
 
  run1 :-
  	findall(_,
- 	d(J,Y,M,D),
 
-	!gregorian_date(J, Date0),
-	!(Date0 = date(Y,M,D)),
-	!gregorian_date(J, Date0),
+		*d(J,Y,M,D),
 
-	!absolute_day(Date, Day0),
-	Day0 = Day,
-	!absolute_day(Date, Day).
+		!gregorian_date0(J, Date0),
+		!(Date0 = date(Y,M,D)),
+		!gregorian_date0(J, Date0),
+
+		!absolute_day0(Date0, Day0),
+		!(Day0 = J),
+		!absolute_day0(Date0, Day0)
+
+	),
+	_).
 
 
 
@@ -53,7 +57,7 @@ test(Abs_Day) :-
 
 run :-
 	debug,
-	load_files('helper/days_python_enumerated_comparison.pl'),
-	format('days_python_enumerated_comparison.pl loaded~n', []),
+	%load_files('helper/days_python_enumerated_comparison.pl'),
+	%format('days_python_enumerated_comparison.pl loaded~n', []),
 	run1,
 	format('success', []).
