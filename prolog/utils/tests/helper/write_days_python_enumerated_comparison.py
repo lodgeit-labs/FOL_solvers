@@ -5,6 +5,15 @@ from datetime import datetime
 def write_asserts():
 	with open(f"days_python_enumerated_comparison.pl", "w") as f:
 
+		def rata_die_date(day_rata_die):
+			return datetime.fromordinal(day_rata_die).date()
+		def w(j,y,m,d):
+			f.write(f"""d({j},{y},{m},{d}). """)
+
+		day1 = rata_die_date(1)
+		w(1, day1.year, day1.month, day1.day)
+		f.write(f"""\n""")
+
 		# Return the date corresponding to the proleptic Gregorian ordinal, where January 1 of year 1 has ordinal 1.
 		dmin = datetime.fromisoformat('1985-01-01').date().toordinal()
 		if dmin == 724642:
@@ -18,7 +27,7 @@ def write_asserts():
 
 		for day_rata_die in range(dmin, dmax):
 
-			python_date = datetime.fromordinal(day_rata_die).date()
+			python_date = rata_die_date(day_rata_die)
 
 			if old is None:
 				pass
@@ -37,8 +46,9 @@ def write_asserts():
 
 			old = python_date
 
-
 			day = day_rata_die - 724642
-			f.write(f"""d({day},{python_date.year},{python_date.month},{python_date.day}). """)
+			w(day, python_date.year, python_date.month, python_date.day)
+
+
 
 write_asserts()
