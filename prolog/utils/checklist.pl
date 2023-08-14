@@ -8,11 +8,11 @@
 
 		debugging,
 
-		flag(disable_graceful_resume_on_unexpected_error, Disable_graceful_resume_on_unexpected_error),
-		format(user_error, '* disable_graceful_resume_on_unexpected_error ~q~n', [Disable_graceful_resume_on_unexpected_error]),
+		flag('DISABLE_GRACEFUL_RESUME_ON_UNEXPECTED_ERROR', Disable_graceful_resume_on_unexpected_error),
+		format(user_error, '* 'DISABLE_GRACEFUL_RESUME_ON_UNEXPECTED_ERROR' ~q~n', [Disable_graceful_resume_on_unexpected_error]),
 
-		flag(gtrace, Gtrace),
-		format(user_error, '* gtrace ~q~n', [Gtrace]),
+		flag('GTRACE_ON_OWN_EXCEPTIONS', Gtrace),
+		format(user_error, '* GTRACE_ON_OWN_EXCEPTIONS ~q~n', [Gtrace]),
 
 		(	getenv('DISPLAY', DISPLAY)
 		->	true

@@ -24,7 +24,7 @@ prolog:error_message(msg(Msg)) --> [Msg].
 
 
  throw_value(V) :-
-	(	current_prolog_flag(debug, true)
+	(	env_bool('GTRACE_ON_OWN_EXCEPTIONS', true)
 	->	(
 			gtrace_if_have_display,
 			get_prolog_backtrace_str(Backtrace_str),
@@ -62,7 +62,7 @@ flag_default(gtrace, true).
 
  gtrace_if_have_display :-
 	(	have_display
-	->	(	\+current_prolog_flag(gtrace, false)
+	->	(	env_bool('GTRACE_ON_OWN_EXCEPTIONS', true)
 		->	(
 				format(user_error, '**********', []),
 				backtrace(200),

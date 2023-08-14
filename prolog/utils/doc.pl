@@ -99,7 +99,7 @@ maybe this program will even run faster without this?*/
 good thing is i think even with retracts (the backtracking kind), we won't have to worry about prolog reusing variable numbers. anyway, variables are todo
 */
 
-env_bool_has_default('ROBUST_DOC_ENABLE_TRAIL', false).
+flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 
 :- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
 
@@ -374,7 +374,7 @@ member
 */
 
 
-env_bool_has_default('ROBUST_ROL_ENABLE_CHECKS', false).
+flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
 :- if(env_bool('ROBUST_ROL_ENABLE_CHECKS', true)).
 

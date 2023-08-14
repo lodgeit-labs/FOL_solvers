@@ -42,7 +42,7 @@ exception: blablabla
 %	).
 
 
-env_bool_has_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
+flag_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
 
 :- if(env_bool('ENABLE_CONTEXT_TRACE_TRAIL',true)).
 
@@ -97,7 +97,7 @@ env_bool_has_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
 
 :- endif.
 
-env_bool_has_default('ENABLE_CONTEXT_TRACE',true).
+flag_default('ENABLE_CONTEXT_TRACE',true).
 
 :- if(env_bool('ENABLE_CONTEXT_TRACE', false)).
 
