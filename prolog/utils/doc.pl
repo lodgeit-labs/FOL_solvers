@@ -957,7 +957,7 @@ represent xml in doc.
 we could control this with a thread select'ing some unix socket
 */
 /*doc_dumping_enabled :-
-	current_prolog_flag(doc_dumping_enabled, true).
+	flag(doc_dumping_enabled, true).
 */
 
 

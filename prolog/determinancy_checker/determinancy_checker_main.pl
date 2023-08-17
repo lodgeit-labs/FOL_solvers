@@ -19,7 +19,9 @@
 	/*'+'/1*/
 ]).
 
-:- use_module('../../prolog/utils/envvars', [env_bool/2]).
+%:- use_module('../../prolog/utils/envvars', [env_bool/2]).
+%:- use_module('../../prolog/utils/exceptions', [throw_string/1]).
+:- ['../../prolog/utils/utils'].
 
 
 

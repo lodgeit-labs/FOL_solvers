@@ -6,8 +6,7 @@
 
 
  services_server(S) :-
-	!getenv('SERVICES_URL',S),
-	%!current_prolog_flag(services_server, S),
+	!flag('SERVICES_URL',S),
 	debug(d, 'services_server = ~q', [S]).
 
  url_parts(Url, Parts) :-

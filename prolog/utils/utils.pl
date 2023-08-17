@@ -33,7 +33,8 @@
 
 
 
-:- use_module(envvars).
+%%:- use_module(envvars).
+:- [envvars].
 :- [checks].
 
 
