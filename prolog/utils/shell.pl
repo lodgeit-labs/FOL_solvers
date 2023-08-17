@@ -73,13 +73,13 @@ swipl shell has a bug making it stuck for long time */
 
 
 
- shell2(Cmd) :-
-	shell2(Cmd, _).
+ shellx2(Cmd) :-
+	shellx2(Cmd, _).
 
- shell2(Cmd_In, Exit_Status) :-
-	shell3(Cmd_In, [exit_status(Exit_Status)]).
+ shellx2(Cmd_In, Exit_Status) :-
+	shellx3(Cmd_In, [exit_status(Exit_Status)]).
 
- shell3(Cmd_In, Options) :-
+ shellx3(Cmd_In, Options) :-
 	flatten([Cmd_In], Cmd_Flat),
 	atomic_list_concat(Cmd_Flat, " ", Cmd),
 
@@ -104,4 +104,4 @@ swipl shell has a bug making it stuck for long time */
  print_clickable_link(Url, Title) :-
 	/* todo replace this with write */
 	atomics_to_string([">&2 printf '\e]8;;", Url,"\e\\   ", Title, "   \e]8;;\e\\\n'"],  S),
-	shell2(S,_).
+	shellx2(S,_).

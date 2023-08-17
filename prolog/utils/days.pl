@@ -28,6 +28,7 @@
 % not entirely comfortable with making this put hooks on a variable and then have unrelated code fail mysteriously,
 % so, let's limit it to checking ground terms for now
 
+flag_default('ROBUST_DAYS_ENABLE_SENSIBLE_YEAR_CHECK', true).
 :- if(env_bool('ROBUST_DAYS_ENABLE_SENSIBLE_YEAR_CHECK', true)).
 
  sensible_date(date(Year, Month, Day)) :-

@@ -1,6 +1,8 @@
 %:- module(_, [env_bool/2, flag/2]).
 
-:- multifile user:flag_default/2.
+%:- multifile user:flag_default/2.
+
+:- multifile flag_default/2.
 
 
  env_bool(Key, Val) :-
@@ -19,7 +21,7 @@
 
 
  flag(Key, Value) :-
- 	format(user_error,'flag(~q~n',[Key]),
+ 	%format(user_error,'flag(~q~n',[Key]),
 	(	current_prolog_flag(Key, Value0)
 	->	true
  	;	(	getenv(Key, Value0)

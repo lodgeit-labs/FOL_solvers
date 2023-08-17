@@ -1,27 +1,32 @@
-:- module(_, [
-	op(812,fx,!),
-	op(812,fx,?),
-	op(812,fx,*),
+%:- module(_, [
+%	op(812,fx,!),
+%	op(812,fx,?),
+%	op(812,fx,*),
+%
+%	/* is nondet. This is just a no-op annotation */
+%	'*'/1,
+%
+%	/* must have one solution */
+%	'!'/1,
+%	'!'/2,
+%	'!'/3,
+%	'!'/4,
+%
+%	/* must have zero or one solution */
+%	'?'/1
+%
+%	/* must have one or more solutions(to be done) */
+%	/*'+'/1*/
+%]).
+:-	op(812,fx,!).
+:-	op(812,fx,?).
+:-	op(812,fx,*).
 
-	/* is nondet. This is just a no-op annotation */
-	'*'/1,
 
-	/* must have one solution */
-	'!'/1,
-	'!'/2,
-	'!'/3,
-	'!'/4,
 
-	/* must have zero or one solution */
-	'?'/1
-
-	/* must have one or more solutions(to be done) */
-	/*'+'/1*/
-]).
-
-%:- use_module('../../prolog/utils/envvars', [env_bool/2]).
+%:- use_module('../../prolog/utils/utils', [env_bool/2, throw_string/1]).
 %:- use_module('../../prolog/utils/exceptions', [throw_string/1]).
-:- ['../../prolog/utils/utils'].
+%:- ['../../prolog/utils/utils'].
 
 
 
@@ -55,8 +60,8 @@
  determinancy_checker_throw_error(E) :-
 	gtrace,throw(E).
 
-env_bool_has_default('DETERMINANCY_CHECKER__USE__ENFORCER', false).
-env_bool_has_default('DETERMINANCY_CHECKER__USE__UNDO', false).
+flag_default('DETERMINANCY_CHECKER__USE__ENFORCER', false).
+flag_default('DETERMINANCY_CHECKER__USE__UNDO', false).
 
 :- if(env_bool('DETERMINANCY_CHECKER__USE__ENFORCER', true)).
 	:- debug(determinancy_checker, "'DETERMINANCY_CHECKER__USE__ENFORCER', true",[]).

@@ -1,6 +1,7 @@
 #!/usr/bin/env swipl
 
-:- ['../../prolog/determinancy_checker/determinancy_checker_main.pl'].
+%:- ['../../prolog/determinancy_checker/determinancy_checker_main.pl'].
+:- ['../../prolog/utils/utils'].
 
 /*
 not all permutations of compilation and toplevel options are implemented. Compilation would be useful if swipl reported all errors, including DCG errors, upon loading, without a need to call 'make'. Right now, it is useless, and it gives no speed improvement.

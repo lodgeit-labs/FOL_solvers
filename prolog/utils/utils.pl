@@ -1,3 +1,4 @@
+%:- module(_, []).
 
 :- b_setval(context, []).
 
@@ -34,6 +35,7 @@
 
 
 %%:- use_module(envvars).
+:- [exceptions].
 :- [envvars].
 :- [checks].
 
@@ -41,7 +43,8 @@
 
 :- multifile determinancy_checker_throw_error/1.
  determinancy_checker_throw_error(X) :- throw_string(X),!.
-:- use_module('../determinancy_checker/determinancy_checker_main.pl').
+%:- use_module('../determinancy_checker/determinancy_checker_main.pl').
+:- ['../determinancy_checker/determinancy_checker_main.pl'].
 %:- asserta((determinancy_checker_throw_error(X) :- throw_string(X),!)).
 
 
@@ -57,7 +60,6 @@
 :- [days].
 :- [dict_vars].
 :- [doc].
-:- [exceptions].
 :- [execution_context].
 :- [files].
 :- [globals].
