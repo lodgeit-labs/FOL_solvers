@@ -29,5 +29,19 @@
  		;	(	flag_default(Key, Value0)
 			->	true
 			;	throw_string(Key)))),
+ 	report_flag_use(Key, Value0),
  	Value = Value0.
+
+ report_flag_use(Key, Value) :-
+	(	nb_current(flag_use, Flag_use)
+	->	true
+	;	Flag_use = []),
+
+	(	member(Key, Flag_use)
+	->	true
+	;	(
+			nb_setval(flag_use, [Key|Flag_use]),
+			format(user_error,'flag(~q, ~q)~n',[Key, Value])
+		)
+	).
 
