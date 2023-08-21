@@ -45,12 +45,16 @@ test0a(Abs_Day) :-
 
 test1a(J, Date) :-
 
+	% try with unbound argument
 	!rata_die_to_gregorian_date(J, Date0),
 	!(Date0 = Date),
+	% try with bound argument
 	!rata_die_to_gregorian_date(J, Date0),
 
+	% try with unbound argument
 	!date_to_absolute_day0(Date0, Day0),
 	!(Day0 = J),
+	% try with bound argument
 	!date_to_absolute_day0(Date0, Day0).
 
 
