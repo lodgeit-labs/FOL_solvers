@@ -23,6 +23,8 @@ prolog:error_message(msg(Msg)) --> [Msg].
 	throw_value(with_html(String, Html)).
 
 
+ flag_default('GTRACE_ON_OWN_EXCEPTIONS', true).
+
  throw_value(V) :-
 	(	env_bool('GTRACE_ON_OWN_EXCEPTIONS', true)
 	->	(
