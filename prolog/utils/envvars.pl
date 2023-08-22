@@ -19,6 +19,7 @@
 	member(V, [0, '0', 'false', 'no', 'off']),!.
 
 
+:- discontiguous flag_default/2.
 
  flag(Key, Value) :-
  	%format(user_error,'flag(~q~n',[Key]),
