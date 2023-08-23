@@ -282,7 +282,7 @@ run_with_toplevel(Debug, Goal, Script, _Opts) :-
 
 	(	getenv('MPROF_OUTPUT_PATH', MPROF_OUTPUT_PATH)
 	->	true
-	;	MPROF_OUTPUT_PATH = '/app/server_root/tmp/mem'),
+	;	MPROF_OUTPUT_PATH = '/app/server_root/tmp/mem_prof'),
 
 	Args0 = ['-v',
 
