@@ -86,6 +86,7 @@ maybe this program will even run faster without this?*/
 	(	nb_current(doc_trail, _)
 	->	true
 	;	doc_init_trace_0),
+	thread_create('watch doc-dumper command pipe', _),
 	doc_clear.
 
  reestablish_doc(G,Ng) :-
@@ -929,8 +930,11 @@ represent xml in doc.
 
  'watch doc-dumper command pipe' :-
     %shell4('mkfifo fo',_),
-    shell('mkfifo control/fo',_),
-    open(fo, read, Fo),
+    File = 'control/fo',
+    (	access_file(File, exist)
+    ->	true
+    ;	shell($>atom_concat('mkfifo ', File), _)),
+    open('control/fo', read, Fo),
     read_term(Fo, X,[]),
     open(X,append,Out_Stream),
     writeq(Out_Stream, 'asking main thread to dump doc..'),
@@ -938,9 +942,7 @@ represent xml in doc.
     thread_signal(main, doc_dump),
     'watch doc-dumper command pipe'.
 
-:- initialization(thread_create('watch doc-dumper command pipe', _)).
-
-
+%:- initialization(thread_create('watch doc-dumper command pipe', _)).
 
  doc_dump :-
 	gensym(dump, Id),
