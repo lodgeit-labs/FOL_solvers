@@ -59,6 +59,7 @@ prolog:error_message(msg(Msg)) --> [Msg].
 	;	format(user_error, 'have_display?no\n', [])).
 
 
+:- discontiguous flag_default/2.
 
 flag_default(gtrace, true).
 
