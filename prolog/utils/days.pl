@@ -189,8 +189,8 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 
 
  absolute_day(Date, Abs_Day) :-
- 	!date_to_absolute_day0(Date, Abs_Day).
- 	%!absolute_day2(Date, Abs_Day).
+ 	%!date_to_absolute_day0(Date, Abs_Day).
+ 	!absolute_day2(Date, Abs_Day).
 
  absolute_day2(date(Y,M,D), Abs_Day) :-
 	ground(date(Y,M,D)),
@@ -254,8 +254,8 @@ in the end we should probably implement this mainly with a lookup table anyway, 
 */
 
  gregorian_date(Abs_Day, Date) :-
-	%gregorian_date2(Abs_Day, Date).
-	gregorian_date_old(Abs_Day, Date).
+	gregorian_date2(Abs_Day, Date).
+	%gregorian_date_old(Abs_Day, Date).
 
 
   gregorian_date2(Abs_Day, date(Y,M,D)) :-
