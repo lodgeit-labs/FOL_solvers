@@ -10,6 +10,8 @@
 :- rdf_register_prefix(depr,				'https://rdf.lodgeit.net.au/v1/calcs/depr#').
 :- rdf_register_prefix(ic,					'https://rdf.lodgeit.net.au/v1/calcs/ic#').
 :- rdf_register_prefix(hp,					'https://rdf.lodgeit.net.au/v1/calcs/hp#').
+:- rdf_register_prefix(div7a,				'https://rdf.lodgeit.net.au/v1/calcs/div7a#').
+:- rdf_register_prefix(div7a_repayment,		'https://rdf.lodgeit.net.au/v1/calcs/div7a/repayment#').
 :- rdf_register_prefix(depr_ui,				'https://rdf.lodgeit.net.au/v1/calcs/depr/ui#').
 :- rdf_register_prefix(ic_ui,				'https://rdf.lodgeit.net.au/v1/calcs/ic/ui#').
 :- rdf_register_prefix(hp_ui,				'https://rdf.lodgeit.net.au/v1/calcs/hp/ui#').
