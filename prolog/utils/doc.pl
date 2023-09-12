@@ -88,7 +88,7 @@ maybe this program will even run faster without this?*/
 	(	nb_current(doc_trail, _)
 	->	true
 	;	doc_init_trace_0),
-	thread_create('watch doc-dumper command pipe', _),
+	%thread_create('watch doc-dumper command pipe', _),
 	doc_clear.
 
  reestablish_doc(G,Ng) :-
