@@ -67,9 +67,9 @@ flag_default(gtrace, true).
 	(	have_display
 	->	(	env_bool('GTRACE_ON_OWN_EXCEPTIONS', true)
 		->	(
-				format(user_error, '**********', []),
-				backtrace(200),
-				format(user_error, '**********', []),
+				format(user_error, '*****vvvbacktrace?vvv*****', []),
+				catch(backtrace(200),_,true),
+				format(user_error, '*****^^^backtrace?^^^*****', []),
 				trace
 			)
 		;	true)
@@ -84,8 +84,13 @@ flag_default(gtrace, true).
 
 
  get_prolog_backtrace_str(Backtrace_str) :-
-	get_prolog_backtrace(200, Backtrace, [goal_depth(7)]),
-	stt(Backtrace, Backtrace_str).
+	catch(
+		(
+			get_prolog_backtrace(200, Backtrace, [goal_depth(7)]),
+			stt(Backtrace, Backtrace_str)
+		),
+		_,
+		Backtrace_str = 'get_prolog_backtrace threw exception.').
 
 
 
