@@ -83,7 +83,7 @@ main :-
 			help('run swipl with -O?')]
 		,[opt(compile), type(boolean), default(false), shortflags([c]), longflags([compile]),
 			help('compile first?')]
-		,[opt(toplevel), type(boolean), default(true), shortflags([t]), longflags([toplevel]),
+		,[opt(toplevel), type(boolean), default(false), shortflags([t]), longflags([toplevel]),
 			help('pass goal interactively into toplevel instead of with -g? Allows guitracer to run after exception.')]
 		,[opt(halt_on_problems), type(boolean), default(true), shortflags([h]), longflags([halt_on_problems])]
 		,[opt(problem_lines_whitelist), type(atom), longflags([problem_lines_whitelist])]
