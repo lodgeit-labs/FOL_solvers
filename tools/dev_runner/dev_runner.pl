@@ -165,7 +165,8 @@ check_syntax(Optimization, Script) :-
 	->	Err_Grep = ['| grep -v -x -F -f ', Whitelist_File]
 	;	Err_Grep = ''),
 
-	shell2([Load_Cmd, ' -g "make,halt."  2>&1  |  tee ', Err_File, Err_Grep, ' | head -n 150 1>&2']),
+	%shell2([Load_Cmd, ' -g "make,halt."  2>&1  |  tee ', Err_File, Err_Grep, ' | head -n 150 1>&2']),
+	shell2([Load_Cmd, ' -g "halt."  2>&1  |  tee ', Err_File, Err_Grep, ' | head -n 150 1>&2']),
 	maybe_halt_on_problems,
 	debug(dev_runner, 'dev_runner: syntax seems ok...\n', []).
 
