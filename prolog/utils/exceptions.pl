@@ -70,7 +70,8 @@ flag_default(gtrace, true).
 				format(user_error, '*****vvvbacktrace?vvv*****', []),
 				catch(backtrace(200),_,true),
 				format(user_error, '*****^^^backtrace?^^^*****', []),
-				trace
+				trace,
+				format(user_error, '*****.......*****', [])
 			)
 		;	true)
 	; true).

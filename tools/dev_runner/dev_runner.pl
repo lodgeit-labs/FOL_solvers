@@ -142,7 +142,7 @@ split_list_by_last_occurence_of2([],_,[],[]) :- !.
 optimization_flag(Debug, Optimization) :-
 	(	Debug = true
 	->	(
-			Optimization = ' ',
+			Optimization = ' --debug=true ',
 			debug(dev_runner, 'dev_runner: debug is true, no -O...\n', [])
 		)
 	;	(
@@ -246,7 +246,11 @@ run_without_compilation(Debug, Optimization, Script, Viewer) :-
 			->	Err_Grep = [' 3>&1 1>&2 2>&3 | grep -v -x -F -f ', Whitelist_File, ' ) 3>&1 1>&2 2>&3']
 			;	Err_Grep = ')'),
 
-			shell2(["(/usr/bin/time -v swipl", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
+			(	getenv('MPROF_OUTPUT_PATH', MPROF_OUTPUT_PATH)
+			->	true
+			;	MPROF_OUTPUT_PATH = '/app/server_root/tmp/mem_prof'),
+
+			shell2(["(/usr/bin/time -v mprof run --nopython -C -E -o ", MPROF_OUTPUT_PATH, " swipl --stack_limit=100G ", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
 
 			(	Exit_status = 0
 			->	true

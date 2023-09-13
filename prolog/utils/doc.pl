@@ -455,6 +455,10 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 */
 
  node_rdf_vs_doc(
+	date(Y,M,D) ^^ 'http://www.w3.org/2001/XMLSchema#date',
+	date(Y,M,D)) :- !.
+
+ node_rdf_vs_doc(
 	date_time(Y,M,D,Z0,Z1,Z2) ^^ 'http://www.w3.org/2001/XMLSchema#dateTime',
 	date(Y,M,D)) :-
 		is_zero_number(Z0),
@@ -505,17 +509,19 @@ X) :-
 
  triple_rdf_vs_doc((S,P,O), (S,P,O2)) :-
 	(var(S);atom(S)),
-	catch(
-		(	node_rdf_vs_doc(O,O2)
-		->	true
-		;	throw($>format(string(<$), 'conversion from rdf to doc failed: ~q <-> ~q', [O,O2]))
-		),
-		E,
-		(
-			format(user_error, '~q', [E]),
-			throw_string(E)
+	(	catch(
+			node_rdf_vs_doc(O,O2),
+			E,
+			(
+				format(user_error, '~q', [E]),
+				throw_string(E)
+			)
 		)
-	).
+	->	true
+    ;	throw_string($>format(string(<$), 'conversion from rdf to doc failed: ~q <-> ~q', [O,O2]))
+    ).
+
+	
 
 /* todo vars */
 
