@@ -27,13 +27,10 @@ prolog:error_message(msg(Msg)) --> [Msg].
 
  throw_value(V) :-
 	(	env_bool('GTRACE_ON_OWN_EXCEPTIONS', true)
-	->	(
-			gtrace_if_have_display,
-			get_prolog_backtrace_str(Backtrace_str),
-			throw(with_backtrace_str(error(msg(V),_),Backtrace_str))
-		)
-	;	throw(error(msg(V),_))
-	).
+	->	gtrace_if_have_display
+	;	true),
+	get_prolog_backtrace_str(Backtrace_str),
+	throw(with_backtrace_str(error(msg(V),_),Backtrace_str)).
 
 
  throw_stringize_and_concat(List_Or_Atomic, String) :-
