@@ -21,6 +21,8 @@
 
 :- discontiguous flag_default/2.
 
+
+/* this naming is unfortunate as swipl already has flag/3 */
  flag(Key, Value) :-
  	%format(user_error,'flag(~q~n',[Key]),
 	(	current_prolog_flag(Key, Value0)
