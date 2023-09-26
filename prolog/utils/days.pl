@@ -16,6 +16,8 @@
 
 
 
+day_year(Rata_die, Y) :-
+	gregorian_date(Rata_die, date(Y,_,_)).
 
 
 
