@@ -1,3 +1,6 @@
+
+prolog:error_message(msg(Msg)) --> [Msg].
+    
 /*
 	throw a msg(Message) term, these errors are caught by our http server code and turned into nice error messages
 */
@@ -20,15 +23,14 @@
 	throw_value(with_html(String, Html)).
 
 
+ flag_default('GTRACE_ON_OWN_EXCEPTIONS', true).
+
  throw_value(V) :-
-	(	current_prolog_flag(debug, true)
-	->	(
-			gtrace_if_have_display,
-			get_prolog_backtrace_str(Backtrace_str),
-			throw(with_backtrace_str(error(msg(V),_),Backtrace_str))
-		)
-	;	throw(error(msg(V),_))
-	).
+	(	env_bool('GTRACE_ON_OWN_EXCEPTIONS', true)
+	->	gtrace_if_have_display
+	;	true),
+	get_prolog_backtrace_str(Backtrace_str),
+	throw(with_backtrace_str(error(msg(V),_),Backtrace_str)).
 
 
  throw_stringize_and_concat(List_Or_Atomic, String) :-
@@ -43,30 +45,30 @@
 			throw(internal_error)
 	).
 
-
  have_display :-
+	format(user_error, 'have_display?\n', []),
 	(	(
 			getenv('DISPLAY', Display),
 			atom_length(Display, X),
 			X > 0
 		)
-	->	debug(checklist, 'have_display?yes\n', [])
-	;	debug(checklist, 'have_display?yes\n', [])).
+	->	format(user_error, 'have_display?yes\n', [])
+	;	format(user_error, 'have_display?no\n', [])).
 
 
+:- discontiguous flag_default/2.
 
 flag_default(gtrace, true).
 
  gtrace_if_have_display :-
 	(	have_display
-	->	(
-			(	\+current_prolog_flag(gtrace, false)
-			)
+	->	(	env_bool('GTRACE_ON_OWN_EXCEPTIONS', true)
 		->	(
-				format(user_error, '**********', []),
-				backtrace(200),
-				format(user_error, '**********', []),
-				trace
+				format(user_error, '*****vvvbacktrace?vvv*****', []),
+				catch(backtrace(200),_,true),
+				format(user_error, '*****^^^backtrace?^^^*****', []),
+				trace,
+				format(user_error, '*****.......*****', [])
 			)
 		;	true)
 	; true).
@@ -80,8 +82,13 @@ flag_default(gtrace, true).
 
 
  get_prolog_backtrace_str(Backtrace_str) :-
-	get_prolog_backtrace(200, Backtrace, [goal_depth(7)]),
-	stt(Backtrace, Backtrace_str).
+	catch(
+		(
+			get_prolog_backtrace(200, Backtrace, [goal_depth(7)]),
+			stt(Backtrace, Backtrace_str)
+		),
+		_,
+		Backtrace_str = 'get_prolog_backtrace threw exception.').
 
 
 

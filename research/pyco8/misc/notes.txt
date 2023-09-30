@@ -1,0 +1,212 @@
+# T-SYS
+# ===
+#
+# /* docset
+#
+# <Request> with <Request_graph> satisfies l:single_entity_ledger_model :-
+# 	m(q(Request,l:has_sheet_instances,Instance_list,l:request_data), Request_graph),..
+
+
+
+
+
+
+
+# problem:
+# 	allowed only one instance of excel_sheet with type bank_statement, where sheet.data.account_name eq X
+#
+#
+# 'all bank statement sheets have unique bank account names'(Bss) :-
+# 	maplist(another_bs_with_same_name_doesnt_exist(Bss), Bss).
+#
+# another_bs_with_same_name_doesnt_exist(Bss, Bs) :-
+# 	maplist(another_bs_with_same_name_doesnt_exist2(Bs), Bss).
+#
+# another_bs_with_same_name_doesnt_exist2(A, B) :-
+# 	dif(A.name, B.name).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+why we can't fake findall:
+	findall(Callable, Items) :-
+		call(Callable),
+		Items first Callable,
+		Items rest Rest.
+
+
+
+
+
+
+
+
+
+
+lists lib:
+
+
+	L first F, L rest R, L a list :-
+		dif(L, nil).
+	nil a list.
+
+
+
+	cell(List, Cell) :-
+		List = Cell.
+
+	cell(List, Cell) :-
+		List rest Rest,
+		cell(Rest, Cell).
+
+
+
+
+	member(I, L) :-
+		L first I.
+
+	member(I, L) :-
+		L rest R,
+		member(I, R).
+
+
+
+
+
+	'<X> is last cell of some list' :-
+		X rfd:rest rdf:nil.
+	'<X> is last cell of <List>' :-
+		cell(X, List),
+		X rfd:rest rdf:nil.
+	'<X> is last item of <List>' :-
+		C is last cell of List,
+		C rdf:first X.
+
+
+
+
+
+
+	notes:
+
+		# all members of a list satisfy some Callable:
+		# this is literally maplist(Callable, List).
+		# when the list is not terminated, once maplist gets to the unbound "last" item, there are two options:
+		# property is normal code:
+		# 	this will be a choicepoint. repeated recursion on multiple unknown tail items will be possible thanks to fixpoint mechanism.
+		# 	1) tail gets unified with nil, nothing to apply prop to, and later this branch fails
+		# 	2) tail gets unified with list bnode followed by nil, prop builds out an existential variable, this later fails
+		# 	3) tail gets unified with list bnode followed by unbound variable, this is suspended by ep, later resumed.
+
+		/*
+		member(Exp,Facts)
+		if we choose the semantics of existential rules that a bnode can bind to a bnode of another type, given that all declared properties have a matching counterpart, how'd that work with constants? An uri with a bunch of facts would not have the same semantics when being unified with some existential. And two uris just won't unify no matter what.
+		*/
+
+
+
+
+
+
+
+
+ledger:
+
+
+	account tree facts for year Y and rphase P(Facts) :-
+		maplist(account tree fact exists(Y, P, Facts), Account_tree_concepts),
+		maplist(smsf         fact(Y, P, Facts), Account_tree_concepts),
+
+
+	account tree fact exists(Y, P, Facts, Concept) :-
+		F has_concept Concept,
+		F has_rphase P,
+		F has_year Y,
+		member(F, Facts)
+
+
+
+
+
+
+
+
+smsf:
+
+	smsf fact(Y, P, Facts, Concept) :-
+		\+Concept subdivide_by_smsf_member true.
+	smsf fact(Y, P, Facts, Concept) :-
+		Concept subdivide_by_smsf_member true,
+		smsf_members(Members),
+		maplist('member has smsf equity facts'(Y, P, Facts), Members, Values),
+		math(sum(Values), Total),
+
+		member(Total_fact, Facts),
+		F has_concept Concept,
+		F has_rphase P,
+		F has_year Y,
+		\+F has_smsf_member _,
+		F has_value Votal.
+
+	'member has smsf equity facts'(Y,P,Facts, Member,V) :-
+		member(F, Facts),
+		F has_concept Concept,
+		F has_rphase P,
+		F has_year Y,
+		F has_smsf_member Member,
+		F has_value V.
+	^^^^^^^
+	V should be a rdf:value, for the usual purpose of avoiding statements about literals
+	--
+	math(sum(Values) = Total)
+	the equation expression can be a light syntax sugar for invocations of a rule that allows formulas to exist.
+
+
+	once again, just generally stating that a concept that is split in a dimension has value that is the sum of the values of the dimension's points:
+
+
+
+
+	sum of dimension points Points equal parent value Sum :-
+
+
+
+
+
+
+
+p8math:
+
+	term_evaluates_to_const(Arg, Const) :-
+
+			?(Arg, 'rdf:value', Const)
+
+		;
+		(
+			?(Arg, 'term_has_op', Op)
+			?(Arg, 'term_has_arg1', Arg1)
+			?(Arg, 'term_has_arg2', Arg2)
+			,
+			term_evaluates_to_const(Arg1, Const1)
+			term_evaluates_to_const(Arg2, Const2)
+
+			(
+				(
+					Op.value = '+'
+					rat_add(Const1,Const2,Const)
+				)
+			;
+			..
+			)
+		)

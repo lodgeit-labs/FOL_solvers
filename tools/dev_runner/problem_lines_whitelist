@@ -67,3 +67,12 @@ Warning: 	/usr/local/lib/swipl/library/clp/clpqr/project.pl:206:32: 2-nd clause 
 Warning: store_r:renormalize/2, which is referenced by
 Warning: 	/usr/local/lib/swipl/library/clp/clpqr/project.pl:212:37: 2-nd clause of renormalize/3
 
+Warning: /usr/local/lib/swipl/library/prolog_codewalk.pl:431:
+Warning:    Singleton-marked variable appears more than once: _TermPos
+Warning: /usr/local/lib/swipl/library/http/mimepack.pl:147:
+Warning:    Singleton variable in branch: In
+Warning: file_search_path/2, which is referenced by
+Warning: 	/usr/local/lib/swipl/library/check.pl:1031: 1-st clause of '__aux_meta_call_7245479f91f33b1ad8e44708e07e31fe61bc41a5'/2
+Warning: '__aux_meta_call_7245479f91f33b1ad8e44708e07e31fe61bc41a5'/2, which is referenced by
+Warning: 	/usr/local/lib/swipl/library/check.pl:1031: 1-st clause of aliased_path/2
+Warning: /usr/local/lib/swipl/library/prolog_codewalk.pl:433:

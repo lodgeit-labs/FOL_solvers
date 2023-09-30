@@ -7,7 +7,9 @@
 
 /*
 	given a list of terms, for example, of transactions, and a Selector_Predicate, for example transaction_account,
-	produce a dict with keys returned by the selector, and values lists of terms
+	produce a dict with keys returned by the selector, and values lists of transaction terms.
+
+	should be O(n)-ish.
 */
  sort_into_dict(Selector_Predicate, Ts, D) :-
 	sort_into_dict(Selector_Predicate, Ts, _{}, D).
@@ -31,7 +33,7 @@
 
 
 
-/* same as sort_into_dict, but predicate is ternary, and third argument is the binned value */
+/* same as sort_into_dict, but Selector_Predicate is ternary, getting an item of the supplied list, and returning a key and a value. should we merge these ? */
  sort_into_dict2(Selector_Predicate, Ts, D) :-
 	sort_into_dict2(Selector_Predicate, Ts, _{}, D).
 
@@ -87,13 +89,13 @@ sort_into_dict_on_success/4(
 
 
 
- sort_into_assoc(Selector_Predicate, Ts, D) :-
+ sort_into_assoc_of_lists(Selector_Predicate, Ts, D) :-
 	empty_assoc(A),
-	sort_into_assoc(Selector_Predicate, Ts, A, D).
+	sort_into_assoc_of_lists(Selector_Predicate, Ts, A, D).
 
-:- meta_predicate sort_into_assoc(2, ?, ?, ?).
+:- meta_predicate sort_into_assoc_of_lists(2, ?, ?, ?).
 
- sort_into_assoc(Selector_Predicate, [T|Ts], D, D_Out) :-
+ sort_into_assoc_of_lists(Selector_Predicate, [T|Ts], D, D_Out) :-
 	call(Selector_Predicate, T, A),
 	(
 		get_assoc(A, D, L)
@@ -104,9 +106,9 @@ sort_into_dict_on_success/4(
 	),
 	append(L, [T], L2),
 	put_assoc(A, D, L2, D2),
-	sort_into_assoc(Selector_Predicate, Ts, D2, D_Out).
+	sort_into_assoc_of_lists(Selector_Predicate, Ts, D2, D_Out).
 
- sort_into_assoc(_, [], D, D).
+ sort_into_assoc_of_lists(_, [], D, D).
 
 
 
@@ -182,3 +184,8 @@ sort_into_dict_on_success/4(
 	!sort_into_dict2([(A, B), A, B]>>true, Pairs, Dict).
 
 
+
+ pair_to_json(Pair, Dict) :-
+ 	Pair =.. [_,K,V],
+ 	Dict0 = j{},
+ 	Dict = Dict0.put(K,V).

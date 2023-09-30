@@ -1,0 +1,563 @@
+# negation
+	there's no need to (deep-)copy variables. When trying to prove a negation, we have 3 possible outcomes:
+		1) no proofs found - success
+		2) proof found - then we unroll all bindings
+		3) ep - it's not possible to go on trying to disprove this theory. We unroll and try again when the theory has changed. When it's changed, we cannot reuse the old hypothesis tree.
+		
+## ?
+	```
+	number(1).
+	number(2).
+	letter(a).
+	?- not(number(X)).
+	```
+
+##
+	https://souffle-lang.github.io/rules
+
+
+
+
+# Using Datalog on RDF
+	https://youtu.be/jPt4MiHFGy8?t=2162
+		two methods of representation:
+			triple(s,p,o)
+			p(s,o)
+
+
+
+
+
+# debugging
+	
+	## http://www.lirmm.fr/cogui/index.html
+		| CoGui is an extensible platform to use, transform and query graph based knowledge.
+		| Cogui is a visual tool for building conceptual graph knowledge bases (KB). It allows to create a KB, to edit its structure and content, and to control it. Imports and exports from and to RDFS, OWL and Datalog+ are also provided. Wizards allow to analyze and check facts with respect to some constraints, as well as to query them while taking into account inferences enabled by the ontology. 
+		| To/From Datalog± 
+		
+	
+	## https://github.com/idaks/PW-explorer
+	
+	
+	## ASPIDE
+		free download
+		https://www.mat.unical.it/ricca/aspide/documentation.html
+			
+	### https://www.dbai.tuwien.ac.at/research/project/arvis/
+		ARVis - Answer Set Relationship Visualizer
+		free download
+		
+	
+	## http://www.sealion.at/
+		for potassco and DLV, eclipse plugin, free download, visualization, ...
+		
+		https://www.researchgate.net/publication/51941895_Kara_A_System_for_Visualising_and_Visual_Editing_of_Interpretations_forAnswer-Set_Programs	
+	
+		-> kara
+			https://sourceforge.net/p/mmdasp/screenshot/8queensVis.png
+		
+	
+	
+	
+	## DLV / http://www.dlvsystem.com/aspide/
+	
+	
+	
+	
+	
+	
+	
+	## https://github.com/theronic/hoist
+		| The thing that made Excel so popular as an exploratory modelling environment (esp. for financial models) is that it does not suffer from the inverted UI problem that plagues all other programming environments.
+		
+		
+		
+	## http://www.kr.tuwien.ac.at/research/systems/debug/index.html
+		SPOCK - Finding errors by means of logic 
+
+
+	## https://www.youtube.com/watch?v=4aXy9UGq4Ng
+		[POPL 2021] Debugging Large-Scale Datalog: A Scalable Provenance Evaluation Strategy (full)
+		
+		dude discovered backward chaining,
+		
+		"debugging queries", yes
+		
+		
+	## http://openproceedings.org/ICDT/2014/paper_36.pdf
+	
+		ditto.
+		https://dl.acm.org/doi/10.1145/3379446
+		| We next exemplify applications of provenance represented
+as Boolean circuits in deletion propagation and probability
+computation in probabilistic databases.
+
+
+	## https://yanniss.github.io/DeclarativeDebugging.pdf
+
+		| Let M =P (I) be the model of P on input I. Bugs in P (or I) manifest
+themselves through unexpected answers (ground atoms) A ∈M , or expected but
+missing A /∈M . 
+
+		| The key idea of our approach is to rewrite P into a provenance-
+enriched program ˆP , which records the derivation history of M =P (I) in an
+extended model ˆM = ˆP (I). A provenance graph G is then extracted from ˆM ,
+which the user can explore further via predefined views and ad-hoc queries
+
+		| Use Cases Overview. Given an IDB atom A, our approach allows to answer
+questions such as the following: What is the data lineage of A, i.e., the set of
+EDB facts that were used in a derivation of A, and what is the rule lineage, i.e.,
+the set of rules used to derive A? When chasing a bug or trying to locate a source
+of inefficiency, a user can explore further details: What is the graph structure
+GA of all derivations of A? What is the length of A, i.e., of shortest derivations,
+and what is the weight, i.e., number of simple derivations (proof trees) of A?
+
+		| For another example, assume the user encounters two “suspicous” atoms A
+and B. It is easy to compute the common lineage GAB = GA ∩ GB shared
+by A and B, or the lowest common ancestors of A and B, i.e., the rule firings
+and ground atoms that occur “closest” to A and B in GAB, thus triangulating
+possible sources of error, somewhat similar to ideas used in delta debugging [22].
+Since nodes in GA are associated with relation symbols and rules, a user
+might also want to compute other aggregates, i.e., not only at the level of GA
+(ground atoms and firings), but at the level of (non-ground) rules and relation
+symbols, respectively. 
+
+
+		| Through this schema-level profiling, a user can quickly find
+the hot (cold) spots in P , e.g., rules having the most (least) number of firings.
+
+
+		| P F records, for each r-satisfying instance  ̄x of  ̄X, a unique fact: firer( ̄x)
+		
+		| Fig. 4. Provenance graphs with annotations for profiling P rtc and P dtc on a 5-node linear
+graph. P dtc causes more rule firings than P rtc and also derives facts in multiple ways.
+Numbers denote len(F ) (in firing nodes) and len(A) (in atom nodes), respectively.
+
+
+
+
+	## paywalled
+
+		## https://conf.researchr.org/details/aplas-2020/aplas-2020-papers/8/A-Counterexample-Guided-Debugger-for-Non-Recursive-Datalog
+		
+		https://dl.acm.org/doi/10.1145/22339.22341
+	
+	
+	
+	
+	## https://www.fdi.ucm.es/profesor/fernan/fsp/scg11aslides.pdf
+		| Declarative Debugging: A Practical Session
+		
+	
+	## https://cpsc.yale.edu/sites/default/files/files/tr237.pdf
+		...
+	
+		
+	
+	## https://www.researchgate.net/publication/220790225_A_Theoretical_Framework_for_the_Declarative_Debugging_of_Datalog_Programs
+		
+		
+	## http://ceur-ws.org/Vol-281/86-100.pdf
+	
+		| Intuitively, a bug in a DLV program P is a difference between what is actually modelled by P and what the programmer was planning to model with P.
+		
+	
+	
+	##
+		https://arxiv.org/pdf/1803.06674.pdf
+	
+	
+
+
+
+
+
+# typing
+	embedding in agda or haskell?
+	https://www.youtube.com/watch?v=ikVZrivln8c
+	
+	
+	
+
+# similar datalogs
+
+	## vadalog
+		https://arxiv.org/pdf/1807.08709.pdf
+		| Warded Datalog+/-,
+		
+			
+	## DLV
+		
+		### DLV^E
+			https://www.mat.unical.it/dlve/dlemanual.html
+			this seems the most promising system to check against?
+			
+						
+	# papers
+		https://link.springer.com/chapter/10.1007/978-3-642-32925-8_3
+			| We consider rules that allow to assert the existence of new individuals, an ability called value invention in databases [AHV95]. These rules are of the form body → head, where the body and the head are function-free conjunctions of atoms, and variables that occur only in the head are existentially quantified, hence their name ∀ ∃-rules in [BLMS09, BLM10] or existential rules in [BMRT11, KR11]. Existential rules have long been studied in databases as high-level constraints called tuple generating dependencies (TGDs) [BV84]. Recently, there has been renewed interest for these rules in the context of ontology-based data access (OBDA), a new paradigm that seeks to exploit the semantics encoded in ontologies while querying data. The deductive database language Datalog could be seen as a natural candidate for expressing ontological knowledge in this context, however its limitation is that it does not allow for value invention, since all variables in a rule head necessarily occur in the rule body. Value invention has been recognized as a necessary prerequisite in an open-world perspective, where all individuals are not known a priori. It is in particular a feature of description logics (DLs), well-known languages dedicated to ontological representation and reasoning. This prerequisite motivated the recent extension of Datalog to existential rules, which gave rise to the Datalog +/- formalism [CGK08, CGL09].
+		
+
+
+# other projects
+	## highly relevant
+	
+	
+	
+		### https://github.com/graphik-team/graal
+			http://graphik-team.github.io/graal/downloads/kiabora
+				http://www.lirmm.fr/~mugnier/graphik/kiabora/
+				| Kiabora is dedicated to the analysis of a set of existential rules. 
+				
+			http://graphik-team.github.io/graal/
+				http://graphik-team.github.io/graal/downloads/pure
+			
+				
+		### DLV
+		
+			http://www.dlvsystem.com/html/DLV_User_Manual.html
+			
+			| 	Positive body literals are ordered for efficiency:
+
+			- Those literals with unique variables are placed at the end of the re-order rule body, since the join operation with the rest of the body literals is equivalent to their Cartesian product.
+
+			- Literals using built-in predicates are moved to the foremost position in the body where all their variables have been bound by previous literals. This is because built-in predicates are evaluated very easily, once their parameters are known, but would give a large range of values to unbound variables.
+
+			- Other literals are sorted by increasing cardinality of their ground occurrences and by decreasing number of shared variables.
+
+			This is the default optimisation. 
+
+
+			http://www.dlvsystem.com/dlvwrapper/
+	
+		
+	
+		
+
+	## somewhat relevant
+
+		### https://github.com/souffle-lang/souffle
+			| Extended semantics of Datalog, e.g., permitting unbounded recursions with numbers and terms
+			| Recursively defined record types (aka. constructors) for tuples
+			| Futamura Projections, staged-compilation with a new abstract machine, partial evaluation, and parallelization with highly-parallel data-structures.
+
+			https://souffle-lang.github.io/magicset
+				| The magic set transformation is a technique used to reduce the number of irrelevant tuples computed during the evaluation of a Soufflé program. Irrelevant tuples are avoided by specialising program clauses based on constraints that appear in the body and the bodies of their dependencies.
+
+		### http://www.rntz.net/datafun/
+			| track monotonicity with types
+			
+
+	## interesting
+		
+		## https://github.com/replikativ/datahike / datomic / datascript
+			db with embedded basic datalog
+		
+		# incremental / differential dataflow 
+			https://github.com/TimelyDataflow/differential-dataflow	
+			https://github.com/comnik/declarative-dataflow
+
+		## LogicBlox 
+			proprietary
+			database / TMS?
+			free port: http://snf-705535.vm.okeanos.grnet.gr/agreement.html
+			https://github.com/taheroo/Design-and-Implementation-of-the-LogicBlox-System
+			
+		## https://github.com/EvgSkv/logica
+			compiles to bigQuery SQL
+
+		### https://github.com/ekzhang/crepe
+			simple rust datalog	
+
+		### https://github.com/HarvardPL/formulog/
+			Datalog with support for SMT queries.
+			
+	
+		### https://github.com/RAbraham/mercylog
+		
+	
+	## the rest
+		https://github.com/gregr/dbKanren
+
+		https://github.com/gonmf/dakilang
+			fwd / chr?
+		
+		https://github.com/iliastsa/woof
+			A Datalog interpreter implementing the Well-Founded semantics. 
+				https://en.wikipedia.org/wiki/Well-founded_semantics
+		
+		https://github.com/mnowotnik/fovris
+			| 4QL is a logic programming language derived from Datalog. However, unlike Datalog, it uses four valued logic to deal with inconsistencies and lack of information.
+		
+		https://github.com/farif/CHCReasoner
+			A simple forward chaining algorithm implementation.
+			
+
+
+# interesting applications
+	https://bitbucket.org/yanniss/doop/src/master/
+	https://souffle-lang.github.io/tutorial
+	https://github.com/mkremins/felt
+	
+
+	
+	
+# optimization / partial evaluation
+	https://souffle-lang.github.io/magicset
+	https://souffle-lang.github.io/translate
+	
+	
+
+
+# syntax / parser
+	https://www.swi-prolog.org/pldoc/man?predicate=ensure_loaded/1
+	https://github.com/racket/datalog
+	https://github.com/epost/purescript-datalog-parsers
+	https://github.com/LumingWu/datalog-json
+	
+
+
+
+
+
+
+
+# visualization 
+	## gv for layouting, then parse back? :
+		https://graphviz.org/docs/outputs/canon/
+
+
+	## embedded web server?
+		koo5/notes/python/web gui frameworks
+
+	## https://datashader.org/
+	
+		| rendering pipeline that makes it practical to work with extremely large datasets even on standard hardware
+
+	https://www.omnigroup.com/omnigraffle
+		?
+	
+
+	http://symbolflux.com/luciditystory.html
+		zoom in / out ...
+		language independent / server
+		wrapping around / landscape memory
+		
+	
+	https://graphia.app/guide/section2/2_first_start_up.html
+	https://networkx.org/documentation/stable/reference/drawing.html#module-networkx.drawing.nx_agraph
+	https://pygraphviz.github.io/
+	https://github.com/benmaier/netwulf/
+	https://kroki.io/examples.html#packetdiag
+	
+	
+# graph exploration
+
+## cogui
+	!
+
+## xdot
+
+	has: interactive highlight edges of nodes under mouse
+	todo: https://github.com/jrfonseca/xdot.py/issues/79
+	forks: https://github.com/pfalcon/xdot.py/commit/489b606d7bdf6b4be46719dc44605006da98dc27
+	even better viewer?: http://zvtm.sourceforge.net/zgrviewer.html
+
+## graphviz - make edges traceable
+
+	edge [fontname=arial penwidth=0.5]
+	no a fakt bych dal kazdy edgi trochu jinou barvu, a jestli tam mas tri ruzny typy, tak to by se dalo znazornit ruznejma line stylama
+	edge [fontname=arial penwidth=0.5 style=dashed]
+	"dashed"
+		"dotted"
+		"solid"
+		"invis"
+		"bold"
+		"tapered"
+
+	
+## gruff + sparql
+	https://www.youtube.com/watch?v=LLmbHcP8ngw
+
+## gephi
+	aimed at statistical visualization but ok
+	
+	
+
+
+
+# declarative debugging 
+#### why
+	
+	when we're asking why, we can probably point to an exact proof that our system gave but shouldn't have. 
+	
+	Or we're asking why the prover is still running, in other words, why is the search space so big, in this configuration.
+	
+	#### why not
+	
+	Again easy if we can point to a specific theory to prove.
+
+
+#### querying the proof graph
+	
+
+
+	
+
+#### random
+
+	https://search.creativecommons.org/photos/c21b9174-c6ef-4416-9fd3-b35c13460f15
+	
+	what part of the debugging task is about finding a path from here to another, known, place? 
+	
+	https://web.archive.org/web/20070927190552/http://users.ipa.net/~dwighth/smalltalk/Fabrik/Fabrik.html
+		https://news.ycombinator.com/item?id=29094633
+
+
+
+
+
+
+
+
+
+
+
+# embedded-ish visualization, technicalities
+
+
+
+## 3d graphics with text
+	https://threejs.org/examples/?q=css#css3d_periodictable
+		yep, looks like a fairly sensible high-level-ish way to do complex text and ui in 3d
+		
+
+
+## c++ visualization
+
+	# https://github.com/ArsMasiuk/qvge
+	
+	
+	# qt websocket server
+		https://doc.qt.io/qt-5/qtwebchannel-javascript.html
+		https://doc.qt.io/qt-5/qtwebchannel-standalone-example.html
+		https://doc.qt.io/qt-5/qtwebchannel-javascript.html
+		https://doc.qt.io/qt-5/qwebchannel.html#details
+		https://doc.qt.io/qt-5/qml-qtwebchannel-webchannel.html
+		https://decovar.dev/blog/2018/07/14/html-from-qml-over-webchannel-websockets/#mostly-c
+		
+	# qt widgets
+		https://doc.qt.io/qt-5/richtext-html-subset.html
+
+	# QGraphicsScene
+		| Graphics View uses a BSP (Binary Space Partitioning) tree to provide very fast item discovery, and as a result of this, it can visualize large scenes in real-time, even with millions of items.
+
+	## widgets inside 2D graphics
+
+		https://doc.qt.io/qtforpython/PySide6/QtWidgets/QGraphicsProxyWidget.html
+
+		| Warning: This class is provided for convenience when bridging QWidgets and QGraphicsItems, it should not be used for high-performance scenarios. In particular, embedding widgets into a scene that is then displayed through a QGraphicsView that uses an OpenGL viewport will not work for all combinations.
+
+
+
+
+# clp/algebra implementations
+
+## js 
+	git@github.com:davidedc/Algebrite.git
+	
+
+
+
+
+
+
+# misc
+
+https://ur.booksc.eu/book/44896270/0dc548
+https://www.researchgate.net/publication/263886722_AN_INFERENCE_BROWSER_FOR_VERIFYING_THE_KNOWLEDGE_BASE_IN_KNOWLEDGE-BASED_SYSTEMS
+https://github.com/potassco/
+
+
+https://dblp.org/rec/conf/dood/ZanioloAO93.html
+	"Negation and Aggregates in Recursive Rules: the LDL++ Approach."
+
+
+
+
+# todo
+cogui
+
+sealion
+
+Fast Query Answering over Existential Rules
+	| We implemented the parsimonious-chase resumption tecnique introduced in Section
+4 inside the well-known Answer Set Programming (ASP) system DLV [Leone et al.
+2006]. This implementation is referred to as DLV∃ and it constitutes a powerful system
+for answering (unrestricted) conjunctive queries over strongly parsimonious programs.
+Following the DLV philosophy, it has been designed as an in-memory system. Basically,
+we extended the DLV parser and the rule safety check because of the presence of exis-
+tentially quantified variables. Moreover, we evolved the DLV fixpoint computation so
+that it can be now resumed an arbitrary number of times. Finally, we developed an
+optimized homomorphism checker which exploits some of the standard routines im-
+plemented in DLV. To speed-up the computation, a number of optimization techniques
+has been introduced. In particular, we implemented a rewriting strategy to avoid the
+evaluation of the rules that are not relevant for answering the input query. Before
+parsing the input facts we find out the list of predicates that are significant for the
+query at hand and, consequently, we load only facts belonging to such predicates. To
+compute the number of times the parsimonious chase needs to be resumed, we execute
+an optimized version of the algorithm induced by Theorem 4.9. In the following subsec-
+tions, after showing the overall architecture of the main components of the system, we
+give a detailed description of the implemented tecniques and optimizations. All data
+and encodings used in our evaluation, along with the Unix executable of the system,
+are publicly available.5
+
+
+http://igrom.sourceforge.net/
+
+
+https://en.wikipedia.org/wiki/Logical_graph
+
+
+https://news.ycombinator.com/item?id=29652139
+
+
+
+Also, like λProlog, Twelf generalizes Horn clauses to hereditary Harrop formulas, which for logically well-founded operational notions of fresh-name generation and scoped extension of the clause database.
+
+
+
+https://arxiv.org/abs/1709.04970
+https://niklasl.github.io/quid/#
+
+
+
+
+
+
+
+
+
+
+
+interval arithmetic:
+	https://github.com/mlliarm/ia
+
+
+
+
+
+
+
+
+
+https://medium.com/computational-law-diary/s-casp-as-a-rules-as-code-tool-97ec3435975c :
+```
+Answer Set Programming Kicks Ass for Rules as Code
+
+Until now I’ve been encoding laws in declarative logic languages. But answer set programming does not tell you just what the right answer is, but all of the ways that you could potentially reach that right answer, and everything else that you know about the world while that answer is true, and s(CASP) adds on an English-language explanation for each method of reaching the right answer.
+
+That’s just a lot more information, and a lot of critically useful information if what you are trying to do is figure out whether or not you faithfully encoded the rule.
+
+Most of the time, when you have a query that doesn’t behave as expected, you can throw a “not” in front of it, run it again, and get a natural language explanation for why the original query failed. I have never used a tool with that capability before, and it is blowing my mind.
+```

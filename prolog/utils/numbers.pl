@@ -68,12 +68,18 @@
 	Y =.. [Functor|Args2].
 
 
+:- debug(numbers).
 
  unify_numbers(A,B) :-
 	(	A = B
 	->	true
 	;	/* allow for integer vs float */
-		A =:= B).
+		(
+			A =:= B,
+			% ^ does this ever still happen?
+			debug(numbers, '~w', [unify_numbers(A,B)])
+		)
+	).
 
 /* todo unify_numbers(Z, 0)?*/
  is_zero_number(Z) :-

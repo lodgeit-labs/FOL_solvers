@@ -15,7 +15,7 @@
 
 :- meta_predicate 'nicety'(0).
 
-env_bool_has_default('ROBUST_ENABLE_NICETY_REPORTS', true).
+flag_default('ROBUST_ENABLE_NICETY_REPORTS', true).
 
 :- if(env_bool('ROBUST_ENABLE_NICETY_REPORTS', false)).
 

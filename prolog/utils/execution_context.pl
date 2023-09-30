@@ -18,24 +18,31 @@ exception: blablabla
 
 
  get_context(Ctx_list) :-
-	catch(
-		b_getval(context, Ctx_list),
-		_,
-		Ctx_list = []
-	).
+	(	nb_current(context, Ctx_list)
+	->	true
+	;	Ctx_list = []).
+
+%	catch(
+%		b_getval(context, Ctx_list),
+%		_,
+%		Ctx_list = []
+%	).
 
  get_context_depth(D) :-
 	b_current_num_with_default(context_depth, 0, D).
 
  get_context_trace(X) :-
-	catch(
-		b_getval(context_trace, X),
-		_,
-		X = []
-	).
+	(	nb_current(context_trace, X)
+	->	true
+	;	X = []).
+%	catch(
+%		b_getval(context_trace, X),
+%		_,
+%		X = []
+%	).
 
 
-env_bool_has_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
+flag_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
 
 :- if(env_bool('ENABLE_CONTEXT_TRACE_TRAIL',true)).
 
@@ -49,13 +56,13 @@ env_bool_has_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
 	b_setval(context_trace_trail, Trail_Stream).
 
  context_trace_trail(Term) :-
-	b_getval(context_trace_trail, Stream),
+	nb_getval(context_trace_trail, Stream),
 	(	Stream \= []
 	->	(
 			statistics(process_epoch, E),
 			get_time(TimeStamp),
 			Ts is TimeStamp - E,
-			format(Stream, 'ct~5f ~w~n', [Ts,Term]),
+			format(Stream, 'T~3fs ~w~n', [Ts,Term]),
 			%writeq(Stream, Term),
 			%writeln(Stream, '\n'),
 			flush_output(Stream)
@@ -65,7 +72,8 @@ env_bool_has_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
  context_trace_trail__push_context(C) :-
 	(
 		(
-			context_string(Str),
+			%context_string(Str),
+			get_context_trace(Trace0), term_string(Trace0, Str),
 			context_trace_trail(Str)
 		)
 		;
@@ -89,7 +97,7 @@ env_bool_has_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
 
 :- endif.
 
-env_bool_has_default('ENABLE_CONTEXT_TRACE',true).
+flag_default('ENABLE_CONTEXT_TRACE',true).
 
 :- if(env_bool('ENABLE_CONTEXT_TRACE', false)).
 
@@ -107,9 +115,9 @@ env_bool_has_default('ENABLE_CONTEXT_TRACE',true).
 	append(Ctx_list, [C], New_ctx_list),
 	New_depth is Depth + 1,
 	append([(Depth,C)], Trace, New_trace),
-	b_setval(context_trace, New_trace),
-	b_setval(context_depth, New_depth),
-	b_setval(context, New_ctx_list),
+	nb_setval(context_trace, New_trace),
+	nb_setval(context_depth, New_depth),
+	nb_setval(context, New_ctx_list),
 	context_trace_trail__push_context(C).
 
 
@@ -121,12 +129,12 @@ env_bool_has_default('ENABLE_CONTEXT_TRACE',true).
 	pop_context.
 
  pop_context :-
-	b_getval(context, Ctx_list),
+	nb_getval(context, Ctx_list),
 	get_context_depth(Depth),
 	New_depth is Depth - 1,
-	b_setval(context_depth, New_depth),
+	nb_setval(context_depth, New_depth),
 	!append(New_ctx_list,[_],Ctx_list),
-	b_setval(context, New_ctx_list),
+	nb_setval(context, New_ctx_list),
 	context_trace_trail__pop_context.
 
 :- endif.
@@ -223,6 +231,12 @@ env_bool_has_default('ENABLE_CONTEXT_TRACE',true).
 
 
 
+% dummy (or debug?) context wrapper
+
+ cd(_Context, Callable) :-
+	call(Callable).
+
+
 /*
 ┏━┓╺┳╸┏━┓╻┏┓╻┏━╸╻┏━╸╻ ╻╻┏┓╻┏━╸
 ┗━┓ ┃ ┣┳┛┃┃┗┫┃╺┓┃┣╸ ┗┳┛┃┃┗┫┃╺┓
@@ -239,7 +253,7 @@ for what it's worth. Should be superseded by a nice svelte Rdf viewer UI
 	->	Str = ""
 	;	(
 			context_string1(1, C, Item_strings),
-			atomics_to_string(['during: \n' | Item_strings], Str)
+			atomics_to_string(['context_string: \n' | Item_strings], Str)
 		)
 	).
 

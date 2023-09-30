@@ -1,57 +1,35 @@
 :- use_module(library(clpfd)).
 
-:- rdf_register_prefix(code,
-'https://rdf.lodgeit.net.au/v1/code#').
-:- rdf_register_prefix(kb,
-'https://rdf.lodgeit.net.au/v1/kb#').
-:- rdf_register_prefix(l,
-'https://rdf.lodgeit.net.au/v1/request#').
-:- rdf_register_prefix(account_taxonomies,
-'https://rdf.lodgeit.net.au/v1/account_taxonomies#').
-:- rdf_register_prefix(accounts,
-'https://rdf.lodgeit.net.au/v1/accounts#').
-:- rdf_register_prefix(livestock,
-'https://rdf.lodgeit.net.au/v1/livestock#').
-:- rdf_register_prefix(excel,
-'https://rdf.lodgeit.net.au/v1/excel#').
-:- rdf_register_prefix(depr,
-'https://rdf.lodgeit.net.au/v1/calcs/depr#').
-:- rdf_register_prefix(ic,
-'https://rdf.lodgeit.net.au/v1/calcs/ic#').
-:- rdf_register_prefix(hp,
-'https://rdf.lodgeit.net.au/v1/calcs/hp#').
-:- rdf_register_prefix(depr_ui,
-'https://rdf.lodgeit.net.au/v1/calcs/depr/ui#').
-:- rdf_register_prefix(ic_ui,
-'https://rdf.lodgeit.net.au/v1/calcs/ic/ui#').
-:- rdf_register_prefix(hp_ui,
-'https://rdf.lodgeit.net.au/v1/calcs/hp/ui#').
-:- rdf_register_prefix(transactions,
-'https://rdf.lodgeit.net.au/v1/transactions#').
-:- rdf_register_prefix(s_transactions,
-'https://rdf.lodgeit.net.au/v1/s_transactions#').
-:- rdf_register_prefix(report_entries,
-'https://rdf.lodgeit.net.au/v1/report_entries#').
-:- rdf_register_prefix(smsf,
-'https://rdf.lodgeit.net.au/v1/calcs/smsf#').
-:- rdf_register_prefix(smsf_ui,
-'https://rdf.lodgeit.net.au/v1/calcs/smsf/ui#').
-:- rdf_register_prefix(smsf_distribution,
-'https://rdf.lodgeit.net.au/v1/calcs/smsf/distribution#').
-:- rdf_register_prefix(smsf_distribution_ui,
-'https://rdf.lodgeit.net.au/v1/calcs/smsf/distribution_ui#').
-:- rdf_register_prefix(smsf_computation,
-'https://rdf.lodgeit.net.au/v1/calcs/smsf/computation#').
-:- rdf_register_prefix(reallocation,
-'https://rdf.lodgeit.net.au/v1/calcs/ic/reallocation#').
-:- rdf_register_prefix(bs,
-'https://rdf.lodgeit.net.au/v1/bank_statement#').
-:- rdf_register_prefix(av,
-'https://rdf.lodgeit.net.au/v1/action_verbs#').
-:- rdf_register_prefix(uv,
-'https://rdf.lodgeit.net.au/v1/unit_values#').
-:- rdf_register_prefix(phases,
-'https://rdf.lodgeit.net.au/v1/phases#').
+:- rdf_register_prefix(code,				'https://rdf.lodgeit.net.au/v1/code#').
+:- rdf_register_prefix(kb,					'https://rdf.lodgeit.net.au/v1/kb#').
+:- rdf_register_prefix(l,					'https://rdf.lodgeit.net.au/v1/request#').
+:- rdf_register_prefix(account_taxonomies,	'https://rdf.lodgeit.net.au/v1/account_taxonomies#').
+:- rdf_register_prefix(accounts,			'https://rdf.lodgeit.net.au/v1/accounts#').
+:- rdf_register_prefix(livestock,			'https://rdf.lodgeit.net.au/v1/livestock#').
+:- rdf_register_prefix(excel,				'https://rdf.lodgeit.net.au/v1/excel#').
+:- rdf_register_prefix(depr,				'https://rdf.lodgeit.net.au/v1/calcs/depr#').
+:- rdf_register_prefix(ic,					'https://rdf.lodgeit.net.au/v1/calcs/ic#').
+:- rdf_register_prefix(hp,					'https://rdf.lodgeit.net.au/v1/calcs/hp#').
+:- rdf_register_prefix(div7a,				'https://rdf.lodgeit.net.au/v1/calcs/div7a#').
+:- rdf_register_prefix(div7a_repayment,		'https://rdf.lodgeit.net.au/v1/calcs/div7a/repayment#').
+:- rdf_register_prefix(depr_ui,				'https://rdf.lodgeit.net.au/v1/calcs/depr/ui#').
+:- rdf_register_prefix(ic_ui,				'https://rdf.lodgeit.net.au/v1/calcs/ic/ui#').
+:- rdf_register_prefix(hp_ui,				'https://rdf.lodgeit.net.au/v1/calcs/hp/ui#').
+:- rdf_register_prefix(transactions,		'https://rdf.lodgeit.net.au/v1/transactions#').
+:- rdf_register_prefix(s_transactions,		'https://rdf.lodgeit.net.au/v1/s_transactions#').
+:- rdf_register_prefix(report_entries,		'https://rdf.lodgeit.net.au/v1/report_entries#').
+:- rdf_register_prefix(smsf,				'https://rdf.lodgeit.net.au/v1/calcs/smsf#').
+:- rdf_register_prefix(smsf_ui,				'https://rdf.lodgeit.net.au/v1/calcs/smsf/ui#').
+:- rdf_register_prefix(smsf_distribution,	'https://rdf.lodgeit.net.au/v1/calcs/smsf/distribution#').
+:- rdf_register_prefix(smsf_distribution_ui,'https://rdf.lodgeit.net.au/v1/calcs/smsf/distribution_ui#').
+:- rdf_register_prefix(smsf_computation,	'https://rdf.lodgeit.net.au/v1/calcs/smsf/computation#').
+:- rdf_register_prefix(reallocation,		'https://rdf.lodgeit.net.au/v1/calcs/ic/reallocation#').
+:- rdf_register_prefix(bs,					'https://rdf.lodgeit.net.au/v1/bank_statement#').
+:- rdf_register_prefix(av,					'https://rdf.lodgeit.net.au/v1/action_verbs#').
+:- rdf_register_prefix(uv,					'https://rdf.lodgeit.net.au/v1/unit_values#').
+:- rdf_register_prefix(phases,				'https://rdf.lodgeit.net.au/v1/phases#').
+
+
 :- rdf_register_prefix(rdf,
 'http://www.w3.org/1999/02/22-rdf-syntax-ns#').
 :- rdf_register_prefix(rdfs,
@@ -81,8 +59,6 @@ maybe this program will even run faster without this?*/
 :- rdf_meta doc_assert(r,r,r,r).
 :- rdf_meta doc(r,r,r).
 :- rdf_meta doc(r,r,r,r).
-:- rdf_meta docm(r,r,r).
-:- rdf_meta docm(r,r,r,r).
 :- rdf_meta doc_new_(r,-).
 :- rdf_meta result_property(r,r).
 :- rdf_meta rp(r,r).
@@ -112,6 +88,7 @@ maybe this program will even run faster without this?*/
 	(	nb_current(doc_trail, _)
 	->	true
 	;	doc_init_trace_0),
+	%thread_create('watch doc-dumper command pipe', _),
 	doc_clear.
 
  reestablish_doc(G,Ng) :-
@@ -125,7 +102,7 @@ maybe this program will even run faster without this?*/
 good thing is i think even with retracts (the backtracking kind), we won't have to worry about prolog reusing variable numbers. anyway, variables are todo
 */
 
-env_bool_has_default('ROBUST_DOC_ENABLE_TRAIL', false).
+flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 
 :- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
 
@@ -161,7 +138,7 @@ env_bool_has_default('ROBUST_DOC_ENABLE_TRAIL', false).
  dump :-
 	findall(_,
 		(
-			docm(S,P,O),
+			*doc(S,P,O),
 			debug(doc, 'dump:~q~n', [(S,P,O)])
 		),
 	_).
@@ -342,7 +319,11 @@ dddd(Spog, X) :-
 
 /*
 must have at most one match
+not sure if this is followed? why not use determinancy checker?
 */
+ doc((S,P,O)) :-
+	doc(S,P,O).
+
  doc(S,P,O) :-
 	doc_default_graph(G),
 	doc(S,P,O,G).
@@ -360,22 +341,6 @@ must have at most one match
 	%debug(doc, 'doc?:~q~n', [(S2,P2,O2,G2)]),
 	dddd(spog(S2,P2,O2,G2), X).
 
-/*
-can have multiple matches
-*/
- docm((S,P,O)) :-
-	docm(S,P,O).
- docm(S,P,O) :-
-	doc_default_graph(G),
-	docm(S,P,O,G).
- docm(S,P,O,G) :-
-	rdf_global_id(S, S2),
-	rdf_global_id(P, P2),
-	rdf_global_id(O, O2),
-	rdf_global_id(G, G2),
-	b_getval(the_theory,X),
-	%debug(doc, 'docm:~q~n', [(S2,P2,O2,G2)]),
-	dddd(spog(S2,P2,O2,G2), X).
 /*
 member
 */
@@ -412,7 +377,7 @@ member
 */
 
 
-env_bool_has_default('ROBUST_ROL_ENABLE_CHECKS', false).
+flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
 :- if(env_bool('ROBUST_ROL_ENABLE_CHECKS', true)).
 
@@ -490,6 +455,10 @@ env_bool_has_default('ROBUST_ROL_ENABLE_CHECKS', false).
 */
 
  node_rdf_vs_doc(
+	date(Y,M,D) ^^ 'http://www.w3.org/2001/XMLSchema#date',
+	date(Y,M,D)) :- !.
+
+ node_rdf_vs_doc(
 	date_time(Y,M,D,Z0,Z1,Z2) ^^ 'http://www.w3.org/2001/XMLSchema#dateTime',
 	date(Y,M,D)) :-
 		is_zero_number(Z0),
@@ -540,16 +509,19 @@ X) :-
 
  triple_rdf_vs_doc((S,P,O), (S,P,O2)) :-
 	(var(S);atom(S)),
-	catch(
-		(	node_rdf_vs_doc(O,O2)
-		->	true
-		;	throw('conversion from rdf to doc failed')),
-		E,
-		(
-			format(user_error, '~q', [E]),
-			throw_string(E)
+	(	catch(
+			node_rdf_vs_doc(O,O2),
+			E,
+			(
+				format(user_error, '~q', [E]),
+				throw_string(E)
+			)
 		)
-	).
+	->	true
+    ;	throw_string($>format(string(<$), 'conversion from rdf to doc failed: ~q <-> ~q', [O,O2]))
+    ).
+
+	
 
 /* todo vars */
 
@@ -560,8 +532,8 @@ X) :-
 	rdf_create_bnode(Rdf_Graph),
 	findall(_,
 		(
-			%docm(X,Y,Z),
-			docm(T),
+			%*doc(X,Y,Z),
+			*doc(T),
 			round_term(T,T2),
 			%debug(doc, 'to_rdf:~q~n', [T2]),
 			triple_rdf_vs_doc((X2,Y2,Z2),T2),
@@ -592,7 +564,7 @@ X) :-
  doc_to_rdf_graph(G) :-
  	rdf_retractall(_,_,_,_),
 	findall(_,(
-			docm(X,Y,Z,G),
+			*doc(X,Y,Z,G),
 			add_to_rdf((X,Y,Z,G))
 		),_
 	).
@@ -602,7 +574,7 @@ X) :-
 	atomic_list_concat(['doc_', Id, '.', Format],Fn),
 	report_file_path(loc(file_name, Fn), Url, loc(absolute_path,Path)),
 	Url = loc(absolute_url, Url_Value),
-    misc_check(!parse_url(Url_Value, _)),
+    %misc_check(!parse_url(Url_Value, _)), % ipv6 syntax is not supported yet, apparently
 	(	var(Report_key)
 	->	Report_key = Fn
 	;	true),
@@ -752,6 +724,10 @@ X) :-
 	!doc(D, l:has_accounts, As).
 
 
+ add_alert_stringified(Type, Msg) :-
+	term_string(Msg, Str),
+ 	add_alert(Type, Str, _).
+
  add_alert(Type, Msg) :-
  	add_alert(Type, Msg, _).
 
@@ -778,7 +754,7 @@ X) :-
 
  get_alert(Type, Msg, Uri) :-
 	result(R),
-	docm(R, l:alert, Uri),
+	*doc(R, l:alert, Uri),
 	doc(Uri, l:type, Type),
 	doc(Uri, l:message, Msg).
 
@@ -962,8 +938,11 @@ represent xml in doc.
 
  'watch doc-dumper command pipe' :-
     %shell4('mkfifo fo',_),
-    shell('mkfifo fo',_),
-    open(fo, read, Fo),
+    File = 'control/fo',
+    (	access_file(File, exist)
+    ->	true
+    ;	shell($>atom_concat('mkfifo ', File), _)),
+    open('control/fo', read, Fo),
     read_term(Fo, X,[]),
     open(X,append,Out_Stream),
     writeq(Out_Stream, 'asking main thread to dump doc..'),
@@ -971,9 +950,7 @@ represent xml in doc.
     thread_signal(main, doc_dump),
     'watch doc-dumper command pipe'.
 
-:- initialization(thread_create('watch doc-dumper command pipe', _)).
-
-
+%:- initialization(thread_create('watch doc-dumper command pipe', _)).
 
  doc_dump :-
 	gensym(dump, Id),
@@ -990,7 +967,7 @@ represent xml in doc.
 we could control this with a thread select'ing some unix socket
 */
 /*doc_dumping_enabled :-
-	current_prolog_flag(doc_dumping_enabled, true).
+	flag(doc_dumping_enabled, true).
 */
 
 
@@ -1150,6 +1127,8 @@ Anyway, we could store both doc and context in State.
 	;	F = E),
 
 	%print_message(information, "................."),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	%backtrace(200),
 
 	% a big potential problem here is running into some code (like a library we need) that makes extensive use of exceptions. Each exception triggers this. Can we meaningfually check CatcherFrame maybe?
 
@@ -1198,7 +1177,9 @@ Required Property Value
  rpv(S,P,V) :-
 	(	doc(S,P,V0)
 	->	!doc(V0, rdf:value, V)
-	;	(
+	;
+		/* throw an error */
+		(
 			(	doc(P, rdfs:label, Label)
 			->	true
 			;	rdf_global_id(Label, P)),
@@ -1230,10 +1211,11 @@ Required Property Value
 	!sheet_and_cell_string(Value, Str).
 
  sheet_and_cell_string(Value, Str) :-
-	!doc(Value, excel:has_sheet_name, Sheet_name),
-	!doc(Value, excel:col, Col),
-	!doc(Value, excel:row, Row),
-	!atomics_to_string(['sheet "', Sheet_name, '", cell ', Col, ':', Row], Str).
+	(	doc(Value, excel:has_sheet_name, Sheet_name)
+	->	(	(doc(Value, excel:col, Col), doc(Value, excel:row, Row))
+		->	!atomics_to_string(['sheet "', Sheet_name, '", cell ', Col, ':', Row], Str)
+		;	!atomics_to_string(['sheet "', Sheet_name], Str))
+	;	Str = "unknown location").
 
  read_coord_vector_from_doc_string(Item, Prop, Default_currency, Side, VectorA) :-
 	doc_value(Item, Prop, Amount_string),
@@ -1273,6 +1255,7 @@ Required Property Value
 
  get_sheet_data(Type, Data) :-
 	*get_sheet(Type, Sheet),
+	!doc_add(Sheet, l:was_processed, true),% todo check.
 	!doc(Sheet, excel:sheet_instance_has_sheet_data, Data).
 
  get_sheets_data(Type, Datas) :-

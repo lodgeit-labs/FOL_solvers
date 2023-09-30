@@ -1,6 +1,7 @@
 #!/usr/bin/env swipl
 
-:- ['../../prolog/determinancy_checker/determinancy_checker_main.pl'].
+%:- ['../../prolog/determinancy_checker/determinancy_checker_main.pl'].
+:- ['../../prolog/utils/utils'].
 
 /*
 not all permutations of compilation and toplevel options are implemented. Compilation would be useful if swipl reported all errors, including DCG errors, upon loading, without a need to call 'make'. Right now, it is useless, and it gives no speed improvement.
@@ -82,7 +83,7 @@ main :-
 			help('run swipl with -O?')]
 		,[opt(compile), type(boolean), default(false), shortflags([c]), longflags([compile]),
 			help('compile first?')]
-		,[opt(toplevel), type(boolean), default(true), shortflags([t]), longflags([toplevel]),
+		,[opt(toplevel), type(boolean), default(false), shortflags([t]), longflags([toplevel]),
 			help('pass goal interactively into toplevel instead of with -g? Allows guitracer to run after exception.')]
 		,[opt(halt_on_problems), type(boolean), default(true), shortflags([h]), longflags([halt_on_problems])]
 		,[opt(problem_lines_whitelist), type(atom), longflags([problem_lines_whitelist])]
@@ -141,7 +142,7 @@ split_list_by_last_occurence_of2([],_,[],[]) :- !.
 optimization_flag(Debug, Optimization) :-
 	(	Debug = true
 	->	(
-			Optimization = ' ',
+			Optimization = ' --debug=true ',
 			debug(dev_runner, 'dev_runner: debug is true, no -O...\n', [])
 		)
 	;	(
@@ -164,7 +165,8 @@ check_syntax(Optimization, Script) :-
 	->	Err_Grep = ['| grep -v -x -F -f ', Whitelist_File]
 	;	Err_Grep = ''),
 
-	shell2([Load_Cmd, ' -g "make,halt."  2>&1  |  tee ', Err_File, Err_Grep, ' | head -n 150 1>&2']),
+	%shell2([Load_Cmd, ' -g "make,halt."  2>&1  |  tee ', Err_File, Err_Grep, ' | head -n 150 1>&2']),
+	shell2([Load_Cmd, ' -g "halt."  2>&1  |  tee ', Err_File, Err_Grep, ' | head -n 150 1>&2']),
 	maybe_halt_on_problems,
 	debug(dev_runner, 'dev_runner: syntax seems ok...\n', []).
 
@@ -244,7 +246,11 @@ run_without_compilation(Debug, Optimization, Script, Viewer) :-
 			->	Err_Grep = [' 3>&1 1>&2 2>&3 | grep -v -x -F -f ', Whitelist_File, ' ) 3>&1 1>&2 2>&3']
 			;	Err_Grep = ')'),
 
-			shell2(["(/usr/bin/time -v swipl", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
+			(	getenv('MPROF_OUTPUT_PATH', MPROF_OUTPUT_PATH)
+			->	true
+			;	MPROF_OUTPUT_PATH = '/app/server_root/tmp/mem_prof'),
+
+			shell2(["(/usr/bin/time -v mprof run --nopython -C -E -o ", MPROF_OUTPUT_PATH, " swipl --stack_limit=100G ", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
 
 			(	Exit_status = 0
 			->	true
@@ -279,11 +285,15 @@ run_with_toplevel(Debug, Goal, Script, _Opts) :-
 	->	Environment = environment(['SWIPL_NODEBUG'=false])
 	;	Environment = environment(['SWIPL_NODEBUG'=true])),
 
+	(	getenv('MPROF_OUTPUT_PATH', MPROF_OUTPUT_PATH)
+	->	true
+	;	MPROF_OUTPUT_PATH = '/app/server_root/tmp/mem_prof'),
+
 	Args0 = ['-v',
 
-		'mprof', 'run', '--nopython', '-C', '-E' , '-o', '/app/server_root/tmp/mem',
+		'mprof', 'run', '--nopython', '-C', '-E' , '-o', MPROF_OUTPUT_PATH,
 
-	'swipl', Optimization, '-s', Script, '--', ScriptArgs],
+	'swipl', '--stack_limit=100G', Optimization, '-s', Script, '--', ScriptArgs],
 
 	flatten(Args0, Args),
 	debug(dev_runner, 'dev_runner: will run with toplevel with args: ~q\n', [Args]),

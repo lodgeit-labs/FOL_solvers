@@ -6,8 +6,17 @@
 
 
  services_server(S) :-
-	!current_prolog_flag(services_server, S),
-	debug(d, 'current_prolog_flag(services_server, ~q)', [S]).
+	!flag('SERVICES_URL',S),
+	debug(d, 'services_server = ~q', [S]).
+
+ url_parts(Url, Parts) :-
+	parse_url(Url, X),
+	member(path('/'), X),
+	member(protocol(S), X),
+	member(host(H), X),
+	member(port(P), X),
+	[scheme(S), host(H), port(P)] = Parts,
+	true.
 
  json_post(Url, Payload, Response) :-
 	json_post(Url, Payload, Response, 5).
@@ -47,9 +56,9 @@
 
 
  services_server_shell_cmd(Cmd) :-
-	format(string(Url), '~w/shell/rpc/', [$>services_server(<$)]),
+	format(string(Url), '~w/shell', [$>services_server(<$)]),
 	debug(shell, 'POST: ~w', Url),
-	json_post(Url, _{cmd:Cmd,quiet_success:true}, _).
+	json_post(Url, _{cmd:Cmd}, _).
 
 
 
@@ -64,13 +73,13 @@ swipl shell has a bug making it stuck for long time */
 
 
 
- shell2(Cmd) :-
-	shell2(Cmd, _).
+ shellx2(Cmd) :-
+	shellx2(Cmd, _).
 
- shell2(Cmd_In, Exit_Status) :-
-	shell3(Cmd_In, [exit_status(Exit_Status)]).
+ shellx2(Cmd_In, Exit_Status) :-
+	shellx3(Cmd_In, [exit_status(Exit_Status)]).
 
- shell3(Cmd_In, Options) :-
+ shellx3(Cmd_In, Options) :-
 	flatten([Cmd_In], Cmd_Flat),
 	atomic_list_concat(Cmd_Flat, " ", Cmd),
 
@@ -95,4 +104,4 @@ swipl shell has a bug making it stuck for long time */
  print_clickable_link(Url, Title) :-
 	/* todo replace this with write */
 	atomics_to_string([">&2 printf '\e]8;;", Url,"\e\\   ", Title, "   \e]8;;\e\\\n'"],  S),
-	shell2(S,_).
+	shellx2(S,_).
