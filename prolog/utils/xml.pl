@@ -134,11 +134,13 @@ a (variable, default value) tuple can also be passed */
 		close(Stream)).
 
  xml_from_url(Url, Dom) :-
-	/*fixme: throw something more descriptive here and produce a human-level error message at output*/
-	setup_call_cleanup(
-        http_open(Url, In, []),
-		load_structure(In, Dom, [dialect(xml),space(remove)]),
-        close(In)).
+%	/*fixme: throw something more descriptive here and produce a human-level error message at output*/
+%	setup_call_cleanup(
+%        http_open(Url, In, []),
+%		load_structure(In, Dom, [dialect(xml),space(remove)]),
+%        close(In)).
+	fetch_remote_file(Url, Downloaded_File_Path),
+	xml_from_path(Downloaded_File_Path, Dom).
 
  xml_from_path(File_Path, Dom) :-
 	%http_safe_file(File_Path, []),
@@ -154,6 +156,41 @@ a (variable, default value) tuple can also be passed */
 		is_url(Url)
 	->	xml_from_url(Url, Dom)
 	;	xml_from_path(Url, Dom).
+
+
+
+ fetch_remote_file(Url, Result) :-
+
+	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
+    resolve_specifier(loc(specifier, my_tmp(Tmp_Dir)), loc(absolute_path, Tmp_Dir_Path)),
+
+	!uri_encoded(query_value,Url,Url_Encoded),
+	!uri_encoded(query_value,Tmp_Dir_Path,Tmp_Dir_Path_Encoded),
+
+	setup_call_cleanup(
+		!http_open(
+		    $>append($>!url_parts($>services_server),
+		    [
+                path('/fetch_remote_url'),
+                search([
+                	tmp_dir_path=Tmp_Dir_Path_Encoded,
+                    url=Url_Encoded
+            	])
+			]),
+            In,
+            [
+				request_header('Accept'='application/json'),
+				method(post)
+			]
+        ),
+		!json_read_dict(In, Response_JSON),
+		/* todo is this correct, or can In be unbound here? */
+		(var(In) -> true ; close(In))
+    ),
+	%format("Result: ~w~n", [Response_JSON.result]),
+	(	Response_JSON.result = "ok"
+	->	Result = Response_JSON.file_path
+	;	throw_string(['fetch_remote_file error: ', Response_JSON.error_message])).
 
 
 
