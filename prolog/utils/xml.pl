@@ -164,33 +164,36 @@ a (variable, default value) tuple can also be passed */
 	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
     resolve_specifier(loc(specifier, my_tmp(Tmp_Dir)), loc(absolute_path, Tmp_Dir_Path)),
 
-	!uri_encoded(query_value,Url,Url_Encoded),
-	!uri_encoded(query_value,Tmp_Dir_Path,Tmp_Dir_Path_Encoded),
+	Url=Url_Encoded,
+	Tmp_Dir_Path=Tmp_Dir_Path_Encoded,
 
 	setup_call_cleanup(
-		!http_open(
-		    $>append($>!url_parts($>services_server),
-		    [
-                path('/fetch_remote_url'),
-                search([
-                	tmp_dir_path=Tmp_Dir_Path_Encoded,
-                    url=Url_Encoded
-            	])
-			]),
-            In,
-            [
-				request_header('Accept'='application/json'),
-				method(post)
-			]
-        ),
-		!json_read_dict(In, Response_JSON),
-		/* todo is this correct, or can In be unbound here? */
-		(var(In) -> true ; close(In))
+		fetch_remote_file2(Tmp_Dir_Path_Encoded, Url_Encoded, Input_Stream),
+		!json_read_dict(Input_Stream, Response_JSON),
+		/* can it be unbound here? */
+		(var(Input_Stream) -> true ; close(Input_Stream))
     ),
 	%format("Result: ~w~n", [Response_JSON.result]),
 	(	Response_JSON.result = "ok"
 	->	Result = Response_JSON.file_path
 	;	throw_string(['fetch_remote_file error: ', Response_JSON.error_message])).
+
+ fetch_remote_file2(Tmp_Dir_Path_Encoded, Url_Encoded, Input_Stream) :-
+ 	!http_open(
+		$>append($>!url_parts($>!services_server),
+		[
+			path('/fetch_remote_file'),
+			search([
+				tmp_dir_path=Tmp_Dir_Path_Encoded,
+				url=Url_Encoded
+			])
+		]),
+		Input_Stream,
+		[
+			request_header('Accept'='application/json'),
+			method(post)
+		]
+	).
 
 
 
@@ -198,6 +201,7 @@ a (variable, default value) tuple can also be passed */
 Validates an XML instance against an XSD schema by calling an external Python script
 */
  validate_xml(loc(absolute_path,Instance_File), loc(absolute_path,Schema_File), Schema_Errors) :-
+	% maybe we shouldnt encode!
 	!uri_encoded(query_value,Instance_File,Instance_File_Encoded),
 	!uri_encoded(query_value,Schema_File,Schema_File_Encoded),
 	setup_call_cleanup(
