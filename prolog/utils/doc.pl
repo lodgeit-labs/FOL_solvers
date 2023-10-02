@@ -455,6 +455,34 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 */
 
  node_rdf_vs_doc(
+	Float ^^ 'http://www.w3.org/2001/XMLSchema#decimal',
+	Rat) :-
+		/*freeze(Float, float(Float)),
+		freeze(Rat, rational(Rat)),*/
+		(
+			(var(Float),rational(Rat)) /* g trace is totally baffled by this place, but the gist is that for anything else than a rational Rat, this correctly fails and goes on to the next case */
+		;
+			(var(Rat), float(Float))
+		),
+		(	nonvar(Rat)
+		->	Float is float(Rat)
+		;	Rat is rationalize(Float)),!.
+
+ node_rdf_vs_doc(
+	String ^^ 'http://www.w3.org/2001/XMLSchema#string',
+	String):- string(String), !.
+
+ node_rdf_vs_doc(
+	X ^^ 'http://www.w3.org/2001/XMLSchema#boolean',
+	X) :-
+	(X == true
+	;
+	X == false),
+	!.
+% boolean has to be above atom as a special case of atomic values
+ node_rdf_vs_doc(Atom, Atom) :- atom(Atom),!.
+
+ node_rdf_vs_doc(
 	date(Y,M,D) ^^ 'http://www.w3.org/2001/XMLSchema#date',
 	date(Y,M,D)) :- !.
 
