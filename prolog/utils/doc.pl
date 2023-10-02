@@ -1,3 +1,15 @@
+/*
+	a backtracking quad-store implemented with an open list stored in a global thread-local variable.
+	also robust-specific prefix declarations, convenience functions, ...
+
+	Since robust currently makes minimal to no use of the backtracking feature of this store, a big optimization might be to replace it with a non-backtracking implementation.
+
+	The SWIPL RDF database itself is a bad candidate, as it's much slower in my tests.
+
+*/
+
+
+
 :- use_module(library(clpfd)).
 
 :- rdf_register_prefix(code,				'https://rdf.lodgeit.net.au/v1/code#').
@@ -45,10 +57,6 @@
 	rdf_equal2(X,Y).
 
 
-/*
-	a quad-store implemented with an open list stored in a global thread-local variable
-*/
-
 %:- debug(doc).
 
 % https://www.swi-prolog.org/pldoc/man?predicate=rdf_meta/1
@@ -85,7 +93,7 @@ maybe this program will even run faster without this?*/
  doc_init :-
 	init_prolog_exception_hook,
 	'check that there is only one exception hook and it\'s ours',
-	(	nb_current(doc_trail, _)
+	(	nb_current(doc_trail_openend_file_output_stream, _)
 	->	true
 	;	doc_init_trace_0),
 	%thread_create('watch doc-dumper command pipe', _),
@@ -102,11 +110,7 @@ maybe this program will even run faster without this?*/
 good thing is i think even with retracts (the backtracking kind), we won't have to worry about prolog reusing variable numbers. anyway, variables are todo
 */
 
-flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
-
-:- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
-
-/* why 0? Probably, the idea was that there'd also be other, higher level formats? */
+/* why 0? the idea was that there'd also be other, higher level formats */
  doc_init_trace_0 :-
 	Fn = 'doc_trace_0.txt',
 	Fnn = loc(file_name, Fn),
@@ -114,10 +118,18 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 	->	true
 	;	Trail_File_Path = Fn),
 	open(Trail_File_Path, write, Trail_Stream, [buffer(line)]),
-	b_setval(doc_trail, Trail_Stream).
+	env_bool('ROBUST_DOC_ENABLE_TRAIL', Enabled),
+	atomic_list_concat(['ROBUST_DOC_ENABLE_TRAIL: ',Enabled], Msg),
+	writeln(Trail_Stream, Msg),
+	b_setval(doc_trail_openend_file_output_stream, Trail_Stream).
+
+
+flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
+
+:- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
 
  doc_trace0(Term) :-
-	b_getval(doc_trail, Stream),
+	b_getval(doc_trail_openend_file_output_stream, Stream),
 	(	true %Stream \= []
 	->	(
 			writeq(Stream, Term),
@@ -127,7 +139,6 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 
 :- else.
 
- doc_init_trace_0 :- true.
  doc_trace0(_) :- true.
 
 :- endif.
@@ -191,6 +202,12 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 	(	XXX = T.get(X)
 	->	true
 	;	XXX = _{}).
+
+ doc_add_gspo_no_global_id(G,S,P,O) :-
+ 	addd(S2,P2,O2,G2).
+ 	/*
+ 	another possible optimization might be to avoid calling rdf_global_id, because all the uris coming from parsing a rdf file are already global ids i think.
+ 	*/
 
  doc_add(S,P,O,G) :-
 	rdf_global_id(S, S2),
@@ -624,6 +641,17 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
 
  doc_from_rdf(Rdf_Graph, Replaced_prefix, Replacement_prefix) :-
+ 	/*
+ 	all graphs are mashed into default graph. That means no triple metadata is preserved, but that's ok, because we don't use it anyway.
+ 	*/
+ 	doc_default_graph(Default_graph),
+
+ 	/*
+ 	a fun optimization might be:
+ 	1) figure out a rdf format that's probably binary, plain quad list, and suitable for partitioning.
+ 	2) concurrent_maplist the loading, and the below logic, one thread for one partition, up until doc_add (which has to be run sequentially)
+ 	*/
+
 	findall((X2,Y2,Z2),
 		(
 			rdf(X,Y,Z,Rdf_Graph),
@@ -633,7 +661,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 		),
 		Triples),
 	maplist(triple_rdf_vs_doc, Triples, Triples2),
-	maplist(doc_add, Triples2).
+	maplist(doc_add_gspo_no_global_id(Default_graph), Triples2).
 
  replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2) :-
 	(	(
