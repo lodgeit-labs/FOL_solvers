@@ -203,8 +203,8 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 	->	true
 	;	XXX = _{}).
 
- doc_add_gspo_no_global_id(G,S,P,O) :-
- 	addd(S2,P2,O2,G2).
+ doc_add_gspo_no_global_id(G,(S,P,O)) :-
+ 	addd(S,P,O,G).
  	/*
  	another possible optimization might be to avoid calling rdf_global_id, because all the uris coming from parsing a rdf file are already global ids i think.
  	*/
