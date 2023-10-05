@@ -8,6 +8,9 @@
 
 		debugging,
 
+		flag(generate_debug_info, Generate_debug_info),
+		format(user_error, '* generate_debug_info ~q~n', [Generate_debug_info]),
+
 		flag('DISABLE_GRACEFUL_RESUME_ON_UNEXPECTED_ERROR', Disable_graceful_resume_on_unexpected_error),
 		format(user_error, '* DISABLE_GRACEFUL_RESUME_ON_UNEXPECTED_ERROR ~q~n', [Disable_graceful_resume_on_unexpected_error]),
 

@@ -233,12 +233,14 @@ assumption: only O's are allowed to be non-atoms
 */
 
  addd(S2,P2,O2,G2) :-
+
+ 	/* these are used as keys to the dicts */
 	atom(S2),atom(P2),atom(G2),
 	!,
 
-	% get the_theory global
+	% get the_theory global, ie a dict from subjects to pred-dicts
 	b_getval(the_theory,Ss),
-	%, ie a dict from subjects to pred-dicts
+
 	% does it contain the subject?
 
 	(	Ps = Ss.get(S2)
@@ -314,6 +316,12 @@ dddd(Spog, X) :-
 
  dddd(Spog, _X) :-
 	member(Spog, $>b_getval(the_theory_nonground)).
+
+
+
+
+
+
 
  doc_assert(S,P,O,G) :-
 	doc_add(S,P,O,G).
