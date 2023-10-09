@@ -387,15 +387,16 @@ Numbers denote len(F ) (in firing nodes) and len(A) (in atom nodes), respectivel
 
 
 # declarative debugging 
-#### why
-	
-	when we're asking why, we can probably point to an exact proof that our system gave but shouldn't have. 
-	
-	Or we're asking why the prover is still running, in other words, why is the search space so big, in this configuration.
+	#### why
+		1)
+			when we're asking why, we can probably point to an exact proof that our system gave but shouldn't have. 
+		2)
+			Or we're asking why the prover is still running, in other words, why is the search space so big, in this configuration.
 	
 	#### why not
 	
-	Again easy if we can point to a specific theory to prove.
+		Again easy if we can point to a specific theory to prove.
+			what if we can only describe it in a fuzzy way?
 
 
 #### querying the proof graph
