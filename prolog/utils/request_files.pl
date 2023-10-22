@@ -26,9 +26,9 @@
 
  make_zip :-
 % todo replace with https://docs.python.org/3/library/shutil.html#archiving-example
+
 	resolve_specifier(loc(specifier, my_tmp('')), loc(absolute_path, Tmp)),
-	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
-	resolve_specifier(loc(specifier, my_tmp(Tmp_Dir)), loc(absolute_path, Tmp_Dir_Path)),
+	my_request_tmp_dir_path(Tmp_Dir_Path),
 
 	!doc($>request_data, l:request_tmp_directory_name, Request_Files_Tmp_Directory_Name),
 	resolve_specifier(loc(specifier, my_tmp(Request_Files_Tmp_Directory_Name)), loc(absolute_path, Request_Files_Tmp_Directory_Path)),
@@ -208,3 +208,6 @@ write_tmp_json_file(Name, Json) :-
 	tmp_file_path_to_url(Path, Url),
 	add_report_file(-1,'result', 'result', Url).
 
+ my_request_tmp_dir_path(Tmp_Dir_Path) :-
+	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
+    resolve_specifier(loc(specifier, my_tmp(Tmp_Dir)), loc(absolute_path, Tmp_Dir_Path)).
