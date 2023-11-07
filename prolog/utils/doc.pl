@@ -794,11 +794,12 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	doc_add(Uri, l:type, Type),
 	doc_add(Uri, l:message, Msg).
 
- get_alert(Type, Msg, Uri) :-
+ get_alert(Type, Msg, Str, Uri) :-
 	result(R),
 	*doc(R, l:alert, Uri),
 	doc(Uri, l:type, Type),
-	doc(Uri, l:message, Msg).
+	doc(Uri, l:plain_message, Msg),
+	doc(Uri, l:message, Str).
 
  add_comment_stringize(Title, Term) :-
 	pretty_term_string(Term, String),
