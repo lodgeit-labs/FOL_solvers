@@ -38,6 +38,11 @@
 
 
  terms_with_floats_close_enough(X,Y) :-
+	var(X), var(Y), !,
+	X = Y.
+	
+
+ terms_with_floats_close_enough(X,Y) :-
 	(number(X);rational(X)),!,
 	(number(Y);rational(Y)),!,
 	floats_close_enough(X, Y).
