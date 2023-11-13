@@ -19,29 +19,29 @@
 	true.
 
  json_post(Url, Payload, Response) :-
-	json_post(Url, Payload, Response, 5).
+	json_post(Url, Payload, Response, 10).
 
  json_post(Url, Payload, Response, Max_retries) :-
 	json_post(Url, Payload, Response, Max_retries, Max_retries).
 
- json_post(Url, Payload, Response, Max_retries, Retries) :-
-	Options = [content_type('application/json'), json_object(dict)],
+ json_post(Url, Payload, Response, Max_retries, Retries_left) :-
+	Options = [content_type('application/json'), json_object(dict), connection('Keep-Alive'), timeout(600)],
 	%format(user_error, '~q~n', [http_post(Url, json(Payload), Response, Options),
 	catch(
 		http_post(Url, json(Payload), Response, Options),
 		E,
 		(
 			(	(
-					E = error(socket_error(eai_again,Msg),_),
-					Retries > 0
+					E = error(socket_error(_/*econnreset,eai_again,..*/,Msg),_),
+					Retries_left > 0
 				)
 			->	(
 					%debug(shell, '~q', Msg),
 					format(user_error, '~q', Msg),
-					Sleep is Max_retries - Retries,
+					Sleep is Max_retries - Retries_left,
 					sleep(Sleep),
-					Next_retries is Retries - 1,
-					json_post(Url, Payload, Response, Max_retries, Next_retries)
+					Next_retries_left is Retries_left - 1,
+					json_post(Url, Payload, Response, Max_retries, Next_retries_left)
 				)
 			;	throw(
 					during(
