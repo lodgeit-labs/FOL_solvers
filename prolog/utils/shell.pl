@@ -32,7 +32,9 @@
 		E,
 		(
 			(	(
-					E = error(socket_error(_/*econnreset,eai_again,..*/,Msg),_),
+					%E = error(socket_error(_/*econnreset,eai_again,..*/,Msg),_),
+					E = error(_,context(_, Msg)),
+					
 					Retries_left > 0
 				)
 			->	(
