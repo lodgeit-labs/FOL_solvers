@@ -124,6 +124,11 @@ a (variable, default value) tuple can also be passed */
  numeric_fields(_, []).
 
 
+file_permission_check(File_Path, Result) :-
+	format(string(Url), '~w/file_permission_check', [$>services_server(<$)]),
+	!doc($>request_data, l:request_tmp_directory_name, Request_Tmp_Directory_Name),
+	json_post(Url, _{request_tmp_directory_name: Request_Tmp_Directory_Name, file_path: File_Path}, Result).
+
 
 
 
@@ -134,22 +139,17 @@ a (variable, default value) tuple can also be passed */
 		close(Stream)).
 
  xml_from_url(Url, Dom) :-
-%	/*fixme: throw something more descriptive here and produce a human-level error message at output*/
-%	setup_call_cleanup(
-%        http_open(Url, In, []),
-%		load_structure(In, Dom, [dialect(xml),space(remove)]),
-%        close(In)).
 	fetch_remote_file(Url, Downloaded_File_Path),
 	xml_from_path(Downloaded_File_Path, Dom).
 
  xml_from_path(File_Path, Dom) :-
-	%http_safe_file(File_Path, []),
-	nb_setval(xml_from_path__file_path,File_Path),
+	nb_setval(xml_loader_error_callback__xml_from_path__file_path,File_Path),
+	file_permission_check(File_Path),
 	load_xml(File_Path, Dom, [space(remove), call(error, xml_loader_error_callback)]),
-	nb_delete(xml_from_path__file_path).
+	nb_delete(xml_loader_error_callback__xml_from_path__file_path).
 
  xml_loader_error_callback(X,Y,Z) :-
-	nb_getval(xml_from_path__file_path,File_Path),
+	nb_getval(xml_loader_error_callback__xml_from_path__file_path,File_Path),
 	throw_string(['XML parsing error: "',File_Path, '": ', X,': ', Y,' (',Z,')']).
 
  xml_from_path_or_url(Url, Dom) :-
