@@ -124,11 +124,6 @@ a (variable, default value) tuple can also be passed */
  numeric_fields(_, []).
 
 
-file_permission_check(File_Path, Result) :-
-	format(string(Url), '~w/file_permission_check', [$>services_server(<$)]),
-	!doc($>request_data, l:request_tmp_directory_name, Request_Tmp_Directory_Name),
-	json_post(Url, _{request_tmp_directory_name: Request_Tmp_Directory_Name, file_path: File_Path}, Result).
-
 
 
 
@@ -161,30 +156,15 @@ file_permission_check(File_Path, Result) :-
 
  fetch_remote_file(Url, Result) :-
 
+	/* todo: if there's ever a need to fetch a set of files, like a xbrl taxonomy, it might make sense to come up with a dedicated directory name under remote_files, so that file names don't change..? */
+
 	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
     resolve_specifier(loc(specifier, my_tmp(Tmp_Dir)), loc(absolute_path, Tmp_Dir_Path)),
-
-	Url=Url_Encoded,
-	Tmp_Dir_Path=Tmp_Dir_Path_Encoded,
-
-	setup_call_cleanup(
-		fetch_remote_file2(Tmp_Dir_Path_Encoded, Url_Encoded, Input_Stream),
-		!json_read_dict(Input_Stream, Response_JSON),
-		/* can it be unbound here? */
-		(var(Input_Stream) -> true ; close(Input_Stream))
-    ),
-	%format("Result: ~w~n", [Response_JSON.result]),
-	(	Response_JSON.result = "ok"
-	->	Result = Response_JSON.file_path
-	;	throw_string(['fetch_remote_file error: ', Response_JSON.error_message])).
-
- fetch_remote_file2(Tmp_Dir_Path_Encoded, Url_Encoded, Input_Stream) :-
- 	!http_open(
-		$>append($>!url_parts($>!services_server),
+    json_post($>!download_bastion_server,
 		[
-			path('/fetch_remote_file'),
+			path('/get_into_dir'),
 			search([
-				tmp_dir_path=Tmp_Dir_Path_Encoded,
+				dir=Remote_Files_Dir,
 				url=Url_Encoded
 			])
 		]),

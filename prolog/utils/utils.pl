@@ -69,7 +69,7 @@
 :- [numbers].
 :- [pacioli].
 :- [request_files].
-:- [shell].
+:- [services].
 :- [string_manipulation].
 :- [structured_xml].
 :- [structures].
