@@ -160,21 +160,6 @@ a (variable, default value) tuple can also be passed */
 
 	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
     resolve_specifier(loc(specifier, my_tmp(Tmp_Dir)), loc(absolute_path, Tmp_Dir_Path)),
-    json_post($>!download_bastion_server,
-		[
-			path('/get_into_dir'),
-			search([
-				dir=Remote_Files_Dir,
-				url=Url_Encoded
-			])
-		]),
-		Input_Stream,
-		[
-			request_header('Accept'='application/json'),
-			method(post)
-		]
-	).
-
 
 
 /*

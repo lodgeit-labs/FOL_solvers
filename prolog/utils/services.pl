@@ -85,8 +85,8 @@
 
 
 
- services_rpc(Path, Cmd, Result) :-
-	json_post_result([$>services_server, '/', Path], Cmd, Result).
+ services_post_result(Path, Params, Result) :-
+	json_post_result([$>services_server, '/', Path], Params, Result).
 
 
 
@@ -114,5 +114,6 @@
 
 
 
- fetch_file_from_url(loc(absolute_url,Url), loc(absolute_path, Path)) :-
-
+ get_file_from_url_into_dir(loc(absolute_url, Url), loc(absolute_path, Path), Filepath) :-
+	json_post_result([$>download_bastion_server(<$), '/get_file_from_url_into_dir'], _{url: Url, dir: Path}, Result),
+	_{filepath: Filepath} :< Result.
