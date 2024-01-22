@@ -250,9 +250,7 @@ run_without_compilation(Debug, Optimization, Script, Viewer) :-
 			->	true
 			;	MPROF_OUTPUT_PATH = '/app/server_root/tmp/mem_prof'),
 
-			% shell2(["(/usr/bin/time -v mprof run --nopython -C -E -o ", MPROF_OUTPUT_PATH, " swipl --stack_limit=100G ", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
-			% ^ not sure how this worked, mprof prints to stdout, even in older versions, let's for it and change the two lines
-			shell2(["(/usr/bin/time -v swipl --stack_limit=100G ", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
+			shell2(["(/usr/bin/time -v mprof run --nopython -C -E -o ", MPROF_OUTPUT_PATH, " swipl --stack_limit=100G ", Optimization, Execution_goal, ' -s ', Script, Redirection, Err_Grep], Exit_status),
 
 			(	Exit_status = 0
 			->	true
