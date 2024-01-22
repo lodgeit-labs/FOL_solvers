@@ -154,12 +154,13 @@ a (variable, default value) tuple can also be passed */
 
 
 
- fetch_remote_file(Url, Result) :-
+ fetch_remote_file(Url, Filepath) :-
 
 	/* todo: if there's ever a need to fetch a set of files, like a xbrl taxonomy, it might make sense to come up with a dedicated directory name under remote_files, so that file names don't change..? */
 
 	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
     resolve_specifier(loc(specifier, my_tmp(Tmp_Dir)), loc(absolute_path, Tmp_Dir_Path)),
+    get_file_from_url_into_dir(loc(absolute_url, Url), loc(absolute_path, Tmp_Dir_Path), Filepath).
 
 
 /*

@@ -48,7 +48,11 @@
 
  is_url(URI) :-
 	% todo atom_prefix is deprecated
-	atom_prefix(URI,"http").
+	atom_prefix(URI,"http://").
+
+ is_url(URI) :-
+	% todo atom_prefix is deprecated
+	atom_prefix(URI,"https://").
 
 
 
