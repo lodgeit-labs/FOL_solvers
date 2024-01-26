@@ -34,14 +34,19 @@
 	->	throw_string(Error)
 	;	Result = Response.get(result)).
 
+
+
  json_post(Url, Payload, Response) :-
 	json_post(Url, Payload, Response, 10).
+
+
 
  json_post(Url, Payload, Response, Max_retries) :-
 	json_post(Url, Payload, Response, Max_retries, Max_retries).
 
- json_post(Url0, Payload, Response, Max_retries, Retries_left) :-
 
+
+ json_post(Url0, Payload, Response, Max_retries, Retries_left) :-
 	(
 		string(Url0)
 	->	Url = Url0
@@ -81,21 +86,13 @@
 
 
  services_server_shell_cmd(Cmd) :-
-	json_post([$>services_server(<$), '/shell'], _{cmd:Cmd}, _).
+	json_post(['http://localhost:1111/shell'], _{cmd:Cmd}, _).
 
 
 
  services_post_result(Path, Params, Result) :-
 	json_post_result([$>services_server, '/', Path], Params, Result).
 
-
-
-
- file_permission_check(File_Path, Result) :-
-	format(string(Url), '~w/file_permission_check', [$>services_server(<$)]),
-	/* it might be useful for privacy if we don't have to thread the user id through prolog at all. (The job data might stay anonymous without any cleaning effort). Hence we use request_tmp_directory_name as a stand-in */
-	!doc($>request_data, l:request_tmp_directory_name, Request_Tmp_Directory_Name),
-	json_post_result(Url, _{request_tmp_directory_name: Request_Tmp_Directory_Name, file_path: File_Path}, Result).
 
 
 

@@ -139,7 +139,6 @@ a (variable, default value) tuple can also be passed */
 
  xml_from_path(File_Path, Dom) :-
 	nb_setval(xml_loader_error_callback__xml_from_path__file_path,File_Path),
-	file_permission_check(File_Path),
 	load_xml(File_Path, Dom, [space(remove), call(error, xml_loader_error_callback)]),
 	nb_delete(xml_loader_error_callback__xml_from_path__file_path).
 
@@ -163,42 +162,11 @@ a (variable, default value) tuple can also be passed */
     get_file_from_url_into_dir(loc(absolute_url, Url), loc(absolute_path, Tmp_Dir_Path), Filepath).
 
 
+
+
 /*
 Validates an XML instance against an XSD schema by calling an external Python script
 */
- validate_xml(loc(absolute_path,Instance_File), loc(absolute_path,Schema_File), Schema_Errors) :-
-	% maybe we shouldnt encode!
-	!uri_encoded(query_value,Instance_File,Instance_File_Encoded),
-	!uri_encoded(query_value,Schema_File,Schema_File_Encoded),
-	setup_call_cleanup(
-		!http_open(
-		    $>append($>!url_parts($>services_server),
-		    [
-                path('/xml_xsd_validator'),
-                search([
-                    xml=Instance_File_Encoded,
-                    xsd=Schema_File_Encoded
-                ])
-            ]),
-            In,
-            [
-				request_header('Accept'='application/json'),
-				method(post)
-			]
-        ),
-		!json_read_dict(In, Response_JSON),
-		/* todo is this correct, or can In be unbound here? */
-		(var(In) -> true ; close(In))
-    ),
-	%format("Result: ~w~n", [Response_JSON.result]),
-	(
-		Response_JSON.result = "ok"
-	->
-		Schema_Errors = []
-	;
-		atomic_list_concat(['XML validation error', Response_JSON.error_message], ": ", Schema_Error),
-		Schema_Errors = [Schema_Error]
-	).
 
  validate_xml2(Xml, Xsd) :-
 	!resolve_specifier(loc(specifier, my_schemas(Xsd)), Schema_File),
@@ -206,7 +174,22 @@ Validates an XML instance against an XSD schema by calling an external Python sc
 	(	Schema_Errors = []
 	->	true
 	;	(
-			!maplist(add_alert(error), Schema_Errors),
+			add_alert(error, Schema_Errors),
 			throw_string(['aborted.'])
 		)
 	).
+
+
+ validate_xml(loc(absolute_path,Instance_File), loc(absolute_path,Schema_File), Schema_Errors) :-
+	
+	Payload = _{
+		xml: Instance_File,
+		xsd: Schema_File
+	},
+	
+	json_post('http://localhost:1111/xml_xsd_validator', Payload, Response)
+
+	(	Error = Response.get(error)
+	->	Schema_Errors = Error
+	;	Schema_Errors = []).
+	
