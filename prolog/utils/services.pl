@@ -5,10 +5,6 @@
 :- use_module(library(http/http_open)).
 
 
- services_server(S) :-
-	!flag('SERVICES_URL',S),
-	debug(d, 'services_server = ~q', [S]).
-
  download_bastion_server(S) :-
 	!flag('DOWNLOAD_BASTION_URL',S),
 	debug(d, 'download_bastion_server = ~q', [S]).
@@ -21,10 +17,6 @@
 	member(port(P), X),
 	[scheme(S), host(H), port(P)] = Parts,
 	true.
-
-
-
-
 
 
  json_post_result(Url, Payload, Result) :-
@@ -48,7 +40,7 @@
 
  json_post(Url0, Payload, Response, Max_retries, Retries_left) :-
 	(
-		string(Url0)
+		atomic(Url0)
 	->	Url = Url0
 	;	atomic_list_concat(Url0, Url)
 	),
@@ -86,14 +78,11 @@
 
 
  services_server_shell_cmd(Cmd) :-
-	json_post(['http://localhost:1111/shell'], _{cmd:Cmd}, _).
-
+	json_post(['http://127.0.0.1:1111/shell'], _{cmd:Cmd}, _).
 
 
  services_post_result(Path, Params, Result) :-
-	json_post_result([$>services_server, '/', Path], Params, Result).
-
-
+	json_post_result(['http://127.0.0.1:1111/', Path], Params, Result).
 
 
  shell4(Cmd_In, Exit_Status) :-

@@ -169,8 +169,7 @@ Validates an XML instance against an XSD schema by calling an external Python sc
 */
 
  validate_xml2(Xml, Xsd) :-
-	!resolve_specifier(loc(specifier, my_schemas(Xsd)), Schema_File),
-	!validate_xml(Xml, Schema_File, Schema_Errors),
+	!validate_xml(Xml, Xsd, Schema_Errors),
 	(	Schema_Errors = []
 	->	true
 	;	(
@@ -187,7 +186,7 @@ Validates an XML instance against an XSD schema by calling an external Python sc
 		xsd: Schema_File
 	},
 	
-	json_post('http://localhost:1111/xml_xsd_validator', Payload, Response)
+	json_post(['http://127.0.0.1:1111/xml_xsd_validator'], Payload, Response),
 
 	(	Error = Response.get(error)
 	->	Schema_Errors = Error

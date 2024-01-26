@@ -1154,11 +1154,12 @@ Anyway, we could store both doc and context in State.
 
  init_prolog_exception_hook :-
  	(	doc_saving_prolog_exception_hook_is_inited
- 	->	throw(doc_saving_prolog_exception_hook_is_inited)
- 	;	true),
- 	assert(doc_saving_prolog_exception_hook_is_inited),
-	'save old prolog exception hook',
-	assert(prolog_exception_hook(E,F, Frame, CatcherFrame) :- doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame)).
+ 	->	true
+ 	;	(
+		assert(doc_saving_prolog_exception_hook_is_inited),
+		'save old prolog exception hook',
+		assert(prolog_exception_hook(E,F, Frame, CatcherFrame) :- doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame))
+	)).
 
 %:- initialization(init_prolog_exception_hook).
 
