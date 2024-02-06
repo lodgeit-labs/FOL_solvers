@@ -494,6 +494,14 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 		;	Rat is rationalize(Float)),!.
 
  node_rdf_vs_doc(
+	Float ^^ 'http://www.w3.org/2001/XMLSchema#double',
+	Rat) :-
+		(var(Rat), float(Float)),
+		(	nonvar(Rat)
+		->	Float is float(Rat)
+		;	Rat is rationalize(Float)),!.
+
+ node_rdf_vs_doc(
 	String ^^ 'http://www.w3.org/2001/XMLSchema#string',
 	String):- string(String), !.
 
