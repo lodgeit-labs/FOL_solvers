@@ -70,6 +70,12 @@ write_tmp_json_file(Name, Json) :-
 */
 
 
+
+
+ /* this numbering is useful for running "quick" series of reports for debugging, finding an offending transaction.
+ But in future it could also be useful for generic nondeterministic calculations, ie, calculators that yield multiple results.*/
+  
+
  nondet_report_fn_key(Fn, Key) :-
 	atomic_list_concat(['report_fn_', Fn], Key).
 
