@@ -9,6 +9,10 @@
 	!flag('DOWNLOAD_BASTION_URL',S),
 	debug(d, 'download_bastion_server = ~q', [S]).
 
+ manager_url(Url) :-
+ 	!flag('MANAGER_URL',Url),
+ 	debug(d, 'manager_url = ~q', [Url]).
+
  url_parts(Url, Parts) :-
 	parse_url(Url, X),
 	member(path('/'), X),
