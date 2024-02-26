@@ -12,6 +12,7 @@
 
 :- use_module(library(clpfd)).
 
+% see also doc.pl RdfTemplates.trig agraph.py
 :- rdf_register_prefix(code,				'https://rdf.lodgeit.net.au/v1/code#').
 :- rdf_register_prefix(kb,					'https://rdf.lodgeit.net.au/v1/kb#').
 :- rdf_register_prefix(l,					'https://rdf.lodgeit.net.au/v1/request#').
