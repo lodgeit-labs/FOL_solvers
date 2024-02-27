@@ -383,8 +383,10 @@ member
  doc_new_uri(Postfix, Uri) :-
 	result_data_uri_base(Result_data_uri_base),
 	/* fixme, use something deterministic */
-	gensym('#bnx', Uri0),
-	atomic_list_concat([Result_data_uri_base, Uri0, '_', Postfix], Uri).
+	gensym('x', Uri0),
+	(	Postfix = ''
+	->	atomic_list_concat([Result_data_uri_base, Uri0], Uri)
+	;	atomic_list_concat([Result_data_uri_base, Uri0, '_', Postfix], Uri)).
 
 % note: uniqueness is not checked, we rely on namespacing by Postfix
  bn(Postfix, Uri) :-
