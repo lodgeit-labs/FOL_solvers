@@ -253,19 +253,27 @@ for what it's worth. Should be superseded by a nice svelte Rdf viewer UI
 	->	Str = ""
 	;	(
 			context_string1(1, C, Item_strings),
-			atomics_to_string(['context_string: \n' | Item_strings], Str)
+			atomics_to_string(Item_strings, Str)
 		)
 	).
 
  context_string1(Number, [C|Rest], [Str|Str_rest]) :-
-	context_string2(Number, C, Str),
+
+ 	nonvar(Rest),
+ 	Rest \= [],
+ 	
+ 	format(string(NumberStr), '~q:', [Number]),
+	context_string2(NumberStr, C, Str),
 	Next is Number + 1,
 	context_string1(Next, Rest, Str_rest).
+
+ context_string1(_, [C], [Str]) :-
+	context_string2('->', C, Str).
 
  context_string1(_, [],[]).
 
  context_string2(Number, C, Str) :-
 	(	atomic(C)
-	->	atomics_to_string([Number, ': ', C, ' \n'], Str)
-	;	format(string(Str), '~q: ~q \n', [Number, C])).
+	->	atomics_to_string([Number, ' ', C, ' \n'], Str)
+	;	format(string(Str), ' ~q \n', [C])).
 
