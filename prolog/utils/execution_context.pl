@@ -73,6 +73,7 @@ flag_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
 	(
 		(
 			%context_string(Str),
+			context_trace_trail(push(C)),
 			get_context_trace(Trace0), term_string(Trace0, Str),
 			context_trace_trail(Str)
 		)
@@ -116,8 +117,8 @@ flag_default('ENABLE_CONTEXT_TRACE',true).
 	New_depth is Depth + 1,
 	append([(Depth,C)], Trace, New_trace),
 	nb_setval(context_trace, New_trace),
-	nb_setval(context_depth, New_depth),
-	nb_setval(context, New_ctx_list),
+	b_setval(context_depth, New_depth),
+	b_setval(context, New_ctx_list),
  	format(user_error, '~q ...~n', [C]),
 	context_trace_trail__push_context(C).
 
@@ -130,12 +131,12 @@ flag_default('ENABLE_CONTEXT_TRACE',true).
 	pop_context.
 
  pop_context :-
-	nb_getval(context, Ctx_list),
+	b_getval(context, Ctx_list),
 	get_context_depth(Depth),
 	New_depth is Depth - 1,
-	nb_setval(context_depth, New_depth),
+	b_setval(context_depth, New_depth),
 	!append(New_ctx_list,[_],Ctx_list),
-	nb_setval(context, New_ctx_list),
+	b_setval(context, New_ctx_list),
 	context_trace_trail__pop_context.
 
 :- endif.
