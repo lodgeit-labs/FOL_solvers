@@ -87,7 +87,11 @@ maybe this program will even run faster without this?*/
 			clause(prolog_exception_hook(A,B,C,D),Body)
 		),
 		Xs),
-	(	Xs = [(user:doc_saving_prolog_exception_hook(A,B,C,D))]
+	(	(
+			Xs = [(user:doc_saving_prolog_exception_hook(A,B,C,D))]
+		;
+			Xs = [(doc_saving_prolog_exception_hook(A,B,C,D))]
+		)
 	->	true
 	;	throw(internal_error(prolog_exception_hook(Xs)))).
 
