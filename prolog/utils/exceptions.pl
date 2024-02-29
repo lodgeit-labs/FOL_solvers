@@ -26,6 +26,7 @@ prolog:error_message(msg(Msg)) --> [Msg].
  flag_default('GTRACE_ON_OWN_EXCEPTIONS', true).
 
  throw_value(V) :-
+	%gtrace,
 	(	env_bool('GTRACE_ON_OWN_EXCEPTIONS', true)
 	->	gtrace_if_have_display
 	;	true),

@@ -118,6 +118,7 @@ flag_default('ENABLE_CONTEXT_TRACE',true).
 	nb_setval(context_trace, New_trace),
 	nb_setval(context_depth, New_depth),
 	nb_setval(context, New_ctx_list),
+ 	format(user_error, '~q ...~n', [C]),
 	context_trace_trail__push_context(C).
 
 
