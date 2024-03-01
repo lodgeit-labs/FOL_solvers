@@ -18,9 +18,9 @@ exception: blablabla
 
 
  get_context(Ctx_list) :-
-	(	nb_current(context, Ctx_list)
+	(	b_current(context, Ctx_list)
 	->	true
-	;	Ctx_list = []).
+	;	Ctx_list = [hmm]).
 
 %	catch(
 %		b_getval(context, Ctx_list),
@@ -74,8 +74,10 @@ flag_default('ENABLE_CONTEXT_TRACE_TRAIL',false).
 		(
 			%context_string(Str),
 			context_trace_trail(push(C)),
+			get_context(Ccc), term_string(Ccc, CccStr),
+			context_trace_trail(context(CccStr)),
 			get_context_trace(Trace0), term_string(Trace0, Str),
-			context_trace_trail(Str)
+			context_trace_trail(context_trace(Str))
 		)
 		;
 		(

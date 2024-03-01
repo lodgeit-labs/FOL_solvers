@@ -1314,8 +1314,9 @@ Required Property Value
 
  get_sheet_data(Type, Data) :-
 	*get_sheet(Type, Sheet),
-	!doc_add(Sheet, l:was_processed, true),% todo check.
-	!doc(Sheet, excel:sheet_instance_has_sheet_data, Data).
+	!doc(Sheet, excel:sheet_instance_has_sheet_data, Data),
+	!doc_add(Sheet, l:was_processed, true). % todo check.
+
 
  get_sheets_data(Type, Datas) :-
  	findall(Data, get_sheet_data(Type, Data), Datas).

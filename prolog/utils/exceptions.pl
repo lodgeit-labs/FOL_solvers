@@ -31,7 +31,8 @@ prolog:error_message(msg(Msg)) --> [Msg].
 	->	gtrace_if_have_display
 	;	true),
 	get_prolog_backtrace_str(Backtrace_str),
-	throw(with_backtrace_str(error(msg(V),_),Backtrace_str)).
+	context_string(Context_str),
+	throw(with_processing_context(with_backtrace_str(error(msg(V),_),Backtrace_str),Context_str)).
 
 
  throw_stringize_and_concat(List_Or_Atomic, String) :-

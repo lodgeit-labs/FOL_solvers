@@ -73,10 +73,11 @@
 			close(R)),
 		free_memory_file(X)).
 
- stt(St, Str) :-
+ stt(St0, Str) :-
+	reverse(St0, St), 
 	new_memory_file(F),
 	open_memory_file(F, write, W),
-	print_prolog_backtrace(W, St),
+	print_prolog_backtrace(W, St, [subgoal_positions(true)]),
 	close(W),
 	open_memory_file(F, read, R),
 	read_stream_to_codes(R,C),
