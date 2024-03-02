@@ -20,7 +20,7 @@ exception: blablabla
  get_context(Ctx_list) :-
 	(	b_current(context, Ctx_list)
 	->	true
-	;	Ctx_list = [hmm]).
+	;	Ctx_list = []).
 
 %	catch(
 %		b_getval(context, Ctx_list),
