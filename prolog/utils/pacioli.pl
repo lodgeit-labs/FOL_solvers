@@ -326,4 +326,5 @@ vec_sum_by_pred(
 
 
  vec_is_almost_zero(Vec) :-
+ 	!is_list(Vec), %see report_entry_total_vec
 	maplist(coord_is_almost_zero, Vec).
