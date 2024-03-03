@@ -105,5 +105,5 @@
 
 
  get_file_from_url_into_dir(loc(absolute_url, Url), loc(absolute_path, Path), Filepath) :-
-	json_post_result([$>download_bastion_server(<$), '/get_file_from_url_into_dir'], _{url: Url, dir: Path}, Result),
+	services_post_result(['get_file_from_url_into_dir'], _{url: Url, dir: Path}, Result),
 	_{filepath: Filepath} :< Result.
