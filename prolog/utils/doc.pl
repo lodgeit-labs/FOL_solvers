@@ -519,6 +519,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	;
 	X == false),
 	!.
+
 % boolean has to be above atom as a special case of atomic values
  node_rdf_vs_doc(Atom, Atom) :- atom(Atom),!.
 
@@ -544,10 +545,9 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
  node_rdf_vs_doc(String, Term) :-
 	var(String),
 	String = String2^^'http://www.w3.org/2001/XMLSchema#string',
-	/*compound(Term), */term_string(Term, String2),
+	/*compound(Term), */
+	term_string(Term, String2),
 	!.
-
-
 
 
 
@@ -598,7 +598,10 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 		)
 	)
 	->	true
-	;	format(user_error, 'add_to_rdf failed on: ~q~n', [(X,Y,Z,G)]).
+	;	(
+			format(user_error, 'add_to_rdf failed on: ~q~n', [(X,Y,Z,G)]),
+			%-+gtrace
+		).
 
 
 /*:- comment(lib:doc_to_rdf_all_graphs, "if necessary, modify to not wipe out whole rdf database and to check that G doesn't already exist */
