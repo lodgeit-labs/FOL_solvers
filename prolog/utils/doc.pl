@@ -599,8 +599,8 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	)
 	->	true
 	;	(
-			format(user_error, 'add_to_rdf failed on: ~q~n', [(X,Y,Z,G)]),
-			%-+gtrace
+			format(user_error, 'add_to_rdf failed on: ~q~n', [(X,Y,Z,G)])
+			%,gtrace
 		).
 
 

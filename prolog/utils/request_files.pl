@@ -26,20 +26,20 @@
 	resolve_specifier(loc(specifier,my_tmp(File_Path_Relative_To_Tmp)), Absolute_File_Name).
 
 
- make_zip :-
-% todo replace with https://docs.python.org/3/library/shutil.html#archiving-example
-
-	resolve_specifier(loc(specifier, my_tmp('')), loc(absolute_path, Tmp)),
-	my_request_tmp_dir_path(Tmp_Dir_Path),
-
-	!doc($>request_data, l:request_tmp_directory_name, Request_Files_Tmp_Directory_Name),
-	resolve_specifier(loc(specifier, my_tmp(Request_Files_Tmp_Directory_Name)), loc(absolute_path, Request_Files_Tmp_Directory_Path)),
-
-	atomic_list_concat([Tmp_Dir_Path, '.zip'], Zip_Fn),
-	atomic_list_concat([Tmp_Dir_Path, '/'], Tmp_Dir_With_Slash),
-	atomic_list_concat([Request_Files_Tmp_Directory_Path, '/'], Request_Files_Tmp_Directory_Path_With_Slash),
-	archive_create(Zip_Fn, [Tmp_Dir_With_Slash, Request_Files_Tmp_Directory_Path_With_Slash], [format(zip), directory(Tmp)]),
-	shell4(['mv', Zip_Fn, Tmp_Dir_With_Slash], _).
+% make_zip :-
+%% todo replace with https://docs.python.org/3/library/shutil.html#archiving-example
+%
+%	resolve_specifier(loc(specifier, my_tmp('')), loc(absolute_path, Tmp)),
+%	my_request_tmp_dir_path(Tmp_Dir_Path),
+%
+%	!doc($>request_data, l:request_tmp_directory_name, Request_Files_Tmp_Directory_Name),
+%	resolve_specifier(loc(specifier, my_tmp(Request_Files_Tmp_Directory_Name)), loc(absolute_path, Request_Files_Tmp_Directory_Path)),
+%
+%	atomic_list_concat([Tmp_Dir_Path, '.zip'], Zip_Fn),
+%	atomic_list_concat([Tmp_Dir_Path, '/'], Tmp_Dir_With_Slash),
+%	atomic_list_concat([Request_Files_Tmp_Directory_Path, '/'], Request_Files_Tmp_Directory_Path_With_Slash),
+%	archive_create(Zip_Fn, [Tmp_Dir_With_Slash, Request_Files_Tmp_Directory_Path_With_Slash], [format(zip), directory(Tmp)]),
+%	shell4(['mv', Zip_Fn, Tmp_Dir_With_Slash], _).
 
  copy_request_files_to_tmp(Paths, Names) :-
 	maplist(copy_request_file_to_tmp, Paths, Names).
