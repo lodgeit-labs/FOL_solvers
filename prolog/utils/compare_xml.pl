@@ -1,6 +1,5 @@
-/*
-% compare_xml_files
-run(RPath1, RPath2) :-
+
+compare_xml_files(RPath1, RPath2) :-
 	writeln("run"),
 	absolute_file_name(RPath1, APath1, [access(read)]),
 	writeln(APath1),
@@ -9,23 +8,24 @@ run(RPath1, RPath2) :-
 	writeln(""),
 
 	load_xml(APath1, DOM1, [space(sgml)]),
-	writeln("DOM1:"),
-	writeln(DOM1),
-	writeln(""),
+	%writeln("DOM1:"),
+	%writeln(DOM1),
+	%writeln(""),
 	load_xml(APath2, DOM2, [space(sgml)]),
-	writeln("DOM2:"),
-	writeln(DOM2),
-	writeln(""),
+	%writeln("DOM2:"),
+	%writeln(DOM2),
+	%writeln(""),
 
-	(
-		compare_xml_dom(DOM1, DOM2),
-		writeln("XMLs equal.")
-	;
-		compare_xml_dom(DOM1, DOM2, Error),
-		writeln(Error)
+	compare_xml_dom(DOM1, DOM2, Error),
+	(	var(Error)
+	->	writeln("XMLs equal.")
+	;	(
+			writeln(Error),
+			fail
+		)
 	).
 
-*/
+
  compare_atoms(A,B,Error,Path, Item) :-
 	(
 		atom_number(A,A_Num),
