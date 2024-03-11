@@ -1,11 +1,11 @@
 
 compare_xml_files(RPath1, RPath2) :-
-	writeln("run"),
+	%writeln("run"),
 	absolute_file_name(RPath1, APath1, [access(read)]),
-	writeln(APath1),
+	%writeln(APath1),
 	absolute_file_name(RPath2, APath2, [access(read)]),
-	writeln(APath2),
-	writeln(""),
+	%writeln(APath2),
+	%writeln(""),
 
 	load_xml(APath1, DOM1, [space(sgml)]),
 	%writeln("DOM1:"),
@@ -18,47 +18,13 @@ compare_xml_files(RPath1, RPath2) :-
 
 	compare_xml_dom(DOM1, DOM2, Error),
 	(	var(Error)
-	->	writeln("XMLs equal.")
+	->	true%writeln("XMLs equal.")
 	;	(
-			writeln(Error),
-			fail
+			writeln(Error)
+			%,fail
 		)
 	).
 
-
- compare_atoms(A,B,Error,Path, Item) :-
-	(
-		atom_number(A,A_Num),
-		atom_number(B,B_Num),
-		float(A_Num),
-		float(B_Num),
-		!,
-		(
-			floats_close_enough(A_Num, B_Num)
-		;
-			atomic_list_concat([A_Num, " != ", B_Num, " at ", Path, "[", Item, "]"], Error)
-		)
-	;
-		(
-			A = B
-		;
-			atomic_list_concat([A, " != ", B, " at ", Path, "[", Item, "]"], Error)
-		)
-	).
-
- compare_xml_attrs([],[]) :-
-	writeln("compare_xml_attrs"),
-	writeln("no attributes").
-
- compare_xml_attrs([Attr1 | Attrs1], [Attr2 | Attrs2]) :-
-	writeln("compare_xml_attrs"),
-	writeln("Attr1:"),
-	writeln(Attr1),
-	writeln(""),
-	writeln("Attr2:"),
-	writeln(Attr2),
-	writeln(""),
-	compare_xml_attrs(Attrs1,Attrs2).
 
  compare_xml_dom([], [], _Error, _Path, _Num) :-!.
 
@@ -137,3 +103,43 @@ compare_xml_dom([], [_|_], 'element count differs, _, _).
  compare_xml_dom(A, B) :-
 	compare_xml_dom(A, B, Error),
 	var(Error).
+
+
+
+ compare_atoms(A,B,Error,Path, Item) :-
+	(
+		atom_number(A,A_Num),
+		atom_number(B,B_Num),
+		float(A_Num),
+		float(B_Num),
+		!,
+		(
+			floats_close_enough(A_Num, B_Num)
+		;
+			atomic_list_concat([A_Num, " != ", B_Num, " at ", Path, "[", Item, "]"], Error)
+		)
+	;
+		(
+			A = B
+		;
+			atomic_list_concat([A, " != ", B, " at ", Path, "[", Item, "]"], Error)
+		)
+	).
+
+
+
+
+% compare_xml_attrs([],[]) :-
+%	writeln("compare_xml_attrs"),
+%	writeln("no attributes").
+%
+% compare_xml_attrs([Attr1 | Attrs1], [Attr2 | Attrs2]) :-
+%	writeln("compare_xml_attrs"),
+%	writeln("Attr1:"),
+%	writeln(Attr1),
+%	writeln(""),
+%	writeln("Attr2:"),
+%	writeln(Attr2),
+%	writeln(""),
+%	compare_xml_attrs(Attrs1,Attrs2).
+
