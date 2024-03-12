@@ -84,8 +84,8 @@
 	maplist(replace_char_if_not(xmlNameChar, Underscore), T, T2),
 	string_codes(Id, [H2|T2]).
 
- xmlNameStartChar(X) :- member(X, `:_`).
- xmlNameStartChar(X) :- char_type(X, alnum).
+ %xmlNameStartChar(X) :- member(X, `:_`).
+ xmlNameStartChar(X) :- char_type(X, alpha).
 
 /*						 | [#xC0-#xD6] |
                           [#xD8-#xF6] | [#xF8-#x2FF] |
@@ -96,8 +96,9 @@
                           [#x10000-#xEFFFF]*/
 
  xmlNameChar(X) :- xmlNameStartChar(X).
- xmlNameChar(X) :- member(X, `-.`).
-
+ xmlNameChar(X) :- char_type(X, alnum).
+ %xmlNameChar(X) :- member(X, `-.`).
+ 
 /*
       					| #xB7 |
                         [#x0300-#x036F] | [#x203F-#x2040]*/
