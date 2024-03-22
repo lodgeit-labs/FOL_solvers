@@ -666,7 +666,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
 
 
- doc_from_rdf(Rdf_Graph, Replaced_prefix, Replacement_prefix) :-
+ doc_from_rdf(Replaced_prefix, Replacement_prefix) :-
  	/*
  	all graphs are mashed into default graph. That means no triple metadata is preserved, but that's ok, because we don't use it anyway.
  	*/
@@ -680,7 +680,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
 	findall((X2,Y2,Z2),
 		(
-			rdf(X,Y,Z,Rdf_Graph),
+			rdf(X,Y,Z,_Rdf_Graph),
 			replace_uri_node_prefix(X, Replaced_prefix, Replacement_prefix, X2),
 			replace_uri_node_prefix(Y, Replaced_prefix, Replacement_prefix, Y2),
 			replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2)
