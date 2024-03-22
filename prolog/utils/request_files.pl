@@ -187,9 +187,9 @@ write_tmp_json_file(Name, Json) :-
 		sane_xml_write(Stream, XML),
 		close(Stream)
 	),
-	add_report_file(-10,Key, Title, Url). % (_{name:Name,format:'xml'}
+	add_report_file(_Report_Uri, -10,Key, Title, Url). % (_{name:Name,format:'xml'}
 
- add_report_file(Priority, Key, Title, loc(absolute_url, Url)) :-
+ add_report_file(Uri, Priority, Key, Title, loc(absolute_url, Url)) :-
 	result(R),
 	doc_new_uri(report_file, Uri),
 	doc_add(R, l:has_report, Uri, files),
@@ -210,11 +210,11 @@ write_tmp_json_file(Name, Json) :-
 
  add_result_file_by_filename(Name) :-
 	report_file_path(Name, Url, _),
-	add_report_file(-1,'result', 'result', Url).
+	add_report_file(_Report_Uri, -1,'result', 'result', Url).
 
  add_result_file_by_path(Path) :-
 	tmp_file_path_to_url(Path, Url),
-	add_report_file(-1,'result', 'result', Url).
+	add_report_file(_Report_Uri, -1,'result', 'result', Url).
 
  my_request_tmp_dir_path(Tmp_Dir_Path) :-
 	my_request_tmp_dir(loc(tmp_directory_name,Tmp_Dir)),
