@@ -622,15 +622,16 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
  save_doc_(Format, Id, Report_key) :-
 	atomic_list_concat(['doc_', Id, '.', Format],Fn),
 	report_file_path(loc(file_name, Fn), Url, loc(absolute_path,Path)),
-	Url = loc(absolute_url, Url_Value),
-    %misc_check(!parse_url(Url_Value, _)), % ipv6 syntax is not supported yet, apparently
+	%Url = loc(absolute_url, Base),
+	result_data_uri_base(Base),
+    misc_check(!parse_url(Base, _)), % ipv6 syntax is not supported yet, apparently
 	(	var(Report_key)
 	->	Report_key = Fn
 	;	true),
 	add_report_file(_Report_Uri, -15, Report_key, Fn, Url),
 	Options = [
 		sorted(true),
-		base(Url_Value),
+		base(Base),
 		canonize_numbers(true),
 		abbreviate_literals(false),
 		prefixes([rdf,rdfs,xsd,l,livestock,excel,r-($>atomic_list_concat([$>result_data_uri_base, '#']))])
