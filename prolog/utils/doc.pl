@@ -659,13 +659,9 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	rdf_retractall(_,_,_,_).
 
 
- save_doc_graph(Graph, Report_key) :-
+ save_doc_graph_as_report(Graph, Report_key) :-
 	doc_to_rdf_graph(Graph),
 	save_doc_(turtle, Report_key, Report_key).
-
-
- add_result_sheets_report(Graph) :-
-	save_doc_graph(Graph, result_sheets).
 
 
 
@@ -688,9 +684,13 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 			replace_uri_node_prefix(Y, Replaced_prefix, Replacement_prefix, Y2),
 			replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2)
 		),
-		Triples),
+		Triples
+	),
+
 	maplist(triple_rdf_vs_doc, Triples, Triples2),
 	maplist(doc_add_gspo_no_global_id(Default_graph), Triples2).
+
+
 
  replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2) :-
 	(	(
@@ -699,6 +699,8 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 		)
 	->	!replace_atom_prefix(Z, Replaced_prefix, Replacement_prefix, Z2)
 	;	Z = Z2).
+
+
 
  replace_atom_prefix(X, Replaced_prefix, Replacement_prefix, X2) :-
 	atom_length(Replaced_prefix, L0),
@@ -728,108 +730,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	doc_new_uri(T),
 	doc_add(T, rdf:type, l:theory).
 
- request_data_property(P, O) :-
-	request_data(Request_Data),
-	doc(Request_Data, P, O).
 
- report_details_property_value(P, V) :-
-	!report_details(Details),
-	doc_value(Details, P, V).
-
- rp(P, O) :-
- 	result_property(P, O).
-
- result_property(P, O) :-
-	result(R),
-	doc(R, P, O).
-
- result_add_property(P, O) :-
-	doc_default_graph(G),
-	result_add_property(P, O, G).
-
- result_add_property(P, O, G) :-
-	result(R),
-	doc_add(R, P, O, G).
-
- result_assert_property(P, O) :-
-	doc_default_graph(G),
-	result_assert_property(P, O, G).
-
- result_assert_property(P, O, G) :-
-	result(R),
-	doc_assert(R, P, O, G).
-
-
-
-
-:- table request/1.
- request(R) :-
-	doc(R, rdf:type, l:'Request').
-
-:- table result/1.
- result(R) :-
-	!doc(R, rdf:type, l:'Result').
- 	%format(user_error, 'result(R): ~q~n', [R]).
-
-:- table request_data/1.
- request_data(D) :-
-	!request(Request),
-	!doc(Request, l:has_request_data, D).
-
-:- table result_data_uri_base/1.
- result_data_uri_base(B) :-
- 	rp(l:result_data_uri_base, B).
-
-
-
- result_accounts(As) :-
-	result(D),
-	!doc(D, l:account_hierarchy, As).
-
-
- add_alert_stringified(Type, Msg) :-
-	term_string(Msg, Str),
- 	add_alert(Type, Str, _).
-
- add_alert(Type, Msg) :-
- 	add_alert(Type, Msg, _).
-
- add_alert(Type, Msg, Uri) :-
-	result(R),
-	context_string(Ctx_str),
-	doc_new_uri(alert, Uri),
-	doc_add(R, l:alert, Uri),
-
-	doc_add(Uri, [
-		l:type, 	Type,
-	 	l:message, 	Msg,
-	 	l:ctx_str, 	Ctx_str
-	]).
-
-
- assert_alert(Type, Msg) :-
-	/*todo*/
-	result(R),
-	doc_new_uri(alert, Uri),
-	doc_add(R, l:alert, Uri),
-	doc_add(Uri, l:type, Type),
-	doc_add(Uri, l:message, Msg).
-
- get_alert(Type, Msg, Str, Uri) :-
-	result(R),
-	*doc(R, l:alert, Uri),
-	doc(Uri, l:type, Type),
-	doc(Uri, l:plain_message, Msg),
-	doc(Uri, l:message, Str).
-
- add_comment_stringize(Title, Term) :-
-	pretty_term_string(Term, String),
-	add_comment_string(Title, String).
-
- add_comment_string(Title, String) :-
-	doc_new_uri(comment, Uri),
-	doc_add(Uri, title, Title, comments),
-	doc_add(Uri, body, String, comments).
 
  doc_list_member(M, L) :-
 	doc(L, rdf:first, M).
@@ -926,64 +827,8 @@ pondering a syntax for triples..
 
 
  t(X,Y) :-
+ /* ifdef this for speed? */
 	!doc(X, rdf:type, Y).
-
-
-
-
-/*
- ┏╸╻ ╻┏┳┓╻     ╺┳╸┏━┓   ╺┳┓┏━┓┏━╸╺┓
-╺┫ ┏╋┛┃┃┃┃      ┃ ┃ ┃    ┃┃┃ ┃┃   ┣╸
- ┗╸╹ ╹╹ ╹┗━╸╺━╸ ╹ ┗━┛╺━╸╺┻┛┗━┛┗━╸╺┛
-        \   ^__^
-         \  (oo)\_______
-            (__)\       )\/\
-                ||----w |
-                ||     ||
-*/
-
-
-/*
-represent xml in doc.
-*/
-
- request_xml_to_doc(Dom) :-
-	xml_to_doc(request_xml, [
-		balanceSheetRequest,
-		unitValues
-	], pid:request_xml, Dom).
-
- xml_to_doc(Prefix, Uris, Root, Dom) :-
-	b_setval(xml_to_doc_uris, Uris),
-	b_setval(xml_to_doc_uris_prefix, Prefix),
-	b_setval(xml_to_doc_uris_used, _),
-	xml_to_doc(Root, Dom).
-
- xml_to_doc(Root, Dom) :-
-	maplist(xml_to_doc(Root), Dom).
-
- xml_to_doc(Root, X) :-
-	atomic(X),
-	doc_add(Root, rdf:value, X).
-
- xml_to_doc(Root, element(Name, _Atts, Children)) :-
-	b_getval(xml_to_doc_uris, Uris),
-	b_getval(xml_to_doc_uris_used, Used),
-	b_getval(xml_to_doc_uris_prefix, Prefix),
-
-	(	member(Name, Uris)
-	->	(	rol_member(Name, Used)
-		->	throw_string('tag with name supposed to be docified as an uri already appeared')
-		;	(
-				Uri = Prefix:Name,
-				rol_add(Name, Used)
-			)
-		)
-	;	doc_new_uri(Uri)),
-
-	doc_add(Root, Name, Uri),
-	xml_to_doc(Uri, Children).
-
 
 
 
