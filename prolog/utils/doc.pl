@@ -98,7 +98,7 @@ maybe this program will even run faster without this?*/
  doc_init :-
 	init_prolog_exception_hook,
 	'check that there is only one exception hook and it\'s ours',
-	(	nb_current(doc_trail_openend_file_output_stream, _)
+	(	nb_current(doc_trail_opened_file_output_stream, _)
 	->	true
 	;	doc_init_trace_0),
 	%thread_create('watch doc-dumper command pipe', _),
@@ -126,7 +126,7 @@ good thing is i think even with retracts (the backtracking kind), we won't have 
 	env_bool('ROBUST_DOC_ENABLE_TRAIL', Enabled),
 	atomic_list_concat(['ROBUST_DOC_ENABLE_TRAIL: ',Enabled], Msg),
 	writeln(Trail_Stream, Msg),
-	b_setval(doc_trail_openend_file_output_stream, Trail_Stream).
+	b_setval(doc_trail_opened_file_output_stream, Trail_Stream).
 
 
 flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
@@ -134,7 +134,7 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 :- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
 
  doc_trace0(Term) :-
-	b_getval(doc_trail_openend_file_output_stream, Stream),
+	b_getval(doc_trail_opened_file_output_stream, Stream),
 	(	true %Stream \= []
 	->	(
 			writeq(Stream, Term),
