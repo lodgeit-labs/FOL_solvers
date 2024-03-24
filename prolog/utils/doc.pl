@@ -776,13 +776,13 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
 :- table result_data_uri_base/1.
  result_data_uri_base(B) :-
- 	rp(l:has_result_data_uri_base, B).
+ 	rp(l:result_data_uri_base, B).
 
 
 
  result_accounts(As) :-
 	result(D),
-	!doc(D, l:has_accounts, As).
+	!doc(D, l:account_hierarchy, As).
 
 
  add_alert_stringified(Type, Msg) :-
@@ -1351,3 +1351,4 @@ Required Property Value
  	Sheets = [Sheet].
 
 
+% should we represent uris explicitly by wrapping them in uri()?

@@ -192,7 +192,7 @@ write_tmp_json_file(Name, Json) :-
  add_report_file(Uri, Priority, Key, Title, loc(absolute_url, Url)) :-
 	result(R),
 	doc_new_uri(report_file, Uri),
-	doc_add(R, l:has_report, Uri, files),
+	doc_add(R, l:report, Uri, files),
 	doc_add(Uri, l:priority, Priority, files),
 	doc_add(Uri, l:key, $>atom_string(Key), files),
 	doc_add(Uri, l:title, $>atom_string(Title), files),
@@ -200,7 +200,7 @@ write_tmp_json_file(Name, Json) :-
 
  get_report_file(Priority, Title, Key, Url) :-
 	result(R),
-	*doc(R, l:has_report, Uri, files),
+	*doc(R, l:report, Uri, files),
 	(	doc(Uri, l:priority, Priority, files)
 	->	true
 	;	Priority = 0),
