@@ -295,6 +295,7 @@ todo this is an alternative ending, check if it's faster.
 
 
  addd(S2,P2,O2,G2) :-
+	/*superfluous*/
 	\+((atom(S2),atom(P2),atom(G2))),
 	!,
 	X = spog(S2,P2,O2,G2),
@@ -304,6 +305,8 @@ todo this is an alternative ending, check if it's faster.
 	append(Ng, [X], Ng2),
 	b_setval(the_theory_nonground, Ng2).
 	%rol_add(X, $>).
+
+
 
 /*
 dddd(Spog, X) :-
@@ -326,7 +329,7 @@ dddd(Spog, X) :-
 
 
 
-
+nb_add(
 
 
 
@@ -352,6 +355,7 @@ dddd(Spog, X) :-
 /*
 must have at most one match
 not sure if this is followed? why not use determinancy checker?
+??????
 */
  doc((S,P,O)) :-
 	doc(S,P,O).
@@ -362,14 +366,21 @@ not sure if this is followed? why not use determinancy checker?
 
 /*
 must have at most one match
+????????
 */
  doc(S,P,O,G) :-
+
+	/*ifdef debug.*/
 	!(atom(S);var(S)),
+
+	% todo: variant that skips the rdf_global_id call for s o an g
 	rdf_global_id(S, S2),
 	rdf_global_id(P, P2),
 	rdf_global_id(O, O2),
 	rdf_global_id(G, G2),
-	b_getval(the_theory,X),
+
+	b_getval(the_theory,X),d
+
 	%debug(doc, 'doc?:~q~n', [(S2,P2,O2,G2)]),
 	dddd(spog(S2,P2,O2,G2), X).
 
