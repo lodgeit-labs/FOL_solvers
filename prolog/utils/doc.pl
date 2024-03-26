@@ -206,20 +206,58 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 	->	true
 	;	XXX = _{}).
 
+
+
+ doc_add(S,P,O) :-
+  	%assertion(ground((S,P,O))),
+	doc_default_graph(G),
+	doc_add(S,P,O,G).
+
+
+
  doc_add_gspo_no_global_id(G,(S,P,O)) :-
  	/*
  	useful optimization when loading data from rdf, since everything's already full uris.
  	*/
  	addd(S,P,O,G).
 
- doc_add(S,P,O,G) :-
-	rdf_global_id(S, S2),
+
+
+
+:- if(env_bool('SWIPL_NODEBUG', true)).
+
+doc_add(S2,P,O2,G2) :-
+	doc_trace0(doc_add(S2,P,O2,G2)),
+	rdf_global_id(P, P2),
+	addd(S2,P2,O2,G2).
+
+:- else.
+
+doc_add(S,P,O,G) :-
+	doc_trace0(doc_add(S,P,O,G)),
+ 	rdf_global_id(S, S2),
 	rdf_global_id(P, P2),
 	rdf_global_id(O, O2),
 	rdf_global_id(G, G2),
-	doc_trace0(doc_add(S2,P2,O2,G2)),
-	%debug(doc, 'add:~q~n', [(S2,P2,O2,G2)]),
 	addd(S2,P2,O2,G2).
+
+:- endif.
+
+
+
+
+
+ doc_add2(S,P,O) :-
+	doc_add2(S,P,O,default).
+
+
+
+ doc_add2(S,P,O,G) :-
+	rdf_global_id(P, P2),
+	doc_trace0(doc_add2(S,P,O,G)),
+	addd(S,P2,O,G).
+
+
 
 :- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
 
@@ -236,10 +274,12 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 
 
 /*
-assumption: only Objects are allowed to be non-atoms
+only Objects are allowed to be non-atoms.
 */
 
  addd(S2,P2,O2,G2) :-
+
+	doc_trace0(addd(S2,P2,O2,G2)),
 
  	/* these are used as keys to the dicts */
 	atom(S2),atom(P2),atom(G2),
@@ -256,7 +296,8 @@ assumption: only Objects are allowed to be non-atoms
 	;	(
 			Ps = preds{},
 			Ss2 = Ss.put(S2, Ps),
-			b_setval(the_theory, Ss2)
+			%b_setval(the_theory, Ss2)
+			nb_linkval(the_theory, Ss2)
 		)
 	),
 
@@ -265,7 +306,8 @@ assumption: only Objects are allowed to be non-atoms
 	;	(
 			Gs = graphs{},
 			Ps2 = Ps.put(P2, Gs),
-			b_set_dict(S2, Ss2, Ps2)
+			%b_set_dict(S2, Ss2, Ps2)
+			nb_link_dict(S2, Ss2, Ps2)
 		)
 	),
 
@@ -284,43 +326,55 @@ todo this is an alternative ending, check if it's faster.
 		)
 	).
 */
+/*
+should we try assoc or similar for the Os? In a big part, our queries look like findall(X, doc(a,b,X,c), ..
+, iow, just enumeration of all objects that are the properties of known s p g,
+
+*/
 
 	(	Os = Gs.get(G2)
     ->      true
 	;	(
             Os = _New_Rol,
             Gs2 = Gs.put(G2, Os),
-            b_set_dict(P2, Ps2, Gs2))),
+            %b_set_dict(P2, Ps2, Gs2))),
+            nb_link_dict(P2, Ps2, Gs2))),
     rol_add(O2, Os).
 
 
  addd(S2,P2,O2,G2) :-
 	/*superfluous*/
-	\+((atom(S2),atom(P2),atom(G2))),
-	!,
+	%\+((atom(S2),atom(P2),atom(G2))),
+	%!,
+
 	X = spog(S2,P2,O2,G2),
+
 	% adding non-ground triples is nonoptimal, because they aren't indexed.
 	%format(user_error, 'ng:~q~n', [X]),
 	b_getval(the_theory_nonground, Ng),
 	append(Ng, [X], Ng2),
-	b_setval(the_theory_nonground, Ng2).
+	%b_setval(the_theory_nonground, Ng2).
+	nb_linkval(the_theory_nonground, Ng2).
 	%rol_add(X, $>).
 
 
 
-/*
-dddd(Spog, X) :-
-	Spog = spog(S2,P2,O2,G2),
-	(atom(S2);var(S2)),
-	(atom(P2);var(P2)),
-	(atom(G2);var(G2)),
-	member(O2, X.get(S2).get(P2).get(G2)).
-*/
- dddd(Spog, X) :-
-	Spog = spog(S2,P2,O2,G2),
+
+ dddd(spog(S2,P2,O2,G2), X) :-
+
+% :- if ROBUST_DOC_USAGE_CHECK.
 	%(atom(S2);var(S2)), i dont think we need to allow this at all
 	%(atom(P2);var(P2)), i dont think we need to allow this at all
 	%(atom(G2);var(G2)), i dont think we need to allow this at all
+% :- endif.
+
+	% this should allow compiling a staticsic of call patterns:
+	%s:var, p:var, o:var, g:var,
+	%....
+	%s: atom, p: atom, o: atom, g: atom..
+
+	doc_trace0(dddd(spog(S2,P2,O2,G2)),
+
 	/* looks like a bug here not finding a triple if S2 is unbound? At any case, if any of S2, P2 or O2 are unbound, the yields are in random order, so we have to find another way than dicts. (and than lists, which were slow, or was that just the rol- stuff?. */
 	rol_member(O2, X.get(S2).get(P2).get(G2)).
 
@@ -328,8 +382,6 @@ dddd(Spog, X) :-
 	member(Spog, $>b_getval(the_theory_nonground)).
 
 
-
-nb_add(
 
 
 
@@ -1039,6 +1091,8 @@ Anyway, we could store both doc and context in State.
 	)).
 
 %:- initialization(init_prolog_exception_hook).
+
+/* if needed wrt nb_link_dict etc, we could turn the whole thing upside down and acutally generate the alerts and wrap up the processing right here, rather than relying on maintaining doc data correctly through the unwinding */
 
  doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
 	%print_message(information, "prolog_stack__prolog_exception_hook"),
