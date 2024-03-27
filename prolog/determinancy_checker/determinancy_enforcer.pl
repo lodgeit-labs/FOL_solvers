@@ -4,7 +4,11 @@ a "performant" implmentation/stub, it cuts after first solution and doesn't chec
 
 
 '!'(X) :-
-	(call(X)->true;determinancy_checker_throw_error(deterministic_call_failed(X))).
+		call(X)
+	->
+		true
+	;
+		determinancy_checker_throw_error(deterministic_call_failed(X)).
 
 '!'(X,A1) :-
 	(call(X,A1)->true;determinancy_checker_throw_error(deterministic_call_failed((X,A1)))).

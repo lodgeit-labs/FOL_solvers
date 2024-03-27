@@ -133,6 +133,12 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 
 :- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
 
+
+% this should allow compiling a staticsic of dddd call patterns:
+%s:var, p:var, o:var, g:var,
+%....
+%s: atom, p: atom, o: atom, g: atom..
+
  doc_trace0(Term) :-
 	b_getval(doc_trail_opened_file_output_stream, Stream),
 	(	true %Stream \= []
@@ -224,7 +230,7 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 
 
 
-:- if(env_bool('SWIPL_NODEBUG', true)).
+:- if(env_bool('ROBUST_DOC_NO_CHECKS', true)).
 
 doc_add(S2,P,O2,G2) :-
 	doc_trace0(doc_add(S2,P,O2,G2)),
@@ -235,11 +241,19 @@ doc_add(S2,P,O2,G2) :-
 
 doc_add(S,P,O,G) :-
 	doc_trace0(doc_add(S,P,O,G)),
+
  	rdf_global_id(S, S2),
-	rdf_global_id(P, P2),
 	rdf_global_id(O, O2),
 	rdf_global_id(G, G2),
-	addd(S2,P2,O2,G2).
+ 	(S = S2 -> true ;
+ 		throw_string(['doc_add: S not a full URI: ', S])),
+	(O = O2 -> true ;
+		throw_string(['doc_add: O not a full URI: ', O])),
+	(G = G2 -> true ;
+		throw_string(['doc_add: G not a full URI: ', G])),
+
+	rdf_global_id(P, P2),
+	addd(S,P2,O,G).
 
 :- endif.
 
@@ -274,6 +288,28 @@ doc_add(S,P,O,G) :-
 
 
 /*
+todo this is an alternative ending, check if it's faster.
+
+	(	Os = Gs.get(G2)
+	->	(
+			append(Os, [O2], Os2),
+			Gs2 = Gs.put(G2, Os2),
+			b_set_dict(P2, Ps2, Gs2)
+		)
+	;	(
+			Gs2 = Gs.put(G2, [O2]),
+			b_set_dict(P2, Ps2, Gs2)
+		)
+	).
+*/
+/*
+should we try assoc or similar for the Os? In a big part, our queries look like findall(X, doc(a,b,X,c), ..
+, iow, just enumeration of all objects that are the properties of known s p g,
+
+*/
+
+
+/*
 only Objects are allowed to be non-atoms.
 */
 
@@ -282,7 +318,7 @@ only Objects are allowed to be non-atoms.
 	doc_trace0(addd(S2,P2,O2,G2)),
 
  	/* these are used as keys to the dicts */
-	atom(S2),atom(P2),atom(G2),
+	atom(S2),atom(P2),atom(G2),ground(O2),
 	!,
 
 	% get the_theory global, ie a dict from subjects to pred-dicts
@@ -311,27 +347,6 @@ only Objects are allowed to be non-atoms.
 		)
 	),
 
-/*
-todo this is an alternative ending, check if it's faster.
-
-	(	Os = Gs.get(G2)
-	->	(
-			append(Os, [O2], Os2),
-			Gs2 = Gs.put(G2, Os2),
-			b_set_dict(P2, Ps2, Gs2)
-		)
-	;	(
-			Gs2 = Gs.put(G2, [O2]),
-			b_set_dict(P2, Ps2, Gs2)
-		)
-	).
-*/
-/*
-should we try assoc or similar for the Os? In a big part, our queries look like findall(X, doc(a,b,X,c), ..
-, iow, just enumeration of all objects that are the properties of known s p g,
-
-*/
-
 	(	Os = Gs.get(G2)
     ->      true
 	;	(
@@ -343,9 +358,6 @@ should we try assoc or similar for the Os? In a big part, our queries look like 
 
 
  addd(S2,P2,O2,G2) :-
-	/*superfluous*/
-	%\+((atom(S2),atom(P2),atom(G2))),
-	%!,
 
 	X = spog(S2,P2,O2,G2),
 
@@ -359,28 +371,33 @@ should we try assoc or similar for the Os? In a big part, our queries look like 
 
 
 
+/* looks like a bug here not finding a triple if S2 is unbound? At any case, if any of S2, P2 or O2 are unbound, the yields are in random order, so we have to find another way than dicts. (and than lists, which were slow, or was that just the rol- stuff?. */
+
+:- if(env_bool('ROBUST_DOC_NO_CHECKS', true)).
 
  dddd(spog(S2,P2,O2,G2), X) :-
+	rol_member(O2, X.get(S2).get(P2).get(G2))
+	;
+	(
+		b_getval(the_theory_nonground, T),
+		member(spog(S2,P2,O2,G2),T)
+	).
 
-% :- if ROBUST_DOC_USAGE_CHECK.
-	%(atom(S2);var(S2)), i dont think we need to allow this at all
-	%(atom(P2);var(P2)), i dont think we need to allow this at all
-	%(atom(G2);var(G2)), i dont think we need to allow this at all
-% :- endif.
+:- else.
 
-	% this should allow compiling a staticsic of call patterns:
-	%s:var, p:var, o:var, g:var,
-	%....
-	%s: atom, p: atom, o: atom, g: atom..
+ dddd(spog(S2,P2,O2,G2), X) :-
+	doc_trace0(dddd(spog(S2,P2,O2,G2))),
+	((atom(S2);var(S2)) -> true ; throw_string('hmm')),
+	((atom(P2);var(P2)) -> true ; throw_string('hmm')),
+	((atom(G2);var(G2)) -> true ; throw_string('hmm')),
+	rol_member(O2, X.get(S2).get(P2).get(G2))
+	;
+	(
+		b_getval(the_theory_nonground, T),
+		member(spog(S2,P2,O2,G2),T)
+	).
 
-	doc_trace0(dddd(spog(S2,P2,O2,G2)),
-
-	/* looks like a bug here not finding a triple if S2 is unbound? At any case, if any of S2, P2 or O2 are unbound, the yields are in random order, so we have to find another way than dicts. (and than lists, which were slow, or was that just the rol- stuff?. */
-	rol_member(O2, X.get(S2).get(P2).get(G2)).
-
- dddd(Spog, _X) :-
-	member(Spog, $>b_getval(the_theory_nonground)).
-
+:- endif.
 
 
 
@@ -431,7 +448,7 @@ must have at most one match
 	rdf_global_id(O, O2),
 	rdf_global_id(G, G2),
 
-	b_getval(the_theory,X),d
+	b_getval(the_theory,X),
 
 	%debug(doc, 'doc?:~q~n', [(S2,P2,O2,G2)]),
 	dddd(spog(S2,P2,O2,G2), X).
@@ -553,7 +570,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
  node_rdf_vs_doc(
 	Float ^^ 'http://www.w3.org/2001/XMLSchema#decimal',
-	Rat) :-
+	Rat, _G) :-
 		/*freeze(Float, float(Float)),
 		freeze(Rat, rational(Rat)),*/
 		(
@@ -563,11 +580,12 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 		),
 		(	nonvar(Rat)
 		->	Float is float(Rat)
+		/* we already do round_term in doc_to_rdf. is this superfluos? */ 
 		;	Rat is rationalize(Float)),!.
 
  node_rdf_vs_doc(
 	Float ^^ 'http://www.w3.org/2001/XMLSchema#double',
-	Rat) :-
+	Rat, _G) :-
 		(var(Rat), float(Float)),
 		(	nonvar(Rat)
 		->	Float is float(Rat)
@@ -575,39 +593,45 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
  node_rdf_vs_doc(
 	String ^^ 'http://www.w3.org/2001/XMLSchema#string',
-	String):- string(String), !.
+	String, _G):- string(String), !.
 
+% boolean has to be above atom as a special case of atomic values
  node_rdf_vs_doc(
 	X ^^ 'http://www.w3.org/2001/XMLSchema#boolean',
-	X) :-
+	X, _G) :-
 	(X == true
 	;
 	X == false),
 	!.
 
-% boolean has to be above atom as a special case of atomic values
- node_rdf_vs_doc(Atom, Atom) :- atom(Atom),!.
+ node_rdf_vs_doc(Atom, Atom, _G) :- atom(Atom),!.
 
  node_rdf_vs_doc(
 	date(Y,M,D) ^^ 'http://www.w3.org/2001/XMLSchema#date',
-	date(Y,M,D)) :- !.
+	date(Y,M,D), _G) :- !.
 
  node_rdf_vs_doc(
 	date_time(Y,M,D,Z0,Z1,Z2) ^^ 'http://www.w3.org/2001/XMLSchema#dateTime',
-	date(Y,M,D)) :-
+	date(Y,M,D), _G) :-
 		is_zero_number(Z0),
 		is_zero_number(Z1),
 		is_zero_number(Z2),!.
 
  node_rdf_vs_doc(
 	date_time(Y,L,D,H,M,S) ^^ 'http://www.w3.org/2001/XMLSchema#dateTime',
-	date(Y,L,D,H,M,S, 0,'UTC',-)) :- !.
+	date(Y,L,D,H,M,S, 0,'UTC',-), _G) :- !.
 
  node_rdf_vs_doc(
 	Int ^^ 'http://www.w3.org/2001/XMLSchema#integer',
-	Int) :- integer(Int),!.
+	Int, _G) :- integer(Int),!.
 
- node_rdf_vs_doc(String, Term) :-
+ node_rdf_vs_doc(Rdf_list, Prolog_list, G) :-
+	var(Rdf_list),
+	is_list(Prolog_list),
+	!,
+	prolog_list_to_rdf_list(Prolog_list, Rdf_list, G).
+
+ node_rdf_vs_doc(String, Term, _G) :-
 	var(String),
 	String = String2^^'http://www.w3.org/2001/XMLSchema#string',
 	/*compound(Term), */
@@ -615,13 +639,22 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	!.
 
 
+ prolog_list_to_rdf_list([], 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil', _G) :- !.
+
+ prolog_list_to_rdf_list([H|T], L, G) :-
+	rdf_create_bnode(L),
+	node_rdf_vs_doc(H_rdf, H, _G),
+	rdf_assert(L, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#first', H_rdf, G),
+	rdf_assert(L, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#rest', L_rest, G),
+	prolog_list_to_rdf_list(T, L_rest, G).
+ 
+	
 
 
-
- triple_rdf_vs_doc((S,P,O), (S,P,O2)) :-
+ triple_rdf_vs_doc(G, (S,P,O), (S,P,O2)) :-
 	(var(S);atom(S)),!,
 	(	catch(
-			node_rdf_vs_doc(O,O2),
+			node_rdf_vs_doc(O,O2,G),
 			E,
 			(
 				format(user_error, '~q', [E]),
@@ -643,18 +676,18 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	rdf_create_bnode(Rdf_Graph),
 	findall(_,
 		(
-			%*doc(X,Y,Z),
 			*doc(T),
 			round_term(T,T2),
 			%debug(doc, 'to_rdf:~q~n', [T2]),
-			triple_rdf_vs_doc((X2,Y2,Z2),T2),
+			triple_rdf_vs_doc(Rdf_Graph, (X2,Y2,Z2),T2),
 			!rdf_assert(X2,Y2,Z2,Rdf_Graph)
-		),_).
+		),
+	_).
 
  add_to_rdf((X,Y,Z,G)) :-
 	(
 		round_term((X,Y,Z),T),
-		triple_rdf_vs_doc((X2,Y2,Z2),T),
+		triple_rdf_vs_doc(G, (X2,Y2,Z2),T),
 		%debug(doc, 'to_rdf:~q~n', [(X2,Y2,Z2,G)]),
 		catch(
 			rdf_assert(X2,Y2,Z2,G),
@@ -750,7 +783,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 		Triples
 	),
 
-	maplist(triple_rdf_vs_doc, Triples, Triples2),
+	maplist(triple_rdf_vs_doc(Default_graph), Triples, Triples2),
 	maplist(doc_add_gspo_no_global_id(Default_graph), Triples2).
 
 
