@@ -316,59 +316,67 @@ only Objects are allowed to be non-atoms.
  addd(S2,P2,O2,G2) :-
 
 	doc_trace0(addd(S2,P2,O2,G2)),
+	
+	(
 
- 	/* these are used as keys to the dicts */
-	atom(S2),atom(P2),atom(G2),ground(O2),
-	!,
-
-	% get the_theory global, ie a dict from subjects to pred-dicts
-	b_getval(the_theory,Ss),
-
-	% does it contain the subject?
-
-	(	Ps = Ss.get(S2)
-	%	it's a mapping from preds to graphs
-	->	Ss2 = Ss
-	;	(
-			Ps = preds{},
-			Ss2 = Ss.put(S2, Ps),
-			%b_setval(the_theory, Ss2)
-			nb_linkval(the_theory, Ss2)
-		)
-	),
-
-	(	Gs = Ps.get(P2)
-	->	Ps2 = Ps
-	;	(
-			Gs = graphs{},
-			Ps2 = Ps.put(P2, Gs),
-			%b_set_dict(S2, Ss2, Ps2)
-			nb_link_dict(S2, Ss2, Ps2)
-		)
-	),
-
-	(	Os = Gs.get(G2)
-    ->      true
-	;	(
-            Os = _New_Rol,
-            Gs2 = Gs.put(G2, Os),
-            %b_set_dict(P2, Ps2, Gs2))),
-            nb_link_dict(P2, Ps2, Gs2))),
-    rol_add(O2, Os).
-
-
- addd(S2,P2,O2,G2) :-
-
-	X = spog(S2,P2,O2,G2),
-
-	% adding non-ground triples is nonoptimal, because they aren't indexed.
-	%format(user_error, 'ng:~q~n', [X]),
-	b_getval(the_theory_nonground, Ng),
-	append(Ng, [X], Ng2),
-	%b_setval(the_theory_nonground, Ng2).
-	nb_linkval(the_theory_nonground, Ng2).
-	%rol_add(X, $>).
-
+		/* these are used as keys to the dicts */
+		atom(S2),atom(P2),atom(G2),ground(O2),
+		!,
+	
+		% get the_theory global, ie a dict from subjects to pred-dicts
+		b_getval(the_theory,Ss),
+	
+		% does it contain the subject?
+	
+		(	Ps = Ss.get(S2)
+		%	it's a mapping from preds to graphs
+		->	Ss2 = Ss
+		;	(
+				Ps = preds{},
+				Ss2 = Ss.put(S2, Ps),
+				%b_setval(the_theory, Ss2)
+				nb_linkval(the_theory, Ss2)
+			)
+		),
+	
+		(	Gs = Ps.get(P2)
+		->	Ps2 = Ps
+		;	(
+				Gs = graphs{},
+				Ps2 = Ps.put(P2, Gs),
+				%b_set_dict(S2, Ss2, Ps2)
+				nb_link_dict(S2, Ss2, Ps2)
+			)
+		),
+	
+		(	Os = Gs.get(G2)
+		->      true
+		;	(
+				Os = _New_Rol,
+				Gs2 = Gs.put(G2, Os),
+				%b_set_dict(P2, Ps2, Gs2))),
+				nb_link_dict(P2, Ps2, Gs2)
+			)
+		),
+		rol_add(O2, Os)
+	
+	)
+	;
+	(
+		X = spog(S2,P2,O2,G2),
+	
+		% adding non-ground triples is nonoptimal, because they aren't indexed.
+		%format(user_error, 'ng:~q~n', [X]),
+		b_getval(the_theory_nonground, Ng),
+		append(Ng, [X], Ng2),
+		%b_setval(the_theory_nonground, Ng2).
+		nb_linkval(the_theory_nonground, Ng2).
+		%rol_add(X, $>).
+	)
+	;
+	(
+		throw_string('doc_add: unwind')
+	).
 
 
 /* looks like a bug here not finding a triple if S2 is unbound? At any case, if any of S2, P2 or O2 are unbound, the yields are in random order, so we have to find another way than dicts. (and than lists, which were slow, or was that just the rol- stuff?. */
