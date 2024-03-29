@@ -371,7 +371,7 @@ only Objects are allowed to be non-atoms.
 			b_getval(the_theory_nonground, Ng),
 			append(Ng, [X], Ng2),
 			%b_setval(the_theory_nonground, Ng2).
-			nb_linkval(the_theory_nonground, Ng2).
+			nb_linkval(the_theory_nonground, Ng2)
 			%rol_add(X, $>).
 		)
 		;
