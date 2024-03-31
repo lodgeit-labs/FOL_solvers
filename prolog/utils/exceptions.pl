@@ -60,7 +60,7 @@ prolog:error_message(msg(Msg)) --> [Msg].
 
 :- discontiguous flag_default/2.
 
-flag_default(gtrace, true).
+ flag_default(gtrace, true).
 
  gtrace_if_have_display :-
 	(	have_display

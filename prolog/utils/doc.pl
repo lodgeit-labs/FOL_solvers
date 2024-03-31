@@ -80,20 +80,22 @@ maybe this program will even run faster without this?*/
 :- rdf_meta doc_add_value(r,r,r,r).
 :- rdf_meta t(r,r).
 
+
  'check that there is only one exception hook and it\'s ours' :-
 	findall(
 		Body,
 		(
-			clause(prolog_exception_hook(A,B,C,D),Body)
+			clause(prolog:prolog_exception_hook(A,B,C,D,E),Body)
 		),
 		Xs),
 	(	(
-			Xs = [(user:doc_saving_prolog_exception_hook(A,B,C,D))]
+			Xs = [(user:doc_saving_prolog_exception_hook(A,B,C,D,E))]
 		;
-			Xs = [(doc_saving_prolog_exception_hook(A,B,C,D))]
+			Xs = [(doc_saving_prolog_exception_hook(A,B,C,D,E))]
 		)
 	->	true
 	;	throw(internal_error(prolog_exception_hook(Xs)))).
+
 
  doc_init :-
 	init_prolog_exception_hook,
@@ -104,7 +106,17 @@ maybe this program will even run faster without this?*/
 	%thread_create('watch doc-dumper command pipe', _),
 	doc_clear.
 
- reestablish_doc(G,Ng) :-
+
+ reestablish_doc :-
+  	(	user:exception_doc_dump((G,Ng))
+ 	->	reestablish_doc(G,Ng)
+ 	;	(
+ 			gtrace
+ 			%,reestablish_doc(x{},[])
+ 		)
+ 	).
+
+  reestablish_doc(G,Ng) :-
 	/* these two global vars together comprise the whole of doc database */
 	b_setval(the_theory, G),
 	b_setval(the_theory_nonground, Ng).
@@ -229,7 +241,6 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 
 
 
-
 :- if(env_bool('ROBUST_DOC_NO_CHECKS', true)).
 
 doc_add(S2,P,O2,G2) :-
@@ -271,15 +282,6 @@ doc_add(S,P,O,G) :-
 	doc_trace0(doc_add2(S,P,O,G)),
 	addd(S,P2,O,G).
 
-
-
-:- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
-
- doc_add(S,P,O,G) :-
-	doc_trace0(clean_pop(doc_add(S,P,O,G))),
-	fail.
-
-:- endif.
 
 
 /*todo b_getval(the_theory_nongrounds,TTT),
@@ -637,6 +639,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
  node_rdf_vs_doc(Rdf_list, Prolog_list, G) :-
 	var(Rdf_list),
 	is_list(Prolog_list),
+	ground(Prolog_list),
 	!,
 	prolog_list_to_rdf_list(Prolog_list, Rdf_list, G).
 
@@ -654,14 +657,19 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	rdf_create_bnode(L),
 	node_rdf_vs_doc(H_rdf, H, _G),
 	rdf_assert(L, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#first', H_rdf, G),
-	rdf_assert(L, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#rest', L_rest, G),
-	prolog_list_to_rdf_list(T, L_rest, G).
- 
+	prolog_list_to_rdf_list(T, L_rest, G),
+	rdf_assert(L, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#rest', L_rest, G).
+
 	
 
 
  triple_rdf_vs_doc(G, (S,P,O), (S,P,O2)) :-
-	(var(S);atom(S)),!,
+	(
+		var(S)
+	;
+		atom(S)
+	),
+	!,
 	(	catch(
 			node_rdf_vs_doc(O,O2,G),
 			E,
@@ -856,6 +864,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	doc_add_list(T, G, Uri2),
 	doc_add(Uri, rdf:rest, Uri2, G).
 
+% fixme full uri
  doc_add_list([], _G, rdf:nil).
 
  doc_value(S, P, V) :-
@@ -1080,7 +1089,7 @@ about namespaces:
 
 
 
-:- dynamic(exception_doc_dump/2).
+:- dynamic(exception_doc_dump/1).
 :- dynamic(exception_ctx_dump/1).
 
 /*
@@ -1103,12 +1112,14 @@ Anyway, we could store both doc and context in State.
 */
 
 :- dynamic(prolog_stack__prolog_exception_hook/4).
-:- dynamic(prolog_exception_hook/4).
+:- dynamic(prolog_exception_hook/5).
 :- dynamic(doc_saving_prolog_exception_hook_is_inited/0).
 
- 'save old prolog exception hook' :-
 
- 	findall(hook((A,B,C,D),Body), clause(prolog_exception_hook(A,B,C,D),Body), Old_hooks),
+
+
+ 'save old prolog exception hook' :-
+ 	findall(hook((A,B,C,D,E),Body), clause(prolog:prolog_exception_hook(A,B,C,D,E),Body), Old_hooks),
 	length(Old_hooks, Old_hooks_len),
 	(	Old_hooks_len #> 1
 	->	throw('Old_hooks_len #> 1')
@@ -1116,12 +1127,16 @@ Anyway, we could store both doc and context in State.
 
 	(	Old_hooks_len #= 1
 	->	(
-			Old_hooks = [hook((A,B,C,D),Body)],
-			assert(prolog_stack__prolog_exception_hook(A,B,C,D) :- Body),
-			%gtrace,
-			retractall(prolog_exception_hook(A,B,C,D))
+			Old_hooks = [hook((A,B,C,D,E),Body)],
+			assert(prolog_stack__prolog_exception_hook(A,B,C,D,E) :- Body),
+			retractall(prolog_exception_hook(A,B,C,D)),
+			retractall(prolog_exception_hook(A,B,C,D,_)),
+			retractall(prolog:prolog_exception_hook(A,B,C,D)),
+			retractall(prolog:prolog_exception_hook(A,B,C,D,_))
 		)
 	;	true).
+
+
 
  init_prolog_exception_hook :-
  	(	doc_saving_prolog_exception_hook_is_inited
@@ -1129,21 +1144,57 @@ Anyway, we could store both doc and context in State.
  	;	(
 		assert(doc_saving_prolog_exception_hook_is_inited),
 		'save old prolog exception hook',
-		assert(prolog_exception_hook(E,F, Frame, CatcherFrame) :- doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame))
+		%retractall(prolog_exception_hook(A,B,C,D)),
+		%retractall(prolog_exception_hook(A,B,C,D,_)),
+		%retractall(prolog:prolog_exception_hook(A,B,C,D)),
+		%retractall(prolog:prolog_exception_hook(A,B,C,D,_)),
+		assert(prolog:prolog_exception_hook(E, F, Frame, CatcherFrame, Ddd) :- doc_saving_prolog_exception_hook(E, F, Frame, CatcherFrame, Ddd))
 	)).
 
-%:- initialization(init_prolog_exception_hook).
+
+
 
 /* if needed wrt nb_link_dict etc, we could turn the whole thing upside down and acutally generate the alerts and wrap up the processing right here, rather than relying on maintaining doc data correctly through the unwinding */
 
- doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame) :-
-	%print_message(information, "prolog_stack__prolog_exception_hook"),
+ doc_saving_prolog_exception_hook(E,F, Frame, CatcherFrame, Ddd) :-
 
-	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame)
+	retractall(prolog_exception_hook(_,_,_,_)),
+	retractall(prolog_exception_hook(_,_,_,_,_)),
+	retractall(prolog:prolog_exception_hook(_,_,_,_)),
+	retractall(prolog:prolog_exception_hook(_,_,_,_,_)),
+	retractall(user:prolog_exception_hook(_,_,_,_)),
+	retractall(user:prolog_exception_hook(_,_,_,_,_)),
+
+
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+	print_message(information, "prolog_stack__prolog_exception_hook"),
+
+	(	prolog_stack__prolog_exception_hook(E,F,Frame,CatcherFrame, Ddd)
 	->	true
 	;	F = E),
 
-	%print_message(information, "................."),
+	print_message(information, "................."),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
+	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
 	format(user_error, 'doc_saving_prolog_exception_hook was invoked with exception ~q~n~n', [F]),
 	%backtrace(200),
 
@@ -1169,10 +1220,12 @@ Anyway, we could store both doc and context in State.
 	).
 
  'store doc data for reporting after exception' :-
+ 	gtrace,
 	(	doc_data(G,Ng)
 	->	(
-			retractall(user:exception_doc_dump(_,_)),
-			assert(user:exception_doc_dump(G,Ng)),
+			retractall(user:exception_doc_dump(_)),
+			duplicate_term((G,Ng), T),
+			assert(user:exception_doc_dump(T)),
 			nicety(doc_dump)
 		)
 	;	true).
@@ -1181,7 +1234,8 @@ Anyway, we could store both doc and context in State.
 	get_context(Ctx_list),
 	%print_message(information, 'storing context:'(Ctx_list)),
 	retractall(user:exception_ctx_dump(_)),
-	assert(user:exception_ctx_dump(Ctx_list)).
+	duplicate_term(Ctx_list, Ctx_list2),
+	assert(user:exception_ctx_dump(Ctx_list2)).
 
 
 /*
