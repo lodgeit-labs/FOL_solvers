@@ -58,7 +58,7 @@
 	rdf_equal2(X,Y).
 
 
-%:- debug(doc).
+:- debug(doc).
 
 % https://www.swi-prolog.org/pldoc/man?predicate=rdf_meta/1
 /* uses goal_expansion, so as soon as you wrap the call in a !, it doesn't work, so we have to do this at runtime too anyway.
@@ -369,6 +369,7 @@ only Objects are allowed to be non-atoms.
 			X = spog(S2,P2,O2,G2),
 
 			% adding non-ground triples is nonoptimal, because they aren't indexed.
+			% but why not make this a rol, that would make writing much faster i think?
 			%format(user_error, 'ng:~q~n', [X]),
 			b_getval(the_theory_nonground, Ng),
 			append(Ng, [X], Ng2),
@@ -444,10 +445,7 @@ not sure if this is followed? why not use determinancy checker?
 	doc_default_graph(G),
 	doc(S,P,O,G).
 
-/*
-must have at most one match
-????????
-*/
+
  doc(S,P,O,G) :-
 
 	/*ifdef debug.*/
@@ -641,7 +639,9 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	is_list(Prolog_list),
 	ground(Prolog_list),
 	!,
-	prolog_list_to_rdf_list(Prolog_list, Rdf_list, G).
+	prolog_list_to_rdf_list(Prolog_list, Rdf_list, G),
+	debug(doc, '~q~n', [node_rdf_vs_doc(Rdf_list, Prolog_list, G)]).
+
 
  node_rdf_vs_doc(String, Term, _G) :-
 	var(String),
@@ -694,8 +694,9 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	findall(_,
 		(
 			*doc(T),
+			%(ground(T) -> true ; gtrace),
 			round_term(T,T2),
-			%debug(doc, 'to_rdf:~q~n', [T2]),
+			%debug(doc, 'doc_to_rdf:~q~n', [T2]),
 			triple_rdf_vs_doc(Rdf_Graph, (X2,Y2,Z2),T2),
 			!rdf_assert(X2,Y2,Z2,Rdf_Graph)
 		),
@@ -703,13 +704,20 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
  add_to_rdf((X,Y,Z,G)) :-
 	(
+		debug(doc, 'add_to_rdf:~q~n', [(X,Y,Z,G)]),
+		((var(X),var(Y),var(Z)) -> (gtrace,throw_string('add_to_rdf: all vars')) ; true),
 		round_term((X,Y,Z),T),
 		triple_rdf_vs_doc(G, (X2,Y2,Z2),T),
-		%debug(doc, 'to_rdf:~q~n', [(X2,Y2,Z2,G)]),
+		debug(doc, 'triple_rdf_vs_doc:~q~n', [(X2,Y2,Z2,G)]),
 		catch(
 			rdf_assert(X2,Y2,Z2,G),
 			E,
-			format(user_error,'~q~n -while saving triple:~n~q~n',[E, (X,Y,Z,G)])
+			(
+%				true,
+%				gtrace, % i have no words for swipl anymore.
+%				true,
+				format(user_error,'~q~n -while saving triple:~n~q~n',[E, (X,Y,Z,G)])
+			)
 		)
 	)
 	->	true
@@ -729,6 +737,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
  	rdf_retractall(_,_,_,_),
 	findall(_,(
 			*doc(X,Y,Z,G),
+			%(ground((X,Y,Z,G))->true;gtrace,true),
 			add_to_rdf((X,Y,Z,G))
 		),_
 	).
@@ -865,7 +874,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	doc_add(Uri, rdf:rest, Uri2, G).
 
 % fixme full uri
- doc_add_list([], _G, rdf:nil).
+ doc_add_list([], _G, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil').
 
  doc_value(S, P, V) :-
 	doc_default_graph(G),
