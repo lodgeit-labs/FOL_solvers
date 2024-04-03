@@ -318,13 +318,15 @@ only Objects are allowed to be non-atoms.
  addd(S2,P2,O2,G2) :-
 
 	doc_trace0(addd(S2,P2,O2,G2)),
-
+	(	atom(S2),atom(P2),atom(G2),ground(O2)
+	->	Atomic = true
+	;	Atomic = false),
 	(
 		(
 
 			/* these are used as keys to the dicts */
-			atom(S2),atom(P2),atom(G2),ground(O2),
-			!,
+			Atomic = true,
+			%!,
 
 			% get the_theory global, ie a dict from subjects to pred-dicts
 			b_getval(the_theory,Ss),
@@ -366,6 +368,8 @@ only Objects are allowed to be non-atoms.
 		)
 		;
 		(
+			Atomic = false,
+		
 			X = spog(S2,P2,O2,G2),
 
 			% adding non-ground triples is nonoptimal, because they aren't indexed.
