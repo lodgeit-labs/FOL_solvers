@@ -58,7 +58,7 @@
 	rdf_equal2(X,Y).
 
 
-:- debug(doc).
+%:- debug(doc).
 
 % https://www.swi-prolog.org/pldoc/man?predicate=rdf_meta/1
 /* uses goal_expansion, so as soon as you wrap the call in a !, it doesn't work, so we have to do this at runtime too anyway.
@@ -146,7 +146,7 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
 :- if(env_bool('ROBUST_DOC_ENABLE_TRAIL', true)).
 
 
-% this should allow compiling a staticsic of dddd call patterns:
+% this should allow compiling a staticsic of doc_read call patterns:
 %s:var, p:var, o:var, g:var,
 %....
 %s: atom, p: atom, o: atom, g: atom..
@@ -391,7 +391,7 @@ only Objects are allowed to be non-atoms.
 
 :- if(env_bool('ROBUST_DOC_NO_CHECKS', true)).
 
- dddd(spog(S2,P2,O2,G2), X) :-
+ doc_read(spog(S2,P2,O2,G2), X) :-
 	rol_member(O2, X.get(S2).get(P2).get(G2))
 	;
 	(
@@ -401,8 +401,8 @@ only Objects are allowed to be non-atoms.
 
 :- else.
 
- dddd(spog(S2,P2,O2,G2), X) :-
-	doc_trace0(dddd(spog(S2,P2,O2,G2))),
+ doc_read(spog(S2,P2,O2,G2), X) :-
+	doc_trace0(doc_read(spog(S2,P2,O2,G2))),
 	((atom(S2);var(S2)) -> true ; throw_string('hmm')),
 	((atom(P2);var(P2)) -> true ; throw_string('hmm')),
 	((atom(G2);var(G2)) -> true ; throw_string('hmm')),
@@ -464,7 +464,7 @@ not sure if this is followed? why not use determinancy checker?
 	b_getval(the_theory,X),
 
 	%debug(doc, 'doc?:~q~n', [(S2,P2,O2,G2)]),
-	dddd(spog(S2,P2,O2,G2), X).
+	doc_read(spog(S2,P2,O2,G2), X).
 
 /*
 member
@@ -1036,7 +1036,7 @@ diff from rol_ version. This was maybe even faster, and prolly uses a lot less m
 
  addd(S2,P2,O2,G2) :-
         \+((ground(spog(S2,P2,O2,G2)),atom(S2),atom(P2),atom(G2))),
-@@ -186,7 +190,7 @@ dddd(Spog, X) :-
+@@ -186,7 +190,7 @@ doc_read(Spog, X) :-
         (atom(S2);var(S2)),
         (atom(P2);var(P2)),
         (atom(G2);var(G2)),
