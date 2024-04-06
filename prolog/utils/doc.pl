@@ -856,7 +856,9 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	doc_new_uri(T),
 	doc_add(T, rdf:type, l:theory).
 
-
+ doc_new_vec(Value, Uri) :-
+ 	doc_new_uri(vec, Uri),
+ 	doc_add(Uri, rdf:value, Value).
 
  doc_list_member(M, L) :-
 	doc(L, rdf:first, M).
@@ -888,7 +890,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
  	doc(S, P, O, G),
  	doc(O, rdf:value, V).
 
- value(O,V) :-
+ val(O,V) :-
  	doc(O, rdf:value, V).
 
  values(Os,Vs) :-

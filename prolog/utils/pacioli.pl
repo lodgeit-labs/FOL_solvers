@@ -53,7 +53,11 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 % - returns a vector of coordinates with debit and credit values switched around
 
  vec_inverse(As, Bs) :-
-	maplist(coord_inverse, As, Bs).
+ 	val(As, AsV),
+	maplist(coord_inverse, AsV, BsV),
+ 	doc_new_vec(BsV, Bs),
+ 	doc_add(Bs, l:origin, As).
+
 
 
 /*
@@ -204,11 +208,21 @@ vec_sum_by_pred(
  is_debit([Coord]) :-
 	is_debit(Coord).
 
+ is_debit(Vec) :-
+ 	atom(Vec),
+ 	val(Vec, VecV),
+ 	is_debit(VecV).
+
  is_credit(coord(_, X)) :-
 	X < 0.
 
  is_credit([Coord]) :-
 	is_credit(Coord).
+
+ is_credit(Vec) :-
+ 	atom(Vec),
+ 	val(Vec, VecV),
+ 	is_credit(VecV).
 
  unify_coords_or_values(coord(U, D1), coord(U, D2)) :-
 	unify_numbers(D1, D2).
@@ -225,6 +239,9 @@ vec_sum_by_pred(
 
  coord_vec(coord(U,A), [coord(U,A)]).
  coord_vec(coord(_U,0), []).
+
+ coord_vec(coord(U,A), V) :-
+ 	val(V, [coord(U,A)]).
 
  number_vec(_, Zero, []) :-
 	unify_numbers(Zero, 0).
@@ -312,7 +329,11 @@ vec_sum_by_pred(
 	H1 = value(U, D1),
 	H2 = value(U, D2).
 
- vector_unit([coord(U, _)], U).
+
+
+ vector_unit(Vec, U) :-
+ 	doc(Vec, rdf:value, [coord(U, _)]).
+ 	
 
 
  value_debit_vec(Value, [Coord]) :-
