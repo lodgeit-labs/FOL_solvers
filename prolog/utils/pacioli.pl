@@ -92,14 +92,14 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	Filtered).
 
 
- vec_reduce(X, Y) :-
-	vec_add(X, [], Y).
+ vec_reduce_(X, Y) :-
+	vec_add_(X, [], Y).
 
 
 
 % Adds the two given vectors together and reduces coords or values in a vector to a minimal (normal) form.
 
- vec_add(As, Bs, Cs_Reduced) :-
+ vec_add_(As, Bs, Cs_Reduced) :-
 	cd('ensure As and Bs are flat lists', assertion((flatten(As, As), flatten(Bs, Bs)))),
 	!append(As, Bs, As_And_Bs),
 	!sort_into_assoc_of_lists(!coord_or_value_unit, As_And_Bs, Assoc),
@@ -139,12 +139,21 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 %
 
 
+vec_add(A,B,C) :-
+	vec_sum([A,B], C).
 
 % sum a list of vectors
- vec_sum(Vectors, Sum) :-
-	foldl(vec_add, Vectors, [], Sum).
+ vec_sum_(Vectors, Sum) :-
+	foldl(vec_add_, Vectors, [], Sum).
 
-
+ vec_sum(Vecs, Sum) :-
+ 	assertion(maplist(atom, Vecs)),
+ 	maplist(val, Vecs, Vectors),
+	foldl(vec_add_, Vectors, [], Sum_),
+	doc_new_vec(Sum_, Sum),
+	%doc_add(Sum, l:source, Vecs),
+	maplist(doc_add(Sum, l:part), Vecs).
+	
 
 
 
