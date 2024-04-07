@@ -284,11 +284,6 @@ doc_add(S,P,O,G) :-
 
 
 
-/*todo b_getval(the_theory_nongrounds,TTT),
-^ not sure what i meant.
-*/
-
-
 /*
 todo this is an alternative ending, check if it's faster.
 
@@ -376,7 +371,11 @@ only Objects are allowed to be non-atoms.
 			% but why not make this a rol, that would make writing much faster i think?
 			%format(user_error, 'ng:~q~n', [X]),
 			b_getval(the_theory_nonground, Ng),
+			
 			append(Ng, [X], Ng2),
+			% we could prepend, but let's test this later, i worry that some code might depend on the expected order .. although .. there's not much that's asserted non-ground.
+			%append([X], Ng, Ng2),
+			
 			%b_setval(the_theory_nonground, Ng2).
 			nb_linkval(the_theory_nonground, Ng2)
 			%rol_add(X, $>).
