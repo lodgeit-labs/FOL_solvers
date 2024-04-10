@@ -13,7 +13,7 @@
 
 /*
 
-	going between value and coord
+	convert between value and coord
 
 */
 
@@ -21,10 +21,10 @@
 value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Zero, 0).*/
 
  coord_normal_side_value(coord(Unit, D), Side, value(Unit, D)) :-
- 	rdf_equal2(Side, kb:debit).
+ 	e(Side, kb:debit).
 
  coord_normal_side_value(coord(Unit, D), Side, value(Unit, V)) :-
- 	rdf_equal2(Side, kb:credit),
+ 	e(Side, kb:credit),
 	{V = -D}.
 
  coord_normal_side_value2(Side, C, V) :-
@@ -47,12 +47,12 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 
 % The identity for vector addition.
 
- vec_identity([]).
+ _vec_identity([]).
 
 % Computes the (additive) inverse of a given vector.
 % - returns a vector of coordinates with debit and credit values switched around
 
- vec_inverse(As, Bs) :-
+ _vec_inverse(As, Bs) :-
 	maplist(coord_inverse, As, Bs).
 
 
@@ -61,7 +61,7 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 
 	this reduces individual coords to normal form, but not against each other.
 */
- vec_reduce_coords(As, Bs) :-
+ _vec_reduce_coords(As, Bs) :-
 	exclude(is_zero_coord, As, Result_Nonzeroes),
 	maplist(unify_coords_or_values, Bs, Result_Nonzeroes),
 	! /*todo: is the cut needed?*/
@@ -73,7 +73,7 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
  coord_or_value_amount(coord(_,A), A).
  coord_or_value_amount(value(_,A), A).
 
- vec_units(Vec, Units) :-
+ _vec_units(Vec, Units) :-
 	findall(Unit,
 	(
 		member(X, Vec),
@@ -83,7 +83,7 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	sort(Units0, Units).
 
 	
- vec_filtered_by_unit(Vec, Unit, Filtered) :-
+ _vec_filtered_by_unit(Vec, Unit, Filtered) :-
 	findall(Coord,
 	(
 		coord_or_value_unit(Coord, Unit),
@@ -92,14 +92,14 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	Filtered).
 
 
- vec_reduce_(X, Y) :-
-	vec_add_(X, [], Y).
+ _vec_reduce(X, Y) :-
+	_vec_add(X, [], Y).
 
 
 
 % Adds the two given vectors together and reduces coords or values in a vector to a minimal (normal) form.
 
- vec_add_(As, Bs, Cs_Reduced) :-
+ _vec_add(As, Bs, Cs_Reduced) :-
 	cd('ensure As and Bs are flat lists', assertion((flatten(As, As), flatten(Bs, Bs)))),
 	!append(As, Bs, As_And_Bs),
 	!sort_into_assoc_of_lists(!coord_or_value_unit, As_And_Bs, Assoc),
@@ -107,7 +107,7 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	!maplist(semigroup_foldl(coord_or_value_merge), Valueses, Total),
 	% Total_Flat is a list with one coord per each unittype in As and Bs combined
 	flatten(Total, Total_Flat),
-	!vec_reduce_coords(Total_Flat, Cs_Reduced).
+	!_vec_reduce_coords(Total_Flat, Cs_Reduced).
 
 
 % faster, but will not work while units are compound terms.
@@ -143,8 +143,8 @@ vec_add(A,B,C) :-
 	vec_sum([A,B], C).
 
 % sum a list of vectors
- vec_sum_(Vectors, Sum) :-
-	foldl(vec_add_, Vectors, [], Sum).
+ _vec_sum(Vectors, Sum) :-
+	foldl(_vec_add, Vectors, [], Sum).
 
  vec_sum(Vecs, Sum) :-
  	assertion(maplist(atom, Vecs)),
@@ -164,9 +164,9 @@ sum_by_pred(
 	Sum			% Numeric = sum {X | Item in Input, P(Item,X)}
 ).
 */
- sum_by_pred(P, Input, Sum) :-
-	convlist(P, Input, Intermediate),
-	sumlist(Intermediate, Sum).
+% sum_by_pred(P, Input, Sum) :-
+%	convlist(P, Input, Intermediate),
+%	sumlist(Intermediate, Sum).
 
 /*
 vec_sum_by_pred(
@@ -175,9 +175,9 @@ vec_sum_by_pred(
 	Sum			% List record:coord = vec_sum {X | Item in Input, P(Item, X)}
 ).
 */
- vec_sum_by_pred(P, Input, Sum) :-
-	convlist(P, Input, Intermediate),
-	vec_sum(Intermediate, Sum).
+% vec_sum_by_pred(P, Input, Sum) :-
+%	convlist(P, Input, Intermediate),
+%	vec_sum(Intermediate, Sum).
 
 
 % Subtracts the vector Bs from As by inverting Bs and adding it to As.
@@ -199,6 +199,11 @@ vec_sum_by_pred(
  is_zero(Value) :-
 	is_zero_value(Value).
 
+ is_zero(X) :-
+ 	atom(X),
+ 	val(X, [V]),
+	is_zero(V).
+
  is_zero([X]) :-
 	is_zero(X).
 
@@ -208,13 +213,13 @@ vec_sum_by_pred(
 	is_zero_coord(coord(_, Zero)).
 
  is_debit(coord(_, X)) :-
-	X > 0.
+	X > 0. % todo: maybe this should be {}?
 
  is_debit([Coord]) :-
 	is_debit(Coord).
 
  is_credit(coord(_, X)) :-
-	X < 0.
+	X < 0. % todo: maybe this should be {}?
 
  is_credit([Coord]) :-
 	is_credit(Coord).
@@ -232,8 +237,10 @@ vec_sum_by_pred(
  dr_cr_coord(Unit, Number, Zero, coord(Unit, Number)) :- {Number >= 0, Zero = 0}.
  dr_cr_coord(Unit, Zero, Credit, coord(Unit, Number)) :- {Number < 0, Zero = 0, Credit = -Number}.
 
- coord_vec(coord(U,A), [coord(U,A)]).
- coord_vec(coord(_U,0), []).
+ _coord_vec(coord(U,A), [coord(U,A)]).
+ _coord_vec(coord(_U,0), []).
+ coord_vec(C, V) :-
+ 	atom(V),
 
  number_vec(_, Zero, []) :-
 	unify_numbers(Zero, 0).
