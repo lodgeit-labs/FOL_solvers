@@ -239,8 +239,14 @@ vec_sum_by_pred(
 
  _coord_vec(coord(U,A), [coord(U,A)]).
  _coord_vec(coord(_U,0), []).
- coord_vec(C, V) :-
+ 
+ coord_of_vec(C, V) :-
  	atom(V),
+ 	val(V, [C]).
+
+ coord_of_vec(coord(_U,0), V) :-
+ 	atom(V),
+ 	val(V, []).
 
  number_vec(_, Zero, []) :-
 	unify_numbers(Zero, 0).
