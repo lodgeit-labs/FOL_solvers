@@ -97,9 +97,18 @@ maybe this program will even run faster without this?*/
 	;	throw(internal_error(prolog_exception_hook(Xs)))).
 
 
+ flag_default('DISABLE_DOC_EXCEPTION_HOOK', false).
+
  doc_init :-
-	init_prolog_exception_hook,
-	'check that there is only one exception hook and it\'s ours',
+	
+	(	env_bool('DISABLE_DOC_EXCEPTION_HOOK', true)
+	->	true
+	;	(
+			init_prolog_exception_hook,
+			'check that there is only one exception hook and it\'s ours'
+		)
+	),
+	
 	(	nb_current(doc_trail_opened_file_output_stream, _)
 	->	true
 	;	doc_init_trace_0),
@@ -847,6 +856,11 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 */
 
 
+ doc_new_vec(List, Uri) :-
+ 	doc_new_(l:vec, Uri),
+ 	doc_add(Uri, rdf:value, List).
+ 	
+
  doc_new_(Type, Uri) :-
 	doc_new_uri(Uri),
 	doc_add(Uri, rdf:type, Type).
@@ -887,10 +901,10 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
  	doc(S, P, O, G),
  	doc(O, rdf:value, V).
 
- value(O,V) :-
+ val(O,V) :-
  	doc(O, rdf:value, V).
 
- values(Os,Vs) :-
+ vals(Os,Vs) :-
  	maplist(value, Os, Vs).
 
 

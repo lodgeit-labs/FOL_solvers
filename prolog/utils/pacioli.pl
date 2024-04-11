@@ -45,27 +45,30 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 % amount. See: On Double-Entry Bookkeeping: The Mathematical Treatment Also see: Tutorial
 % on multiple currency accounting
 
-% The identity for vector addition.
-
- _vec_identity([]).
 
 % Computes the (additive) inverse of a given vector.
 % - returns a vector of coordinates with debit and credit values switched around
 
- _vec_inverse(As, Bs) :-
-	maplist(coord_inverse, As, Bs).
+ vec_inverse(As, Bs) :-
+ 	val(As, AsV),
+	maplist(coord_inverse, AsV, BsV),
+	doc_new_vec(BsV, Bs),
+	doc_add(Bs, l:origin, As).
 
 
 /*
-	reducing a coord to normal form is a no-op now that coords are represented with a single number.
+	reducing a coord to normal form is a no-op now that coords are represented with a single number,
+	so all we do is remove zero coords.
 
-	this reduces individual coords to normal form, but not against each other.
 */
- _vec_reduce_coords(As, Bs) :-
+
+ vec_reduce_coords(As, Bs) :-
+ 	atom(As),var(Bs),
 	exclude(is_zero_coord, As, Result_Nonzeroes),
 	maplist(unify_coords_or_values, Bs, Result_Nonzeroes),
 	! /*todo: is the cut needed?*/
 	.
+
 
  coord_or_value_unit(coord(Unit,_), Unit).
  coord_or_value_unit(value(Unit,_), Unit).
@@ -73,111 +76,45 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
  coord_or_value_amount(coord(_,A), A).
  coord_or_value_amount(value(_,A), A).
 
- _vec_units(Vec, Units) :-
-	findall(Unit,
-	(
-		member(X, Vec),
-		coord_or_value_unit(X, Unit)
-	),
-	Units0),
-	sort(Units0, Units).
-
-	
- _vec_filtered_by_unit(Vec, Unit, Filtered) :-
-	findall(Coord,
-	(
-		coord_or_value_unit(Coord, Unit),
-		member(Coord, Vec)
-	),
-	Filtered).
 
 
- _vec_reduce(X, Y) :-
-	_vec_add(X, [], Y).
+ vec_reduce_(X, Y) :-
+	vec_add_(X, [], Y).
 
 
 
 % Adds the two given vectors together and reduces coords or values in a vector to a minimal (normal) form.
 
- _vec_add(As, Bs, Cs_Reduced) :-
-	cd('ensure As and Bs are flat lists', assertion((flatten(As, As), flatten(Bs, Bs)))),
-	!append(As, Bs, As_And_Bs),
-	!sort_into_assoc_of_lists(!coord_or_value_unit, As_And_Bs, Assoc),
-	!assoc_to_values(Assoc, Valueses),
-	!maplist(semigroup_foldl(coord_or_value_merge), Valueses, Total),
-	% Total_Flat is a list with one coord per each unittype in As and Bs combined
-	flatten(Total, Total_Flat),
-	!_vec_reduce_coords(Total_Flat, Cs_Reduced).
+ 
+ vec_reduce_coords_(As, Bs) :-
+	exclude(is_zero_coord, As, Result_Nonzeroes),
+	maplist(unify_coords_or_values, Bs, Result_Nonzeroes),
+	! /*todo: is the cut needed?*/
+	.
 
-
-% faster, but will not work while units are compound terms.
-% vec_add(A, B, C) :-
-% 	vec_add2_(A, vec{}, Dict2),
-% 	vec_add2_(B, Dict2, Dict3),
-% 	assoc_to_values(Dict3, Coords),
-%	!vec_reduce_coords(Coords, C).
-%
-% vec_add2_([], Dict, Dict).
-%
-% vec_add2_([coord(U,A1)|Coords], Dict, Dict_out) :-
-% 	(	get_dict(U, Dict, coord(U, A2))
-% 	->	(
-% 			{A1 + A2 = A3},
-% 			Dict2 = Dict.put(U, coord(U, A3))
-% 		)
-% 	;	Dict2 = Dict.put(U, coord(U, A1))),
-% 	vec_add2_(Coords, Dict2, Dict_out).
-%
-% vec_add2_([value(U,A1)|Coords], Dict, Dict_out) :-
-% 	(	get_dict(U, Dict, value(U, A2))
-% 	->	(
-% 			{A1 + A2 = A3},
-% 			Dict2 = Dict.put(U, value(U, A3))
-% 		)
-% 	;	Dict2 = Dict.put(U, value(U, A1))),
-% 	vec_add2_(Coords, Dict2, Dict_out).
-%
-
-
-vec_add(A,B,C) :-
+ vec_add(A,B,C) :-
 	vec_sum([A,B], C).
 
 % sum a list of vectors
- _vec_sum(Vectors, Sum) :-
-	foldl(_vec_add, Vectors, [], Sum).
 
  vec_sum(Vecs, Sum) :-
  	assertion(maplist(atom, Vecs)),
  	maplist(val, Vecs, Vectors),
-	foldl(vec_add_, Vectors, [], Sum_),
-	doc_new_vec(Sum_, Sum),
-	%doc_add(Sum, l:source, Vecs),
+ 	flatten(Vectors, Flat),
+
+	!sort_into_assoc_of_lists(!coord_or_value_unit, Flat, Assoc),
+	!assoc_to_values(Assoc, Valueses),
+	!maplist(semigroup_foldl(coord_or_value_merge), Valueses, Total),
+	% Total_Flat is a list with one coord per each unittype in As and Bs combined
+	flatten(Total, Total_Flat),
+	exclude(is_zero_coord, Total_Flat, Result_Nonzeroes),
+	
+	doc_new_vec(Result_Nonzeroes, Sum),
 	maplist(doc_add(Sum, l:part), Vecs).
 	
 
-
-
-/*
-sum_by_pred(
-	P,			% pred(Item, Numeric)
-	Input,		% List<Item>
-	Sum			% Numeric = sum {X | Item in Input, P(Item,X)}
-).
-*/
-% sum_by_pred(P, Input, Sum) :-
-%	convlist(P, Input, Intermediate),
-%	sumlist(Intermediate, Sum).
-
-/*
-vec_sum_by_pred(
-	P,			% pred(Item, List record:coord)
-	Input,		% List Item
-	Sum			% List record:coord = vec_sum {X | Item in Input, P(Item, X)}
-).
-*/
-% vec_sum_by_pred(P, Input, Sum) :-
-%	convlist(P, Input, Intermediate),
-%	vec_sum(Intermediate, Sum).
+ 	
+ 
 
 
 % Subtracts the vector Bs from As by inverting Bs and adding it to As.
@@ -237,9 +174,6 @@ vec_sum_by_pred(
  dr_cr_coord(Unit, Number, Zero, coord(Unit, Number)) :- {Number >= 0, Zero = 0}.
  dr_cr_coord(Unit, Zero, Credit, coord(Unit, Number)) :- {Number < 0, Zero = 0, Credit = -Number}.
 
- _coord_vec(coord(U,A), [coord(U,A)]).
- _coord_vec(coord(_U,0), []).
- 
  coord_of_vec(C, V) :-
  	atom(V),
  	val(V, [C]).
@@ -258,10 +192,6 @@ vec_sum_by_pred(
 	assertion(var(Unit);atom(Unit)),
 	credit_coord(Unit, Credit, Coord).
 
-
- credit_isomorphism(Coord, C) :-
-	number_coord(_, D, Coord),
-	{C = -D}.
 
  debit_isomorphism(Coord, C) :-
 	number_coord(_, C, Coord).
@@ -334,9 +264,13 @@ vec_sum_by_pred(
 	H1 = value(U, D1),
 	H2 = value(U, D2).
 
- vector_unit([coord(U, _)], U).
 
 
+ vector_unit(V, U) :-
+ 	val(V, [coord(U, _)]).
+ 	
+ 	
+ 	
  value_debit_vec(Value, [Coord]) :-
 	coord_normal_side_value(Coord, kb:debit, Value).
 
