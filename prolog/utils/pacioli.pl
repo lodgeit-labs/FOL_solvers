@@ -55,6 +55,8 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	doc_new_vec(BsV, Bs),
 	doc_add(Bs, l:origin, As).
 
+ vec_inverse_(As, Bs) :-
+	maplist(coord_inverse, As, Bs).
 
 /*
 	reducing a coord to normal form is a no-op now that coords are represented with a single number,
@@ -282,5 +284,21 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 
 
  vec_is_almost_zero(Vec) :-
- 	!is_list(Vec), %see report_entry_total_vec
-	maplist(coord_is_almost_zero, Vec).
+ 	!atom(Vec),
+ 	val(Vec, VecV),
+ 	!is_list(VecV), %see report_entry_total_vec
+	maplist(coord_is_almost_zero, VecV).
+
+
+ vec_add_(As, Bs, Cs_Reduced) :-
+	%cd('ensure As and Bs are flat lists', assertion((flatten(As, As), flatten(Bs, Bs)))),
+	!append(As, Bs, As_And_Bs),
+	!sort_into_assoc_of_lists(!coord_or_value_unit, As_And_Bs, Assoc),
+	!assoc_to_values(Assoc, Valueses),
+	!maplist(semigroup_foldl(coord_or_value_merge), Valueses, Total),
+	% Total_Flat is a list with one coord per each unittype in As and Bs combined
+	flatten(Total, Total_Flat),
+	!vec_reduce_coords_(Total_Flat, Cs_Reduced).
+
+ coord_vec_(coord(U,A), [coord(U,A)]).
+ coord_vec_(coord(_U,0), []).

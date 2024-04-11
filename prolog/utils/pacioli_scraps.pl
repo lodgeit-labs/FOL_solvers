@@ -74,25 +74,11 @@ vec_sum_by_pred(
 %	vec_sum(Intermediate, Sum).
 
 
- coord_vec_(coord(U,A), [coord(U,A)]).
- coord_vec_(coord(_U,0), []).
  
 
  credit_isomorphism(Coord, C) :-
 	number_coord(_, D, Coord),
 	{C = -D}.
-
-
-
-vec_add_(As, Bs, Cs_Reduced) :-
-	cd('ensure As and Bs are flat lists', assertion((flatten(As, As), flatten(Bs, Bs)))),
-	!append(As, Bs, As_And_Bs),
-	!sort_into_assoc_of_lists(!coord_or_value_unit, As_And_Bs, Assoc),
-	!assoc_to_values(Assoc, Valueses),
-	!maplist(semigroup_foldl(coord_or_value_merge), Valueses, Total),
-	% Total_Flat is a list with one coord per each unittype in As and Bs combined
-	flatten(Total, Total_Flat),
-	!vec_reduce_coords_(Total_Flat, Cs_Reduced).
 
 
 
