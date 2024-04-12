@@ -247,7 +247,25 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	floats_close_enough(V, 0).
 
  vector_of_coords_vs_vector_of_values(Side, Coords, Values) :-
+ 	is_list(Coords),
+ 	is_list(Values),
 	maplist(coord_normal_side_value2(Side), Coords, Values).
+
+ vector_of_coords_vs_vector_of_values(Side, Coords, Values) :-
+	atom(Coords),
+	var(Values),
+	val(Coords, CoordsV),
+	maplist(coord_normal_side_value2(Side), CoordsV, ValuesV),
+	doc_new_vec(ValuesV, Values),
+	doc_add(Values, l:origin, Coords).
+
+ vector_of_coords_vs_vector_of_values(Side, Coords, Values) :-
+	var(Coords),
+	atom(Values),
+	val(Values, ValuesV),
+	maplist(coord_normal_side_value2(Side), CoordsV, ValuesV),
+	doc_new_vec(CoordsV, Coords),
+	doc_add(Coords, l:origin, Values).
 
  split_vector_by_percent(V0, Rate, V1, V2) :-
 	maplist(split_coord_by_percent(Rate), V0, V1, V2).
