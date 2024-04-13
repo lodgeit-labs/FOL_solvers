@@ -124,6 +124,9 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
  vec_sub(As, Bs, Cs) :-
 	vec_add(As, $>vec_inverse(Bs), Cs).
 
+ vec_sub_(As, Bs, Cs) :-
+	vec_add_(As, $>vec_inverse_(Bs), Cs).
+
 % Checks two vectors for equality by subtracting the latter from the former and verifying
 % that all the resulting coordinates are zero.
 
@@ -237,7 +240,15 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	{Amount3 = Amount1 - Amount2}.
 	
  vecs_are_almost_equal(A, B) :-
+ 	is_list(A),
+ 	is_list(B),
 	vec_sub(A, B, C),
+	val(C, CV),
+	maplist(coord_is_almost_zero, CV).
+
+ vecs_are_almost_equal(A, B) :-
+ 	atom(A), atom(B),
+	vec_sub_(A, B, C),
 	maplist(coord_is_almost_zero, C).
 
  coord_is_almost_zero(coord(_, D)) :-
