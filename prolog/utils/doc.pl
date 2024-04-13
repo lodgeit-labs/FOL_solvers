@@ -484,20 +484,6 @@ member
 	->	O = O2
 	;	doc_add(S,P,O)).
 */
- doc_new_uri(Uri) :-
-	doc_new_uri('', Uri).
-
- doc_new_uri(Postfix, Uri) :-
-	result_data_uri_base(Result_data_uri_base),
-	/* fixme, use something deterministic */
-	gensym('x', Uri0),
-	(	Postfix = ''
-	->	atomic_list_concat([Result_data_uri_base, Uri0], Uri)
-	;	atomic_list_concat([Result_data_uri_base, Uri0, '_', Postfix], Uri)).
-
-% note: uniqueness is not checked, we rely on namespacing by Postfix
- bn(Postfix, Uri) :-
-	doc_new_uri(Postfix, Uri).
 
 /*
 ░░░░░░░░░░░░░█▀▄░█▀█░█░░
@@ -856,21 +842,6 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 */
 
 
- doc_new_vec(List, Uri) :-
- 	doc_new_(l:vec, Uri),
- 	doc_add(Uri, rdf:value, List).
- 	
-
- doc_new_(Type, Uri) :-
-	doc_new_uri(Uri),
-	doc_add(Uri, rdf:type, Type).
-
- doc_new_theory(T) :-
-	doc_new_uri(T),
-	doc_add(T, rdf:type, l:theory).
-
-
-
  doc_list_member(M, L) :-
 	doc(L, rdf:first, M).
 
@@ -960,15 +931,6 @@ pondering a syntax for triples..
 
  gu(Prefixed, Full) :-
 	rdf_global_id(Prefixed, Full).
-
-
-
-
-
-
- t(X,Y) :-
- /* ifdef this for speed? */
-	!doc(X, rdf:type, Y).
 
 
 

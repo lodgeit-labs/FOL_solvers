@@ -247,8 +247,11 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	floats_close_enough(V, 0).
 
  vector_of_coords_vs_vector_of_values(Side, Coords, Values) :-
- 	is_list(Coords),
- 	is_list(Values),
+ 	(
+ 		(is_list(Coords),var(Values))
+ 		;
+ 		(var(Coords),is_list(Values))
+ 	),
 	maplist(coord_normal_side_value2(Side), Coords, Values).
 
  vector_of_coords_vs_vector_of_values(Side, Coords, Values) :-
