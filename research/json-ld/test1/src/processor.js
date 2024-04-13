@@ -7,7 +7,7 @@ var jl = require('jsonld');
 
 /*
 
-todo: extract this stuff into aa shared lib
+todo: extract this stuff into a shared lib
 
 import * as interop from 'ld-lib-interop';!
 
@@ -57,9 +57,13 @@ async function n3_file_jld_quads(fn)
 	return quads2;
 }
 
-async function add_type2_quads(quads)
+async function do_add_type2_quads(quads)
 {
 	//hack around json-ld @reverse rdf:type problem by adding "rdf:type2" for each "rdf:type" quad.
+	// i believe the problem was that i wanted things like this in the context:
+	//"is_type_of": {"@reverse": "rdf:type2", "@container": "@set"},
+	// but due to a peculiarity of the library, it wouldn't work with rdf:type
+
 	const to_be_added = [];
 	quads.forEach((q) =>
 	{
@@ -79,10 +83,11 @@ async function add_type2_quads(quads)
 		quads.push(q));
 }
 
-async function load_n3(fn)
+async function load_n3(fn, add_type2_quads=true)
 {
 	const quads = await n3_file_jld_quads(fn);
-	add_type2_quads(quads);
+	if (add_type2_quads)
+		do_add_type2_quads(quads);
 	const data = await jl.fromRDF(quads);
 	return data;
 }

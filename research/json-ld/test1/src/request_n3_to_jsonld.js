@@ -50,7 +50,7 @@ const frame = {
 
 (async () => {
 
-	var doc = await processor.load_n3('../../../../lodgeitrequest.n3');
+	var doc = await processor.load_n3('lodgeitrequest.n3');
 	const r = await processor.frame(doc, frame);
 	console.log(JSON.stringify(r, null, 2))
 
