@@ -1,0 +1,302 @@
+{
+    "@id": "https://rdf.lodgeit.net.au/v1/excel_request#request",
+    "excel:has_sheet_instances": {
+        "@list": [
+            {
+                "excel:sheet_instance_has_sheet_data": {
+                    "rdf:value": {
+                        "@list": [
+                            {
+                                "@type": "depr:depreciation_asset",
+                                "depr:cost": {
+                                    "rdf:value": {
+                                        "@type": "xsd:integer",
+                                        "@value": "1000"
+                                    }
+                                },
+                                "depr:effective_life_years": {
+                                    "rdf:value": {
+                                        "@type": "xsd:integer",
+                                        "@value": "5"
+                                    }
+                                },
+                                "depr:id": {
+                                    "rdf:value": "car123"
+                                },
+                                "depr:start_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2017-05-01T00:00:00.000000"
+                                    }
+                                }
+                            },
+                            {
+                                "@type": "depr:depreciation_asset",
+                                "depr:cost": {
+                                    "rdf:value": {
+                                        "@type": "xsd:integer",
+                                        "@value": "2000"
+                                    }
+                                },
+                                "depr:effective_life_years": {
+                                    "rdf:value": {
+                                        "@type": "xsd:integer",
+                                        "@value": "8"
+                                    }
+                                },
+                                "depr:id": {
+                                    "rdf:value": "car456"
+                                },
+                                "depr:start_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2015-03-16T00:00:00.000000"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "excel:sheet_instance_has_sheet_type": "depr_ui:depreciation_calculator_sheet_assets"
+            },
+            {
+                "excel:sheet_instance_has_sheet_data": {
+                    "rdf:value": {
+                        "@list": [
+                            {
+                                "@type": "depr:depreciation_query",
+                                "depr:depreciation_query_asset_id": {
+                                    "rdf:value": "car123"
+                                },
+                                "depr:depreciation_query_from_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2017-06-01T00:00:00.000000"
+                                    }
+                                },
+                                "depr:depreciation_query_has_type": {
+                                    "rdf:value": {
+                                        "@id": "depr:depreciation_between_two_dates",
+                                        "@type": "depr:depreciation_query_type"
+                                    }
+                                },
+                                "depr:depreciation_query_method": {
+                                    "rdf:value": {
+                                        "@id": "depr:diminishing_value",
+                                        "@type": "depr:depreciation_query_method_type"
+                                    }
+                                },
+                                "depr:depreciation_query_to_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2019-02-02T00:00:00.000000"
+                                    }
+                                }
+                            },
+                            {
+                                "@type": "depr:depreciation_query",
+                                "depr:depreciation_query_asset_id": {
+                                    "rdf:value": "car123"
+                                },
+                                "depr:depreciation_query_from_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2017-06-01T00:00:00.000000"
+                                    }
+                                },
+                                "depr:depreciation_query_has_type": {
+                                    "rdf:value": {
+                                        "@id": "depr:depreciation_between_two_dates"
+                                    }
+                                },
+                                "depr:depreciation_query_method": {
+                                    "rdf:value": {
+                                        "@id": "depr:prime_cost",
+                                        "@type": "depr:depreciation_query_method_type"
+                                    }
+                                },
+                                "depr:depreciation_query_to_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2019-02-02T00:00:00.000000"
+                                    }
+                                }
+                            },
+                            {
+                                "@type": "depr:depreciation_query",
+                                "depr:depreciation_query_asset_id": {
+                                    "rdf:value": "car123"
+                                },
+                                "depr:depreciation_query_has_type": {
+                                    "rdf:value": {
+                                        "@id": "depr:written_down_value",
+                                        "@type": "depr:depreciation_query_type"
+                                    }
+                                },
+                                "depr:depreciation_query_method": {
+                                    "rdf:value": {
+                                        "@id": "depr:diminishing_value"
+                                    }
+                                },
+                                "depr:depreciation_query_written_down_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2019-07-07T00:00:00.000000"
+                                    }
+                                }
+                            },
+                            {
+                                "@type": "depr:depreciation_query",
+                                "depr:depreciation_query_asset_id": {
+                                    "rdf:value": "car123"
+                                },
+                                "depr:depreciation_query_has_type": {
+                                    "rdf:value": {
+                                        "@id": "depr:written_down_value"
+                                    }
+                                },
+                                "depr:depreciation_query_method": {
+                                    "rdf:value": {
+                                        "@id": "depr:diminishing_value"
+                                    }
+                                },
+                                "depr:depreciation_query_written_down_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2019-02-02T00:00:00.000000"
+                                    }
+                                }
+                            },
+                            {
+                                "@type": "depr:depreciation_query",
+                                "depr:depreciation_query_asset_id": {
+                                    "rdf:value": "car123"
+                                },
+                                "depr:depreciation_query_has_type": {
+                                    "rdf:value": {
+                                        "@id": "depr:written_down_value"
+                                    }
+                                },
+                                "depr:depreciation_query_method": {
+                                    "rdf:value": {
+                                        "@id": "depr:diminishing_value"
+                                    }
+                                },
+                                "depr:depreciation_query_written_down_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2017-06-01T00:00:00.000000"
+                                    }
+                                }
+                            },
+                            {
+                                "@type": "depr:depreciation_query",
+                                "depr:depreciation_query_asset_id": {
+                                    "rdf:value": "car123"
+                                },
+                                "depr:depreciation_query_has_type": {
+                                    "rdf:value": {
+                                        "@id": "depr:written_down_value"
+                                    }
+                                },
+                                "depr:depreciation_query_method": {
+                                    "rdf:value": {
+                                        "@id": "depr:prime_cost"
+                                    }
+                                },
+                                "depr:depreciation_query_written_down_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2019-02-02T00:00:00.000000"
+                                    }
+                                }
+                            },
+                            {
+                                "@type": "depr:depreciation_query",
+                                "depr:depreciation_query_asset_id": {
+                                    "rdf:value": "car123"
+                                },
+                                "depr:depreciation_query_has_type": {
+                                    "rdf:value": {
+                                        "@id": "depr:written_down_value"
+                                    }
+                                },
+                                "depr:depreciation_query_method": {
+                                    "rdf:value": {
+                                        "@id": "depr:prime_cost"
+                                    }
+                                },
+                                "depr:depreciation_query_written_down_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2017-06-01T00:00:00.000000"
+                                    }
+                                }
+                            },
+                            {
+                                "@type": "depr:depreciation_query",
+                                "depr:depreciation_query_asset_id": {
+                                    "rdf:value": "car123"
+                                },
+                                "depr:depreciation_query_has_type": {
+                                    "rdf:value": {
+                                        "@id": "depr:profit_and_loss",
+                                        "@type": "depr:depreciation_query_type"
+                                    }
+                                },
+                                "depr:depreciation_query_method": {
+                                    "rdf:value": {
+                                        "@id": "depr:diminishing_value"
+                                    }
+                                },
+                                "depr:depreciation_query_termination_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2019-07-07T00:00:00.000000"
+                                    }
+                                },
+                                "depr:depreciation_query_termination_value": {
+                                    "rdf:value": {
+                                        "@type": "xsd:integer",
+                                        "@value": "200"
+                                    }
+                                }
+                            },
+                            {
+                                "@type": "depr:depreciation_query",
+                                "depr:depreciation_query_asset_id": {
+                                    "rdf:value": "car123"
+                                },
+                                "depr:depreciation_query_has_type": {
+                                    "rdf:value": {
+                                        "@id": "depr:profit_and_loss"
+                                    }
+                                },
+                                "depr:depreciation_query_method": {
+                                    "rdf:value": {
+                                        "@id": "depr:diminishing_value"
+                                    }
+                                },
+                                "depr:depreciation_query_termination_date": {
+                                    "rdf:value": {
+                                        "@type": "xsd:dateTime",
+                                        "@value": "2019-07-07T00:00:00.000000"
+                                    }
+                                },
+                                "depr:depreciation_query_termination_value": {
+                                    "rdf:value": {
+                                        "@type": "xsd:integer",
+                                        "@value": "700"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "excel:sheet_instance_has_sheet_type": "depr_ui:depreciation_calculator_sheet_queries"
+            }
+        ]
+    },
+    "https://rdf.lodgeit.net.au/v1/request#client_version": "3",
+    "https://rdf.lodgeit.net.au/v1/request#templates_version": "2"
+}

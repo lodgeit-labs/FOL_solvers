@@ -53,7 +53,9 @@ const frame = {
 		{
 			"@list": [
 				{
-					"@embed": "@always"
+					"@embed": "@always",
+				    "@omitDefault": true
+
 				}
 			]
 		}
@@ -67,7 +69,7 @@ async function do_frame(data, frame)
 		base: "http://ex.com/",
 		processingMode: "json-ld-1.1",
 		omitGraph: true,
-		embed: '@always',
+		embed: '@once',
 		ordered: true
 	})
 	return framed
@@ -88,12 +90,58 @@ async function simplify(frame)
 	return items;
 }
 
+function clean(data) {
+    //console.log(data);
+    var del = [];
+    for (var key in data) {
+        var value = data[key];
+        //console.error(key);
+        
+        if (key === "excel:sheet_instance_has_sheet_type") {
+            data[key] = value['@id'];
+        }
+        
+        if (
+            (key === "rdf:value" && value === null) ||
+            key === "excel:col" || 
+            key === "excel:row" || 
+            key === "excel:title" || 
+            key === "excel:position" || 
+            key === "excel:has_sheet_name" || 
+            key === "excel:template" ||
+            key === "excel:sheet_instance_has_sheet_name" ||
+            key === "excel:sheet_type"
+             
+            
+            
+            ) {
+            //console.log('deleting ' + key + '...');
+            del.push(key);
+        }
+        else if ((typeof value) === 'object') {
+            //console.log(value);
+            if (value != null)
+                clean(value);
+        }
+    }
+    for (var k of del) {
+        console.error('deleting ' + k + '...');
+        delete data[k];
+    }
+}
+
 program
-	.command('frame <source>')
+	.command('frameAndCleanRequest <source>')
 	.action(async (source) => {
 
 		var doc = await processor.load_n3(source, false);
-		const r = await do_frame(doc, frame);
+		var r = await do_frame(doc, frame);
+		//r = await jl.compact(r, ctx);
+		//console.log(r);
+		clean(r);
+		delete r['@context'];
+		
+		
 		//r = await simplify(r);
 		console.log(JSON.stringify(r, null, 4))
 });
