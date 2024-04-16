@@ -1208,7 +1208,6 @@ Anyway, we could store both doc and context in State.
 	).
 
  'store doc data for reporting after exception' :-
- 	gtrace,
 	(	doc_data(G,Ng)
 	->	(
 			retractall(user:exception_doc_dump(_)),

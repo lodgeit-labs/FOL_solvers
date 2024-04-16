@@ -131,7 +131,7 @@ function clean(data) {
 }
 
 program
-	.command('frameAndCleanRequest <source>')
+	.command('frame_and_clean_request <source>')
 	.action(async (source) => {
 
 		var doc = await processor.load_n3(source, false);
