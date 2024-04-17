@@ -108,7 +108,7 @@ function clean(data) {
             key === "excel:title" || 
             key === "excel:position" || 
             key === "excel:has_sheet_name" || 
-            key === "excel:template" ||
+            //key === "excel:template" ||
             key === "excel:sheet_type"
             ) {
             //console.log('deleting ' + key + '...');

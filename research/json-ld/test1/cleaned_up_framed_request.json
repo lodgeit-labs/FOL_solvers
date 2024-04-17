@@ -55,11 +55,90 @@
                                 }
                             }
                         ]
+                    },
+                    "excel:template": {
+                        "@id": "depr_ui:depreciation_assets",
+                        "@type": "excel:template",
+                        "excel:cardinality": "excel:multi",
+                        "excel:class": {
+                            "@id": "depr:depreciation_asset"
+                        },
+                        "excel:fields": {
+                            "@list": [
+                                {
+                                    "@id": "_:b179",
+                                    "excel:property": {
+                                        "@id": "depr:id"
+                                    }
+                                },
+                                {
+                                    "@id": "_:b180",
+                                    "excel:property": {
+                                        "@id": "depr:start_date"
+                                    },
+                                    "excel:type": "xsd:dateTime"
+                                },
+                                {
+                                    "@id": "_:b181",
+                                    "excel:property": {
+                                        "@id": "depr:cost"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b182",
+                                    "excel:property": {
+                                        "@id": "depr:effective_life_years"
+                                    },
+                                    "excel:type": "xsd:integer"
+                                }
+                            ]
+                        }
                     }
                 },
                 "excel:sheet_instance_has_sheet_name": "depreciation_assets",
                 "excel:sheet_instance_has_sheet_type": {
-                    "@id": "depr_ui:depreciation_calculator_sheet_assets"
+                    "@id": "depr_ui:depreciation_calculator_sheet_assets",
+                    "excel:name_prefix": "depreciation_assets",
+                    "excel:root": {
+                        "@id": "depr_ui:depreciation_assets",
+                        "@type": "excel:template",
+                        "excel:cardinality": "excel:multi",
+                        "excel:class": {
+                            "@id": "depr:depreciation_asset"
+                        },
+                        "excel:fields": {
+                            "@list": [
+                                {
+                                    "@id": "_:b179",
+                                    "excel:property": {
+                                        "@id": "depr:id"
+                                    }
+                                },
+                                {
+                                    "@id": "_:b180",
+                                    "excel:property": {
+                                        "@id": "depr:start_date"
+                                    },
+                                    "excel:type": "xsd:dateTime"
+                                },
+                                {
+                                    "@id": "_:b181",
+                                    "excel:property": {
+                                        "@id": "depr:cost"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b182",
+                                    "excel:property": {
+                                        "@id": "depr:effective_life_years"
+                                    },
+                                    "excel:type": "xsd:integer"
+                                }
+                            ]
+                        }
+                    }
                 }
             },
             {
@@ -109,7 +188,8 @@
                                 },
                                 "depr:depreciation_query_has_type": {
                                     "rdf:value": {
-                                        "@id": "depr:depreciation_between_two_dates"
+                                        "@id": "depr:depreciation_between_two_dates",
+                                        "@type": "depr:depreciation_query_type"
                                     }
                                 },
                                 "depr:depreciation_query_method": {
@@ -138,7 +218,8 @@
                                 },
                                 "depr:depreciation_query_method": {
                                     "rdf:value": {
-                                        "@id": "depr:diminishing_value"
+                                        "@id": "depr:diminishing_value",
+                                        "@type": "depr:depreciation_query_method_type"
                                     }
                                 },
                                 "depr:depreciation_query_written_down_date": {
@@ -155,12 +236,14 @@
                                 },
                                 "depr:depreciation_query_has_type": {
                                     "rdf:value": {
-                                        "@id": "depr:written_down_value"
+                                        "@id": "depr:written_down_value",
+                                        "@type": "depr:depreciation_query_type"
                                     }
                                 },
                                 "depr:depreciation_query_method": {
                                     "rdf:value": {
-                                        "@id": "depr:diminishing_value"
+                                        "@id": "depr:diminishing_value",
+                                        "@type": "depr:depreciation_query_method_type"
                                     }
                                 },
                                 "depr:depreciation_query_written_down_date": {
@@ -177,12 +260,14 @@
                                 },
                                 "depr:depreciation_query_has_type": {
                                     "rdf:value": {
-                                        "@id": "depr:written_down_value"
+                                        "@id": "depr:written_down_value",
+                                        "@type": "depr:depreciation_query_type"
                                     }
                                 },
                                 "depr:depreciation_query_method": {
                                     "rdf:value": {
-                                        "@id": "depr:diminishing_value"
+                                        "@id": "depr:diminishing_value",
+                                        "@type": "depr:depreciation_query_method_type"
                                     }
                                 },
                                 "depr:depreciation_query_written_down_date": {
@@ -199,12 +284,14 @@
                                 },
                                 "depr:depreciation_query_has_type": {
                                     "rdf:value": {
-                                        "@id": "depr:written_down_value"
+                                        "@id": "depr:written_down_value",
+                                        "@type": "depr:depreciation_query_type"
                                     }
                                 },
                                 "depr:depreciation_query_method": {
                                     "rdf:value": {
-                                        "@id": "depr:prime_cost"
+                                        "@id": "depr:prime_cost",
+                                        "@type": "depr:depreciation_query_method_type"
                                     }
                                 },
                                 "depr:depreciation_query_written_down_date": {
@@ -221,12 +308,14 @@
                                 },
                                 "depr:depreciation_query_has_type": {
                                     "rdf:value": {
-                                        "@id": "depr:written_down_value"
+                                        "@id": "depr:written_down_value",
+                                        "@type": "depr:depreciation_query_type"
                                     }
                                 },
                                 "depr:depreciation_query_method": {
                                     "rdf:value": {
-                                        "@id": "depr:prime_cost"
+                                        "@id": "depr:prime_cost",
+                                        "@type": "depr:depreciation_query_method_type"
                                     }
                                 },
                                 "depr:depreciation_query_written_down_date": {
@@ -249,7 +338,8 @@
                                 },
                                 "depr:depreciation_query_method": {
                                     "rdf:value": {
-                                        "@id": "depr:diminishing_value"
+                                        "@id": "depr:diminishing_value",
+                                        "@type": "depr:depreciation_query_method_type"
                                     }
                                 },
                                 "depr:depreciation_query_termination_date": {
@@ -272,12 +362,14 @@
                                 },
                                 "depr:depreciation_query_has_type": {
                                     "rdf:value": {
-                                        "@id": "depr:profit_and_loss"
+                                        "@id": "depr:profit_and_loss",
+                                        "@type": "depr:depreciation_query_type"
                                     }
                                 },
                                 "depr:depreciation_query_method": {
                                     "rdf:value": {
-                                        "@id": "depr:diminishing_value"
+                                        "@id": "depr:diminishing_value",
+                                        "@type": "depr:depreciation_query_method_type"
                                     }
                                 },
                                 "depr:depreciation_query_termination_date": {
@@ -294,11 +386,240 @@
                                 }
                             }
                         ]
+                    },
+                    "excel:template": {
+                        "@id": "depr_ui:depreciation_queries",
+                        "@type": "excel:template",
+                        "excel:cardinality": "excel:multi",
+                        "excel:class": {
+                            "@id": "depr:depreciation_query"
+                        },
+                        "excel:fields": {
+                            "@list": [
+                                {
+                                    "@id": "_:b159",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_has_type",
+                                        "rdfs:range": {
+                                            "@id": "depr:depreciation_query_type"
+                                        }
+                                    },
+                                    "excel:type": "excel:uri"
+                                },
+                                {
+                                    "@id": "_:b160",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_asset_id"
+                                    }
+                                },
+                                {
+                                    "@id": "_:b161",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_pool"
+                                    }
+                                },
+                                {
+                                    "@id": "_:b162",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_from_date"
+                                    },
+                                    "excel:type": "xsd:dateTime"
+                                },
+                                {
+                                    "@id": "_:b163",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_to_date"
+                                    },
+                                    "excel:type": "xsd:dateTime"
+                                },
+                                {
+                                    "@id": "_:b164",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_written_down_date"
+                                    },
+                                    "excel:type": "xsd:dateTime"
+                                },
+                                {
+                                    "@id": "_:b165",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_method",
+                                        "rdfs:range": {
+                                            "@id": "depr:depreciation_query_method_type"
+                                        }
+                                    },
+                                    "excel:type": "excel:uri"
+                                },
+                                {
+                                    "@id": "_:b166",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_termination_value"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b167",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_termination_date"
+                                    },
+                                    "excel:type": "xsd:dateTime"
+                                },
+                                {
+                                    "@id": "_:b168",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_total_depreciation"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b169",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_depreciation_value"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b170",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_written_down_value"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b171",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_recup"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b172",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_capital_gain"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                }
+                            ]
+                        }
                     }
                 },
                 "excel:sheet_instance_has_sheet_name": "depreciation_queries",
                 "excel:sheet_instance_has_sheet_type": {
-                    "@id": "depr_ui:depreciation_calculator_sheet_queries"
+                    "@id": "depr_ui:depreciation_calculator_sheet_queries",
+                    "excel:name_prefix": "depreciation_queries",
+                    "excel:root": {
+                        "@id": "depr_ui:depreciation_queries",
+                        "@type": "excel:template",
+                        "excel:cardinality": "excel:multi",
+                        "excel:class": {
+                            "@id": "depr:depreciation_query"
+                        },
+                        "excel:fields": {
+                            "@list": [
+                                {
+                                    "@id": "_:b159",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_has_type",
+                                        "rdfs:range": {
+                                            "@id": "depr:depreciation_query_type"
+                                        }
+                                    },
+                                    "excel:type": "excel:uri"
+                                },
+                                {
+                                    "@id": "_:b160",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_asset_id"
+                                    }
+                                },
+                                {
+                                    "@id": "_:b161",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_pool"
+                                    }
+                                },
+                                {
+                                    "@id": "_:b162",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_from_date"
+                                    },
+                                    "excel:type": "xsd:dateTime"
+                                },
+                                {
+                                    "@id": "_:b163",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_to_date"
+                                    },
+                                    "excel:type": "xsd:dateTime"
+                                },
+                                {
+                                    "@id": "_:b164",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_written_down_date"
+                                    },
+                                    "excel:type": "xsd:dateTime"
+                                },
+                                {
+                                    "@id": "_:b165",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_method",
+                                        "rdfs:range": {
+                                            "@id": "depr:depreciation_query_method_type"
+                                        }
+                                    },
+                                    "excel:type": "excel:uri"
+                                },
+                                {
+                                    "@id": "_:b166",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_termination_value"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b167",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_termination_date"
+                                    },
+                                    "excel:type": "xsd:dateTime"
+                                },
+                                {
+                                    "@id": "_:b168",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_total_depreciation"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b169",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_depreciation_value"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b170",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_written_down_value"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b171",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_recup"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                },
+                                {
+                                    "@id": "_:b172",
+                                    "excel:property": {
+                                        "@id": "depr:depreciation_query_capital_gain"
+                                    },
+                                    "excel:type": "xsd:decimal"
+                                }
+                            ]
+                        }
+                    }
                 }
             }
         ]
