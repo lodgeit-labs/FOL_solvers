@@ -36,7 +36,8 @@
 
 
  get_sheet(Type, Sheet) :-
-	!doc($>request_data, excel:has_sheet_instances, Sheets),
+ 	request_data(R),
+	!doc(R, excel:has_sheet_instances, Sheets),
 	*doc_list_member(Sheet, Sheets),
 	?doc(Sheet, excel:sheet_instance_has_sheet_type, Type).
 

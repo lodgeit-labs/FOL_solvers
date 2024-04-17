@@ -97,10 +97,10 @@ function clean(data) {
         var value = data[key];
         //console.error(key);
         
-        if (key === "excel:sheet_instance_has_sheet_type") {
+        /*if (key === "excel:sheet_instance_has_sheet_type") {
             data[key] = value['@id'];
-        }
-        
+        }*/ // this wont translate back without this in the context: "ex:contains": {"@type": "@id"}
+
         if (
             (key === "rdf:value" && value === null) ||
             key === "excel:col" || 
@@ -111,9 +111,6 @@ function clean(data) {
             key === "excel:template" ||
             key === "excel:sheet_instance_has_sheet_name" ||
             key === "excel:sheet_type"
-             
-            
-            
             ) {
             //console.log('deleting ' + key + '...');
             del.push(key);
@@ -138,6 +135,8 @@ program
 		var r = await do_frame(doc, frame);
 		//r = await jl.compact(r, ctx);
 		//console.log(r);
+
+
 		clean(r);
 		delete r['@context'];
 		
@@ -149,11 +148,9 @@ program
 program
 	.command('request_jsonld_to_n3 <source>')
 	.action(async (source) => {
-
-		const r = await jl.toRDF(
-			await JSON.parse(fs.readFileSync(source, {encoding: 'utf-8'})),
-			{format: 'application/n-quads'}
-		);
+		var j = await JSON.parse(fs.readFileSync(source, {encoding: 'utf-8'}));
+		j['@context'] = ctx;
+		const r = await jl.toRDF(j,	{format: 'application/n-quads'});
 		// print out the N-Quads
 		process.stdout.write(r);
 

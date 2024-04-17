@@ -57,7 +57,9 @@
                         ]
                     }
                 },
-                "excel:sheet_instance_has_sheet_type": "depr_ui:depreciation_calculator_sheet_assets"
+                "excel:sheet_instance_has_sheet_type": {
+                    "@id": "depr_ui:depreciation_calculator_sheet_assets"
+                }
             },
             {
                 "excel:sheet_instance_has_sheet_data": {
@@ -293,7 +295,9 @@
                         ]
                     }
                 },
-                "excel:sheet_instance_has_sheet_type": "depr_ui:depreciation_calculator_sheet_queries"
+                "excel:sheet_instance_has_sheet_type": {
+                    "@id": "depr_ui:depreciation_calculator_sheet_queries"
+                }
             }
         ]
     },
