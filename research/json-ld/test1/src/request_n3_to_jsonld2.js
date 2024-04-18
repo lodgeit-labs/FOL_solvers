@@ -63,19 +63,6 @@ const frame = {
 };
 
 
-async function do_frame(data, frame)
-{
-	const framed = await jl.frame(data, frame, {
-		base: "http://ex.com/",
-		processingMode: "json-ld-1.1",
-		omitGraph: true,
-		embed: '@once',
-		ordered: true
-	})
-	return framed
-}
-
-
 async function simplify(frame)
 {
 	let f = await cars_framed(source);
@@ -89,6 +76,19 @@ async function simplify(frame)
 	});
 	return items;
 }
+
+async function do_frame(data, frame)
+{
+	const framed = await jl.frame(data, frame, {
+		base: "http://ex.com/",
+		processingMode: "json-ld-1.1",
+		omitGraph: true,
+		embed: '@once',
+		ordered: true
+	})
+	return framed
+}
+
 
 function clean(data) {
     //console.log(data);
