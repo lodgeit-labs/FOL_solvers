@@ -6,6 +6,7 @@
 :- use_module(library(record)).
 :- use_module(library(semweb/rdf11),except(['{}'/1])).
 :- use_module(library(semweb/turtle)).
+:- use_module(library(semweb/rdf_ntriples)).
 :- use_module(library(http/json)).
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_open)).

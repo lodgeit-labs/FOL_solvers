@@ -58,7 +58,7 @@
 	rdf_equal2(X,Y).
 
 
-%:- debug(doc).
+:- debug(doc).
 
 % https://www.swi-prolog.org/pldoc/man?predicate=rdf_meta/1
 /* uses goal_expansion, so as soon as you wrap the call in a !, it doesn't work, so we have to do this at runtime too anyway.
@@ -800,9 +800,11 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 	findall((X2,Y2,Z2),
 		(
 			rdf(X,Y,Z,_Rdf_Graph),
+			debug(doc, 'rdf(~q) -> ', [(X,Y,Z)]),
 			replace_uri_node_prefix(X, Replaced_prefix, Replacement_prefix, X2),
 			replace_uri_node_prefix(Y, Replaced_prefix, Replacement_prefix, Y2),
-			replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2)
+			replace_uri_node_prefix(Z, Replaced_prefix, Replacement_prefix, Z2),
+			debug(doc, '  ~q', [(X2,Y2,Z2)])
 		),
 		Triples
 	),
