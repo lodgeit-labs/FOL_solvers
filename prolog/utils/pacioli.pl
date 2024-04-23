@@ -50,12 +50,14 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 % - returns a vector of coordinates with debit and credit values switched around
 
  vec_inverse(As, Bs) :-
+ 	(atom(As);atom(Bs)),
  	val(As, AsV),
 	maplist(coord_inverse, AsV, BsV),
 	doc_new_vec(BsV, Bs),
 	doc_add(Bs, l:origin, As).
 
- vec_inverse_(As, Bs) :-
+ vec_inverse(As, Bs) :-
+ 	(is_list(As);is_list(Bs)),
 	maplist(coord_inverse, As, Bs).
 
 /*
@@ -123,9 +125,6 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 
  vec_sub(As, Bs, Cs) :-
 	vec_add(As, $>vec_inverse(Bs), Cs).
-
- vec_sub_(As, Bs, Cs) :-
-	vec_add_(As, $>vec_inverse_(Bs), Cs).
 
 % Checks two vectors for equality by subtracting the latter from the former and verifying
 % that all the resulting coordinates are zero.
@@ -243,13 +242,13 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
  	is_list(A),
  	is_list(B),
 	vec_sub(A, B, C),
-	val(C, CV),
-	maplist(coord_is_almost_zero, CV).
+	maplist(coord_is_almost_zero, C).
 
  vecs_are_almost_equal(A, B) :-
  	atom(A), atom(B),
-	vec_sub_(A, B, C),
-	maplist(coord_is_almost_zero, C).
+	vec_sub(A, B, C),
+	val(C, CV),
+	maplist(coord_is_almost_zero, CV).
 
  coord_is_almost_zero(coord(_, D)) :-
 	floats_close_enough(D, 0).
