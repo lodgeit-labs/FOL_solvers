@@ -1,0 +1,235 @@
+%
+% Classes and fields
+%
+	C a class,
+	X a C,
+	C field F,
+	F name N,
+	F optional false
+=>
+	X N V.
+
+
+
+	C a class,
+	X a C,
+	C field F,
+	F name N,
+	F type T,
+	X N V
+=>
+	V a T.
+
+
+
+	C a class,
+	X a C,
+	C field F,
+	F name N,
+	F unique true
+	X N V1,
+	X N V2
+=>
+	V1 = V2.
+
+
+
+
+%
+% Time-period constraints
+%
+	
+
+time_period a class;
+			field 	[name start; optional false; type time; unique true], 
+					[name end; optional false; type time; unique true],
+					[name duration; optional false; type duration; unique true].
+
+
+	Period a time_period
+=>
+	Period.end = Period.start + Period.duration
+
+
+
+
+%
+% Hire-purchase arrangement constraints
+%
+
+
+	HP a hp_arrangement
+<=>
+	HP arrangement_period Period,
+	Period a time_period,
+	HP report_period Report_Period,
+	Report_Period a time_period,
+	HP contract_number Contract_Number,
+	HP cash_price Cash_Price, 
+	HP repayment_period Repayment_Period,
+	HP repayment_amount Repayment_Amount,
+	Repayment_Period a duration,
+	HP interest_period Interest_Period,
+	Interest_Period a duration,
+	HP interest_rate Interest_Rate,
+	HP number_of_installments Number_Of_Installments,
+	HP payment_type Payment_Type, 		% advance or arrears
+	HP installments Installments,
+	HP balloons Balloons,				% set of installments greater than the repayment amount
+	HP submarines Submarines			% set of installments less than the repayment amount
+	HP total_payments Total_Payments,
+	HP total_interest Total_Interest,
+	HP liability_balance Liability_Balance,
+	HP repayment_balance Repayment_Balance,
+	HP unexpired_interest Unexpired_Interest,
+	HP current_liability Current_Liability,
+	HP noncurrent_liability Noncurrent_Liability,
+	HP current_unexpired_interest Current_Unexpired_Interest,
+	HP noncurrent_unexpired_interest Noncurrent_Unexpired_Interest,
+	HP final_balance Final_Balance,
+	Installments first First_Installment,
+	First_Installment installment_number 1,
+	First_Installment opening_balance Cash_Price,
+	Installments last Last_Installment,
+	Last_Installment installment_number Number_of_Installments,
+	Last_Installment closing_balance Final_Balance,
+	Last_Installment total_payments Total_Payments,
+	Last_Installment total_interest Total_Interest,
+
+	#(
+		Total_Payments = Cash_Price + Total_Interest - Final_Balance,
+		Liability_Balance = Repayment_Balance + Unexpired_Interest,
+		Repayment_Balance = Current_Liability + Noncurrent_Liability,
+		Unexpired_Interest = Current_Unexpired_Interest + Noncurrent_Unexpired_Interest,
+		Current_Liability = ..., % lots of different aggregates so need to figure out how to express these as cleanly/generically as possible
+		Noncurrent_Liability = ...,
+		Current_Unexpired_Interest = ...,
+		Noncurrent_Unexpired_Interest = ...,
+		Repayment_Amount = repayment_formula(Cash_Price, Interest_Rate, (Repayment_Period/Interest_Period), Number_Of_Installments)
+	)
+}
+
+
+
+
+%
+% Hire-purchase installments constraints
+%
+
+	Installment a hp_installment
+<=>
+	HP a hp_arrangement,
+	Installment in HP.Installments,
+
+	#(
+		Is_Regular in 0..1,
+		Is_Balloon = 1 - Is_Regular,
+		Closing_Balance = Opening_Balance + Interest_Amount - Installment_Amount,
+		Installment_Amount = Is_Regular * HP.repayment_amount + Is_Balloon * Balloon_Amount,
+		Balloon_Amount =\= HP.repayment_amount,
+	),
+
+	% constraints relating prev/next?.
+
+
+	HP a hp_arrangement,
+	HP number_of_installments N,
+	HP installments 
+=>
+	% uniqueness of list elements
+	(
+		Installment number N1,
+		Installment number N2
+	=>
+		N1 = N2
+	),
+
+	% bounds on list indexes and length
+	(
+		1 =< I,
+		I =< N,
+	<=>
+		Installment in HP.installments
+		Installment number Installment_Number
+	),
+
+	% relation between previous and next items in list
+	(
+		Next_Number = Prev_Number + 1,
+		1 =< Prev_Number,
+		Next_Number =< N
+	<=>	
+
+		Prev in HP.installments,
+		Next in HP.installments,
+		Prev next Next,
+		Next prev Prev,
+		Prev number Prev_Number,
+		Next number Next_Number
+	)
+
+	
+
+
+
+
+	L a list,
+	L length N
+<=>
+
+	% last element
+	(
+		L first X
+	<=>
+		X number 1
+	),
+
+
+	% first element 
+	(
+		L last X
+	<=>
+		X number N
+	),
+
+
+	% entries have values
+	(
+		X in L
+	=>
+		X val _
+	),
+
+	% uniqueness of entries
+	(
+		X in L,
+		X number I_1,
+		X number I_2
+	=>
+		I_1 = I_2
+	),
+
+
+
+	% list bounds
+	(
+		1 =< I,
+		I =< N
+	<=>
+		X in L,
+		X number I
+	),
+
+	
+	% relation between previous and next elements
+	(
+		I_N = I_P + 1
+	<=>
+		Prev in L,
+		Next in L,
+		Prev next Next,
+		Next prev Prev,
+		Prev number I_P,
+		Next number I_N
+	).
+	
