@@ -153,17 +153,29 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
  is_zero_value(value(_, Zero)) :-
 	is_zero_coord(coord(_, Zero)).
 
+
+
  is_debit(coord(_, X)) :-
 	X > 0. % todo: maybe this should be {}?
 
  is_debit([Coord]) :-
 	is_debit(Coord).
 
+ is_debit(Vec) :-
+ 	atom(Vec),
+ 	val(Vec, VecV),
+ 	is_debit(VecV).
+
  is_credit(coord(_, X)) :-
 	X < 0. % todo: maybe this should be {}?
 
  is_credit([Coord]) :-
 	is_credit(Coord).
+
+ is_credit(Vec) :-
+ 	atom(Vec),
+ 	val(Vec, VecV),
+ 	is_credit(VecV).
 
  unify_coords_or_values(coord(U, D1), coord(U, D2)) :-
 	unify_numbers(D1, D2).
