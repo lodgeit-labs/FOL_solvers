@@ -1278,4 +1278,4 @@ Required Property Value
 	result(Result),
 	doc(Result, l:rdf_explorer_base, Rdf_explorer_base),
 	atomics_to_string([Rdf_explorer_base, '<', Uri, '>&focused-graph=', $>result_data_uri_base, 'default'], Uri2),
-	Link = a(href=Uri2, [small("⍰")]).
+	Link = a(href=Uri2, ["ⓘ"]).
