@@ -249,6 +249,7 @@ flag_default('ROBUST_DOC_ENABLE_TRAIL', false).
  	addd(S,P,O,G).
 
 
+flag_default('ROBUST_DOC_NO_CHECKS', false).
 
 :- if(env_bool('ROBUST_DOC_NO_CHECKS', true)).
 
