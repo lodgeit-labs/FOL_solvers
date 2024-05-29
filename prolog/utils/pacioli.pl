@@ -231,6 +231,8 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
  value_merge(value(Unit, D1), value(Unit, D2), value(Unit, D3)) :-
 	{D3 = D2 + D1}.
 
+
+/* only used in investment calculator and livestock */
  value_convert(value(Unit, Amount1), exchange_rate(_,Src,Dst,Rate), value(Unit2, Amount2)) :-
 	assertion(Unit = Src),
 	assertion(Unit2 = Dst),
