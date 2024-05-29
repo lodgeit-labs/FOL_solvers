@@ -54,7 +54,7 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
  	val(As, AsV),
 	maplist(coord_inverse, AsV, BsV),
 	doc_new_vec(BsV, Bs),
-	doc_add(Bs, l:origin, As).
+	doc_add(Bs, l:source, As).
 
  vec_inverse(As, Bs) :-
  	(is_list(As);is_list(Bs)),
@@ -282,7 +282,7 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	val(Coords, CoordsV),
 	maplist(coord_normal_side_value2(Side), CoordsV, ValuesV),
 	doc_new_vec(ValuesV, Values),
-	doc_add(Values, l:origin, Coords).
+	doc_add(Values, l:source, Coords).
 
  vector_of_coords_vs_vector_of_values(Side, Coords, Values) :-
 	var(Coords),
@@ -290,7 +290,7 @@ value_credit(value(Unit, Amount), coord(Unit, Zero, Amount)) :- unify_numbers(Ze
 	val(Values, ValuesV),
 	maplist(coord_normal_side_value2(Side), CoordsV, ValuesV),
 	doc_new_vec(CoordsV, Coords),
-	doc_add(Coords, l:origin, Values).
+	doc_add(Coords, l:source, Values).
 
  split_vector_by_percent(V0, Rate, V1, V2) :-
 	maplist(split_coord_by_percent(Rate), V0, V1, V2).
