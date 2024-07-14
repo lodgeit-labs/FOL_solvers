@@ -757,7 +757,7 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 		base(Base),
 		canonize_numbers(true),
 		abbreviate_literals(false),
-		prefixes([rdf,rdfs,xsd,l,livestock,excel,r-($>atomic_list_concat([$>result_data_uri_base, '#']))])
+		prefixes([rdf,rdfs,xsd,l,livestock,excel,r-($>atomic_list_concat([$>result_data_uri_base, '']))])
 	],
 	(	Format = trig
 	->	!rdf_save_trig(Path, Options)
