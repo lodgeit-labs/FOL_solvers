@@ -11,7 +11,33 @@ graph abstraction (in browsing/visualization):
 
 * change pyco2 to work with uri's
 * pyco2 wrapper / runner for generation of input kb
+* extend test2b to reason over a minimal realistic input from excel ic template - 
+this poses some interesting questions about ordering of items in lists, about concatenantion of multiple lists of s_transactions. - 
+say, we run a variant where we dont enforce ordering of stransactions - 
+of forward-searching, variants are produced.
+an abstracting visualization might subsequently abstract away the equivalent variants, but where do the variants pop up?:
+in 'fr' - 'list exists'?  - nope
+  
 
+
+
+* pathfinding in a graph -
+metaphactory
+agraph
+neo4j
+- at any case, curating of predicates and their semantics is needed
+
+
+
+* 2d graph visualization
+- programmatic layout
+- visual overview of whole model
+
+
+
+
+* additional constraints
+- is every transaction in exactly one period
 
 
 
