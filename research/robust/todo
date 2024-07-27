@@ -1,0 +1,10 @@
+graph abstraction (in browsing/visualization):
+	collapsing of multiple equivalent (subsequent) children of a node (of proof tree) into a "repeat" node
+
+* revive pyco2, ensure testcase runs to completion
+* make output machine-readable - streaming quads first, maybe add binary option later
+* rendering of reasoner trace - proof trace - tracer1 web app
+* rendering of reasoner trace - proof search (qt?)
+
+* change pyco2 to work with uri's
+* pyco2 wrapper / runner for generation of input kb
