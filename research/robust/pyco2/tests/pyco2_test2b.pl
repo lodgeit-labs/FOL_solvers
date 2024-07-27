@@ -148,7 +148,7 @@ pyco0_rule(
 % s_transaction2s are processed or produced in order.
 % transactions are picked out from anywhere in the list.
 pyco0_rule(
-	'(nil, nil) has the relation "preprocess"',
+	'an empty list of s_transactions preprocesses into an empty list of transactions',
 	[preprocess(_,nil,nil)]
  	<=
 	[]).
