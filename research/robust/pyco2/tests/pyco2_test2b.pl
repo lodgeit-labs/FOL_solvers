@@ -476,15 +476,15 @@ test(Q) :-
 print_1(Q) :-
 	Q =.. [_,Sts,Ts],
 	(
-	format(user_error,'~nRESULT:~n', []),
-	nicer_bn2(Sts, Sts_n),
-	nicer_bn2(Ts, Ts_n),
-	format(user_error,'~nSts:~n', []),
-	maplist(writeln, Sts_n),
-	format(user_error,'~nTs:~n', []),
-	maplist(writeln, Ts_n),
-	nl,nl,
-	true
+		format(user_error,'~nRESULT:~n', []),
+		nicer_bn2(Sts, Sts_n),
+		nicer_bn2(Ts, Ts_n),
+		format(user_error,'~nSts:~n', []),
+		maplist(writeln, Sts_n),
+		format(user_error,'~nTs:~n', []),
+		maplist(writeln, Ts_n),
+		nl,nl,
+		true
 	)
 	->	true
 	;	throw(xxx).

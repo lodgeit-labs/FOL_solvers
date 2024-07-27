@@ -7,10 +7,6 @@ ledger2
 pyco*
 
 
-# notes for hypothetical next research
-
-* AI answering over graphs
-
 
 
 
