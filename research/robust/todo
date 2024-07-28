@@ -1,8 +1,45 @@
-graph abstraction (in browsing/visualization):
+
+# graph visualization
+
+
+- programmatic layout
+- visual overview of whole model
+
+
+the database is a hairball. We can specify what we want to see
+
+0) by simple subgraph-ing
+1) declaratively, by asserting statements pointing to some nodes or edges as more important for particular views
+2) by crafting queries
+3) imperatively, by generating view graph from data
+
+## graph layout
+...
+
+
+
+## graph abstraction (in browsing/visualization):
 	collapsing of multiple equivalent (subsequent) children of a node (of proof tree) into a "repeat" node
 
 
 
+
+## pathfinding in graphs
+metaphactory
+agraph
+neo4j
+- at any case, curating of predicates and their semantics is needed
+
+
+
+## AI answering over graphs
+
+
+
+
+
+
+# pyco2
 
 * revive pyco2, ensure testcase runs to completion
 * make output machine-readable - streaming quads first, maybe add binary option later
@@ -18,58 +55,16 @@ of forward-searching, variants are produced.
 an abstracting visualization might subsequently abstract away the equivalent variants, but where do the variants pop up?:
 in 'fr' - 'list exists'?  - nope
   
+* pyco 11 - js/bun interpreter - parallel search
 
 
 
-* pathfinding in a graph -
-metaphactory
-agraph
-neo4j
-- at any case, curating of predicates and their semantics is needed
-
-
-
-* 2d graph visualization
-- programmatic layout
-- visual overview of whole model
-
-
-
+# general accounting data stuff 
 
 * additional constraints
 - is every transaction in exactly one period
 
 
-
 * unified formula language
-
-
-
-
-* AI answering over graphs
-
-
-
-
-
-
-
-* pyco 11 - js/bun interpreter - parallel search
-
-
-
-
-
-# graph visualization
-the database is a hairball. We can specify what we want to see
-
-0) by simple subgraph-ing
-1) declaratively, by asserting statements pointing to some nodes or edges as more important for particular views
-2) by crafting queries
-3) imperatively, by generating view graph from data
-
-## graph layout
-...
-
 
 
