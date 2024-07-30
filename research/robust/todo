@@ -1,4 +1,37 @@
+
+# introduction - nomenclature
+## model 
+
+> What is a model in FOL?
+An interpretation (or model) of a first-order formula specifies what each predicate means, and the entities that can instantiate the variables.
+
+> ▷ formulae/sentences are true with respect to a model and an interpretation. ▷ model contains objects (domain elements) and relations among them.
+
+>  a “model” in first order logic is the analogue of a truth assignment in propositional logic. I
+
+
+# graph visualization
+
 graph abstraction (in browsing/visualization):
+
+
+- programmatic layout
+- visual overview of whole model
+
+
+the database is a hairball. We can specify what we want to see
+
+0) by simple subgraph-ing
+1) declaratively, by asserting statements pointing to some nodes or edges as more important for particular views
+2) by crafting queries
+3) imperatively, by generating view graph from data
+
+## graph layout
+...
+
+
+
+## graph abstraction (in browsing/visualization):
 	collapsing of multiple equivalent (subsequent) children of a node (of proof tree) into a "repeat" node
 
 * revive pyco2, ensure testcase runs to completion
@@ -8,3 +41,28 @@ graph abstraction (in browsing/visualization):
 
 * change pyco2 to work with uri's
 * pyco2 wrapper / runner for generation of input kb
+* extend test2b to reason over a minimal realistic input from excel ic template - 
+this poses some interesting questions about ordering of items in lists, about concatenantion of multiple lists of s_transactions. - 
+say, we run a variant where we dont enforce ordering of stransactions - 
+of forward-searching, variants are produced.
+an abstracting visualization might subsequently abstract away the equivalent variants, but where do the variants pop up?:
+in 'fr' - 'list exists'?  - nope
+ 
+- but the code / library itself needs refinements to allow producing understandable models 
+
+
+* pyco 11 - js/bun interpreter - parallel search
+
+
+
+# general accounting data stuff 
+
+codify an ontology of data structures shared between robust and other reasoners
+
+* additional constraints
+- is every transaction in exactly one period
+
+
+* unified formula language
+
+
