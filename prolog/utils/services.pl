@@ -86,8 +86,15 @@
 	json_post_result(['http://127.0.0.1:1111/', Path], Params, Result).
 
  services_server_shell_cmd(Cmd) :-
-	json_post('shell', _{cmd:Cmd}, _).
+	services_post_result('shell', _{cmd:Cmd}, Result).
 
+ services_server_shell_cmd_check(Cmd) :-
+	services_post_result('shell', _{cmd:Cmd}, Result),
+	(	0 = Result.get(returncode)
+	->	true
+	;	throw_string(Result)
+	).
+	
 
 
  shell4(Cmd_In, Exit_Status) :-
@@ -98,7 +105,7 @@
 	*/
 
 	%format(user_error, 'shell4: ~q ...\n', [Cmd_In]),
-	services_server_shell_cmd(Cmd_In),
+	services_server_shell_cmd_check(Cmd_In),
 	Exit_Status=0,
 	%format(user_error, 'shell4: done\n', []),
 	true.
@@ -106,5 +113,5 @@
 
 
  get_file_from_url_into_dir(loc(absolute_url, Url), loc(absolute_path, Path), Filepath) :-
-	services_post_result(['get_file_from_url_into_dir'], _{url: Url, dir: Path}, Result),
+	services_post_result('get_file_from_url_into_dir', _{url: Url, dir: Path}, Result),
 	_{filepath: Filepath} :< Result.
