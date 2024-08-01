@@ -81,12 +81,13 @@
 
 
 
- services_server_shell_cmd(Cmd) :-
-	json_post(['http://127.0.0.1:1111/shell'], _{cmd:Cmd}, _).
-
-
+ /* "services" are now served in worker fastapi server, not in the services service, so this naming is confusing.. */
  services_post_result(Path, Params, Result) :-
 	json_post_result(['http://127.0.0.1:1111/', Path], Params, Result).
+
+ services_post_result(Cmd) :-
+	json_post('shell', _{cmd:Cmd}, _).
+
 
 
  shell4(Cmd_In, Exit_Status) :-
