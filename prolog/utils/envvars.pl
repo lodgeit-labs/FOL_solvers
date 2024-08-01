@@ -24,7 +24,7 @@
 
 /* this naming is unfortunate as swipl already has flag/3 */
  flag(Key, Value) :-
- 	%format(user_error,'flag(~q~n',[Key]),
+ 	format(user_error,'flag(~q~n',[Key]),
 	(	current_prolog_flag(Key, Value0)
 	->	true
  	;	(	getenv(Key, Value0)

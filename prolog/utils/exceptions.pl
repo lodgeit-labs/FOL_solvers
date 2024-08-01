@@ -26,12 +26,32 @@ prolog:error_message(msg(Msg)) --> [Msg].
  flag_default('GTRACE_ON_OWN_EXCEPTIONS', true).
 
  throw_value(V) :-
-	%gtrace,
+
+	format(user_error, 'throw_value: ~q\n', [V]),
 	(	env_bool('GTRACE_ON_OWN_EXCEPTIONS', true)
 	->	gtrace_if_have_display
 	;	true),
+
+	format(user_error, 'get_prolog_backtrace_str\n', []),
 	get_prolog_backtrace_str(Backtrace_str),
+	format(user_error, 'context_string\n', []),
 	context_string(Context_str),
+	format(user_error, 'throw\n', []),
+
+	(	tracing
+	->	format(user_error, 'tracing.\n', [])
+	;	format(user_error, 'not tracing.\n', [])),
+	
+	% swipl is somehow obsessed with connecting to X11:
+	%2024-08-01T13:44:20Z app[1857704a33e118] mad [info]INFO:app.call_prolog:not tracing.
+    %2024-08-01T13:44:21Z app[1857704a33e118] mad [info]INFO:app.call_prolog:% The graphical front-end will be used for subsequent tracing
+    %2024-08-01T13:44:21Z app[1857704a33e118] mad [info]INFO:app.call_prolog:[PCE fatal: @display/display: Failed to connect to X-server at `': no DISPLAY environment variable
+    %2024-08-01T13:44:21Z app[1857704a33e118] mad [info]INFO:app.call_prolog:*********************************************************************
+	%2024-08-01T13:44:21Z app[1857704a33e118] mad [info]INFO:app.call_prolog:* You MUST be running the X11 Windowing environment.  If you are,   *
+	% It only happens in the fly machine.	
+	% it seems to go away on V9.3.8	
+	%set_prolog_flag(debug_on_error, false),
+	
 	throw(with_processing_context(with_backtrace_str(error(msg(V),_),Backtrace_str),Context_str)).
 
 
@@ -63,6 +83,7 @@ prolog:error_message(msg(Msg)) --> [Msg].
  flag_default(gtrace, true).
 
  gtrace_if_have_display :-
+ 	format(user_error, 'gtrace_if_have_display\n', []),
 	(	have_display
 	->	(	env_bool('GTRACE_ON_OWN_EXCEPTIONS', true)
 		->	(
