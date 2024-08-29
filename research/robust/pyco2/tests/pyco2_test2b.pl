@@ -366,6 +366,7 @@ pyco0_rule(
 		q5(Sts, Ts0)
 	] <=
 	[
+				
 		fr(Ts0, T0, Ts1),
 		fr(Ts1, T1, Ts2),
 		fr(Ts2, T2, Ts3),
@@ -378,10 +379,12 @@ pyco0_rule(
 		fr(Ts9, T9, Ts10),
 		fr(Ts10, T10, Ts11),
 		fr(Ts11, T11, nil),
+		
 		coord(C1,'AUD',-5),fr(Vec1,C1,nil),
 		coord(C2,'AUD',5),fr(Vec2,C2,nil),
 		coord(C3,'AUD',-60),fr(Vec3,C3,nil),
 		coord(C4,'AUD',60),fr(Vec4,C4,nil),
+
 		transaction(T0,0,_,bank0,Vec1),
 		transaction(T1,0,_,expenses,Vec2),
 		transaction(T2,1,_,bank0,Vec1),
@@ -397,6 +400,7 @@ pyco0_rule(
 
 		default_verbs(Verbs, _, _),
 		preprocess(Verbs,Sts,Ts0)
+		
 	]).
 
 

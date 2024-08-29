@@ -135,3 +135,34 @@ univar pyco outputs, for example, kbdbgtests_clean_lists_pyco_unify_bnodes_0.n3:
 		S() is a call to a function in the browser. This ensures that the js file stays valid syntax even on crash.
 
 
+
+
+# cacheing / "memoization"
+
+... :- 
+	global(Job),
+	sheets(Job, Sheets),
+	
+
+
+
+model(Model) :-
+	q(Model, a, model).
+
+
+sheet(Name, Sheet) :-
+	model(Model),
+	q(Model, sheets, Sheets),
+	member(Sheet, Sheets),
+	q(Sheet, name, Name).
+	
+
+model_start_date(Start_Date) :-
+	sheet(report_details, D),
+	q(D, ic:from, Start_Date).
+
+
+
+	
+
+
