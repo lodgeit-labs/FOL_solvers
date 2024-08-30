@@ -138,13 +138,15 @@ univar pyco outputs, for example, kbdbgtests_clean_lists_pyco_unify_bnodes_0.n3:
 
 
 # cacheing / "memoization"
+..
 
+# ...
 ... :- 
 	global(Job),
 	sheets(Job, Sheets),
-	
 
 
+---	
 
 model(Model) :-
 	q(Model, a, model).
@@ -160,9 +162,40 @@ sheet(Name, Sheet) :-
 model_start_date(Start_Date) :-
 	sheet(report_details, D),
 	q(D, ic:from, Start_Date).
+---
+========
 
 
 
-	
+kb facts:
+:model a model.
+:model sheet report_details.
+
+
+
+
+query:
+is_valid_ic2_model(:model)?
+
+two options for interfacing kb with existentials:
+etiher 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
