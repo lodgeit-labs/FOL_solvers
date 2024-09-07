@@ -167,21 +167,73 @@ model_start_date(Start_Date) :-
 
 
 
-kb facts:
-:model a model.
-:model sheet report_details.
-
-
-
-
 query:
-is_valid_ic2_model(:model)?
-
-two options for interfacing kb with existentials:
-etiher 
 
 
 
+=>
+
+q(Model sheets Sheets), 
+q(Sheets first report_details1), 
+q(Sheets rest Sheets1), 
+q(Sheets1 first bank_statement1), 
+q(Sheets1 rest Sheets2), 
+q(Sheets2 first ?BS), 
+q(Sheets2 rest nil), 
+is_valid_ic2_model(Model).
+
+the first part might be expressed in compact rdf:
+?Model sheets (report_details1 bank_statement1 [a balance_sheet]), 
+
+the second part does not have a direct representation in rdf:
+is_valid_ic2_model(Model).
+
+(could use the obvious Model is_valid_model true, ...
+
+====
+
+existentials:
+ 
+ - Model:
+
+	 - sheets
+	   - note: i think i'll aim to represent all inputs and outputs as excel sheet rdf, for a baseline. All input sheet types are already defined as such, and reports can be represented as such. 
+
+	 - states
+	   - note: the model represents a series of states representing different steps of automatic accounting. Each state is a product of a particular domain specific phase, for exampe phase of SMSF profit redistribution.
+
+	 - accounts
+	    - note: account hierarchy as extracted from XML or XBRL files. It's not clear how our sub-accounts (currently "generated" at run time according to traded units) will fit into this.
+
+	 - units
+	    - note: traded unit classifications and values
+	    
+
+ - State:
+     - note: holds the "s_transactions" and "gl_transactions" posted in a particular accounting phase.
+
+	 - "s_transactions"
+	   - note: the high-level "bank statement" transactions. Better name needed. Business events is too broad.
+	   - type: list
+	   - origin: reorder_sts..
+
+	 - gl_transactions
+	   - note: the general ledger transactions
+	   - type: list
+	   - origin: this is currently called "preprocess"
+
+   
+ 
+   
+===
+
+
+
+
+
+is_valid_ic2_model(Model) :-
+	   
+   
 
 
 
@@ -189,13 +241,33 @@ etiher
 
 
 
+smsf_final_states(Model) :-
+	
+
+
+	q(Model, states, States),
+	member(State, States),
+	q(State, phase, smsf_profit_redistribution).
 
 
 
 
 
 
+-====
+fixed layouter python:
 
+phases_center = 100,100
+phases_radius = 50
+phases_angle = 2 * math.pi / len(phases)
 
+for i,phase in enumerate(phases):
+	phase.position = (phases_center[0] + phases_radius * math.cos(phases_angle * i), phases_center[1] + phases_radius * math.sin(phases_angle * i))
+	
+	
+	
+	
+	
+	
 
 
