@@ -271,3 +271,72 @@ for i,phase in enumerate(phases):
 	
 
 
+======
+
+
+# avoiding negation by using nonequality constraints:
+(it seems potentially beneicial to avoid negation simply to keep the proof tree simpler)
+
+
+smsf :-
+		maplist({ != smsf_members_sheet }, Sheets)
+		maplist({ != smsf_distribution_sheet }, Sheets)
+		maplist({ != smsf_taxes_sheet }, Sheets)
+	;
+		(
+			member(Sheet, Sheets),
+			q(Sheet, name, smsf_members_sheet),
+			q(Sheet, name, smsf_distribution_sheet),
+			q(Sheet, name, smsf_taxes_sheet),
+		).
+
+
+======
+
+
+next, should we simplify by avoiding an open-ended sheet list - it's not clear how it would become closed in the proof tree, perhaps by unifying it with a concatenation of lists of specific sheet types, ie: (pseudocode)
+
+```
+Smsf_sheets = [smsf_members_sheet, smsf_distribution_sheet, smsf_taxes_sheet],
+Bank_statement_sheets = [bank_statement1, bank_statement2, bank_statement3],
+Sheets = Smsf_sheets + Bank_statement_sheets + [report_details, unit_values].
+```
+
+
+
+
+====
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
