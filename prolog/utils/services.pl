@@ -86,7 +86,7 @@
 	json_post_result(['http://127.0.0.1:1111/', Path], Params, Result).
 
  services_server_shell_cmd(Cmd) :-
-	services_post_result('shell', _{cmd:Cmd}, Result).
+	services_post_result('shell', _{cmd:Cmd}, _Result).
 
  services_server_shell_cmd_check(Cmd) :-
 	services_post_result('shell', _{cmd:Cmd}, Result),
