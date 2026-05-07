@@ -135,3 +135,384 @@ univar pyco outputs, for example, kbdbgtests_clean_lists_pyco_unify_bnodes_0.n3:
 		S() is a call to a function in the browser. This ensures that the js file stays valid syntax even on crash.
 
 
+
+
+# cacheing / "memoization"
+..
+
+# ...
+... :- 
+	global(Job),
+	sheets(Job, Sheets),
+
+
+---	
+
+model(Model) :-
+	q(Model, a, model).
+
+
+sheet(Name, Sheet) :-
+	model(Model),
+	q(Model, sheets, Sheets),
+	member(Sheet, Sheets),
+	q(Sheet, name, Name).
+	
+
+model_start_date(Start_Date) :-
+	sheet(report_details, D),
+	q(D, ic:from, Start_Date).
+---
+========
+
+
+
+query:
+
+
+
+=>
+
+q(Model sheets Sheets), 
+q(Sheets first report_details1), 
+q(Sheets rest Sheets1), 
+q(Sheets1 first bank_statement1), 
+q(Sheets1 rest Sheets2), 
+q(Sheets2 first ?BS), 
+q(Sheets2 rest nil), 
+is_valid_ic2_model(Model).
+
+the first part might be expressed in compact rdf:
+?Model sheets (report_details1 bank_statement1 [a balance_sheet]), 
+
+the second part does not have a direct representation in rdf:
+is_valid_ic2_model(Model).
+
+(could use the obvious Model is_valid_model true, ...
+
+====
+
+existentials:
+ 
+ - Model:
+
+	 - sheets
+	   - note: i think i'll aim to represent all inputs and outputs as excel sheet rdf, for a baseline. All input sheet types are already defined as such, and reports can be represented as such. 
+
+	 - states
+	   - note: the model represents a series of states representing different steps of automatic accounting. Each state is a product of a particular domain specific phase, for exampe phase of SMSF profit redistribution.
+
+	 - accounts
+	    - note: account hierarchy as extracted from XML or XBRL files. It's not clear how our sub-accounts (currently "generated" at run time according to traded units) will fit into this.
+
+	 - units
+	    - note: traded unit classifications and values
+	    
+
+ - State:
+     - note: holds the "s_transactions" and "gl_transactions" posted in a particular accounting phase.
+
+	 - "s_transactions"
+	   - note: the high-level "bank statement" transactions. Better name needed. Business events is too broad.
+	   - type: list
+	   - origin: reorder_sts..
+
+	 - gl_transactions
+	   - note: the general ledger transactions
+	   - type: list
+	   - origin: this is currently called "preprocess"
+
+   
+ 
+   
+===
+
+
+
+
+
+is_valid_ic2_model(Model) :-
+	   
+   
+
+
+
+
+
+
+
+smsf_final_states(Model) :-
+	
+
+
+	q(Model, states, States),
+	member(State, States),
+	q(State, phase, smsf_profit_redistribution).
+
+
+
+
+
+
+-====
+fixed layouter python:
+
+phases_center = 100,100
+phases_radius = 50
+phases_angle = 2 * math.pi / len(phases)
+
+for i,phase in enumerate(phases):
+	phase.position = (phases_center[0] + phases_radius * math.cos(phases_angle * i), phases_center[1] + phases_radius * math.sin(phases_angle * i))
+	
+	
+	
+	
+	
+	
+
+
+======
+
+
+# avoiding negation by using nonequality constraints:
+(it seems potentially beneicial to avoid negation simply to keep the proof tree simpler)
+
+
+smsf :-
+		maplist({ != smsf_members_sheet }, Sheets)
+		maplist({ != smsf_distribution_sheet }, Sheets)
+		maplist({ != smsf_taxes_sheet }, Sheets)
+	;
+		(
+			member(Sheet, Sheets),
+			q(Sheet, name, smsf_members_sheet),
+			q(Sheet, name, smsf_distribution_sheet),
+			q(Sheet, name, smsf_taxes_sheet),
+		).
+
+
+======
+
+
+next, should we simplify by avoiding an open-ended sheet list - it's not clear how it would become closed in the proof tree, perhaps by unifying it with a concatenation of lists of specific sheet types, ie: (pseudocode)
+
+```
+Smsf_sheets = [smsf_members_sheet, smsf_distribution_sheet, smsf_taxes_sheet],
+Bank_statement_sheets = [bank_statement1, bank_statement2, bank_statement3],
+Sheets = Smsf_sheets + Bank_statement_sheets + [report_details, unit_values].
+```
+
+
+
+
+====
+
+
+
+
+
+
+
+
+
+====
+
+existentials:
+ 
+ - Model:
+
+
+     - reasoner
+	   - note: info about the reasoner that produced the model
+  
+	 - sheetset
+	 
+
+	 - states
+	   - note: the model represents a series of states representing different steps of automatic accounting. Each state is a product of a particular domain specific phase, for exampe phase of SMSF profit redistribution.
+
+	 - accounts
+	    - note: account hierarchy as extracted from XML or XBRL files. It's not clear how our sub-accounts (currently "generated" at run time according to traded units) will fit into this.
+
+	 - units
+	    - note: traded unit classifications and values
+	    
+
+ - State:
+     - note: holds the "s_transactions" and "gl_transactions" posted in a particular accounting phase.
+
+	 - "s_transactions"
+	   - note: the high-level "bank statement" transactions. Better name needed. Business events is too broad.
+	   - type: list
+	   - origin: reorder_sts..
+
+	 - gl_transactions
+	   - note: the general ledger transactions
+	   - type: list
+	   - origin: this is currently called "preprocess"
+
+   
+ 
+   
+===
+
+
+vvv it might be an interesting idea to propagate the truthness of a head statement into the body and deeper recursively. These would not fare as logical conditions proper, it could be a good syntax to obtain head variables down the proof tree?
+
+
+====	
+
+
+% we will not force rules into rdf, they will be like datalog:
+
+q:
+
+% generate all valid models
+model(M),
+% whose bank_statement_sheets list unifies with our input sheets
+bank_statement_excels(M, Bank_statement_excels),
+
+% where we have two bank statements
+fr(Bank_statement_excels, Bs0, Bank_statement_excels1),
+fr(Bank_statement_excels1, Bs1, rdf:nil),
+% where both are exactly the user input sheets
+eq(Bs0, bank_statement_0),
+eq(Bs1, bank_statement_1),
+%
+
+% and we have report_details excel
+report_details_sheet(M, Report_details_excel),
+eq(Report_details_excel, report_details_1),
+%
+
+% and that's it. We'll check the resulting balance sheet visually in the rdf explorer.
+
+
+
+
+
+
+====
+
+
+	model(M),
+	states(M, States),
+
+	bank_statement_sheets(M, Bank_statement_excel),
+	report_details_sheet(M, Report_details_excel),
+
+	balance_sheet(M, Balance_sheet_excel)
+
+
+:-
+%	is_list(Bank_statement_sheets),
+	
+	nth(0, States, State0),
+	nth(1, States, State1),
+	
+	state_stransactions_from_bank_statements(Bank_statement_sheets, State0),
+	post_book_closing(State1, Report_details_sheet, State2),
+	balance_sheet(State2, Balance_sheet_excel).	
+	
+	
+
+	
+stransactions_from_bank_statements(Bank_statement_sheets, State) :-
+	state_stransactions(State, Sorted_stransactions),
+	maplist(stransactions_from_bank_statement, Bank_statement_sheets, Stransactionses),
+	concat(Stransactionses, Stransactions),
+	sort_stransactions(Stransactions, Sorted_stransactions),
+
+
+
+
+
+append(ListOfLists, List) :-
+    must_be(list, ListOfLists),
+    append_(ListOfLists, List).
+
+append_([], []).
+append_([L|Ls], As) :-
+    append(L, Ws, As),
+    append_(Ls, Ws).
+
+
+
+
+% finishme
+must_be(_,_).
+
+
+
+
+
+% These semantics do not cover what one would expect of sort/2. After a call to sort, the Out list should indeed be sorted if "ground" and if nonground, there should be constraints between the members regarding their future ordering that make any unification about to violate that ordering fail. (can that be implemented? I think so, we have attributed variables!) or else sort/2 should throw a fat exception when it can't take out this insurance on the future.
+% - https://www.swi-prolog.org/pldoc/man?predicate=sort/2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+list_minimum([L|Ls], Min) :- foldl(minimum_, Ls, L, Min).
+
+minimum_(A, B, Min) :- Min #= min(A, B).
+
+
+
+
+
+
+
+% naivesort?
+
+sorted(A, B) :-
+	ordered(B),
+	permutation(A, B).
+	
+
+ordered([]).
+ordered([X|Xs]) :- 
+	ordered(Xs),
+	maplist(>=(X), Xs).
+
+
+permute([], []).
+permute([X|Rest], L) :-
+    permute(Rest, L1),
+    select(X, L, L1).
+
+
+
+
+===
+
+oscillation - the system must spot when it's going back and forth between two body items. It's a little more complex than that.
+
+Then, it's a question how systematically we want to traverse the space of body item order permutations, and whether we want to parallelize or rollback and work in the same thread.
+
+===
+
+visualization - 
+
+what goes into the kb: rule descriptions
+
+
+
+
+
+
+
+
+
+
+

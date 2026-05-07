@@ -113,7 +113,7 @@ prove_body(Path, Proof_id_str, Ep_yield, Eps0, Ep_List, Query_ep_terms, Desc, Pr
 	updated_ep_list(Eps0, Ep_List, Proof_id_str, Path, Query_ep_terms, Desc, Eps1),
 	call_prep(Prep, Path),
 	bump_step,
-	body_proof(Path, Proof_id_str, Ep_yield, Level, Eps1, Body_items, Quiet, Proof).
+	q(Path, Proof_id_str, Ep_yield, Level, Eps1, Body_items, Quiet, Proof).
 
 body_proof(Path, Proof_id_str, Ep_yield, Level, Eps1, Body_items, Quiet, Proof) :-
 	body_proof2(Path, Proof_id_str, Ep_yield, Level, Eps1, Body_items, Quiet, Proof).
