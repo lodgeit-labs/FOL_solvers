@@ -873,7 +873,13 @@ flag_default('ROBUST_ROL_ENABLE_CHECKS', false).
 
  doc_value(S, P, V, G) :-
  	doc(S, P, O, G),
- 	doc(O, rdf:value, V).
+ 	% the cell wrapper's `rdf:value` triple lives in the same named graph
+ 	% as the parent triple — `doc_add_value/4` writes both into `G`. The
+ 	% reader was previously dropping to default graph here, which made
+ 	% any cell-wrapped value in a named graph unreadable through this
+ 	% predicate (e.g. gl_input writes via this pattern; gl_export read
+ 	% it back through here).
+ 	doc(O, rdf:value, V, G).
 
  val(O,V) :-
  	doc(O, rdf:value, V).
